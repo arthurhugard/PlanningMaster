@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Planning Coup de Feu</title>
+<meta name="description" content="Simulateur de planning d'équipe en restauration : construisez la semaine sous contraintes de repos, de couverture et de budget.">
+<meta name="author" content="Arthur Hugard">
+<meta name="color-scheme" content="light dark">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Planning Coup de Feu">
+<meta property="og:title" content="Planning Coup de Feu">
+<meta property="og:description" content="Trois semaines à planifier dans un restaurant. 11 h de repos, effectifs par service, masse salariale : saurez-vous tenir les trois à la fois ?">
+<meta property="og:url" content="https://jeu.arthurhugard.com/">
+<meta property="og:image" content="https://jeu.arthurhugard.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:locale:alternate" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Planning Coup de Feu">
+<meta name="twitter:description" content="Trois semaines à planifier dans un restaurant. 11 h de repos, effectifs par service, masse salariale : saurez-vous tenir les trois à la fois ?">
+<meta name="twitter:image" content="https://jeu.arthurhugard.com/og.png">
+
+<link rel="canonical" href="https://jeu.arthurhugard.com/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --bg:#E9ECE8; --surface:#FDFDFC; --surface-2:#F2F4F0;
+  --ink:#171C1A; --ink-2:#4A544F; --muted:#79837D;
+  --line:#D2D8D0; --line-strong:#B4BDB4;
+  --midi:#C06A16; --midi-soft:#F6E5D0;
+  --prep:#8A6A2F; --prep-soft:#EFE7D4;
+  --soir:#33527E; --soir-soft:#DBE3EF;
+  --coup:#6B4A7C; --coup-soft:#E8DEEE;
+  --repos:#8E9790; --repos-soft:#E6E9E4;
+  --ok:#2F6B45; --ok-soft:#DCEAE0;
+  --warn:#9A6206; --warn-soft:#F6E8CE;
+  --bad:#A8322B; --bad-soft:#F5DEDB;
+  --accent:#A8322B;
+  --shadow:0 1px 2px rgba(23,28,26,.06), 0 6px 18px -10px rgba(23,28,26,.22);
+  --radius:6px;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111513; --surface:#191E1C; --surface-2:#212725;
+    --ink:#E7ECE7; --ink-2:#AEB8B1; --muted:#8A948D;
+    --line:#2C3330; --line-strong:#3C443F;
+    --midi:#E6A055; --midi-soft:#3A2A16;
+    --prep:#C7A667; --prep-soft:#332C1B;
+    --soir:#8DAEDC; --soir-soft:#1C263A;
+    --coup:#BC9BD0; --coup-soft:#2B2234;
+    --repos:#7E8882; --repos-soft:#232825;
+    --ok:#7BC496; --ok-soft:#18291F;
+    --warn:#E0B462; --warn-soft:#2E2413;
+    --bad:#EE8B81; --bad-soft:#331B19;
+    --accent:#EE8B81;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111513; --surface:#191E1C; --surface-2:#212725;
+  --ink:#E7ECE7; --ink-2:#AEB8B1; --muted:#8A948D;
+  --line:#2C3330; --line-strong:#3C443F;
+  --midi:#E6A055; --midi-soft:#3A2A16;
+  --prep:#C7A667; --prep-soft:#332C1B;
+  --soir:#8DAEDC; --soir-soft:#1C263A;
+  --coup:#BC9BD0; --coup-soft:#2B2234;
+  --repos:#7E8882; --repos-soft:#232825;
+  --ok:#7BC496; --ok-soft:#18291F;
+  --warn:#E0B462; --warn-soft:#2E2413;
+  --bad:#EE8B81; --bad-soft:#331B19;
+  --accent:#EE8B81;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:24px 56px}
+
+header.masthead{
+  display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+  gap:16px;padding-bottom:16px;border-bottom:2px solid var(--ink);
+}
+.brandline{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+h1{font-family:"Fraunces","Iowan Old Style",Georgia,serif;font-optical-sizing:auto;
+  font-weight:800;font-size:clamp(30px,5.2vw,44px);line-height:.98;margin:0;
+  letter-spacing:-.02em;text-wrap:balance}
+h1 em{font-style:italic;font-weight:600;color:var(--accent)}
+.tagline{margin:6px 0 0;color:var(--ink-2);max-width:52ch}
+.hdbtns{display:flex;gap:8px;align-items:center}
+.themebtn{font:inherit;font-size:12px;background:var(--surface);color:var(--ink-2);
+  border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer}
+.themebtn:hover{border-color:var(--line-strong);color:var(--ink)}
+.themebtn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+
+.levels{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.lvl{flex:1 1 200px;text-align:left;font:inherit;cursor:pointer;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;
+  display:grid;gap:2px;transition:border-color .15s}
+.lvl:hover{border-color:var(--line-strong)}
+.lvl .n{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.lvl .t{font-weight:600}
+.lvl .d{font-size:12px;color:var(--muted)}
+.lvl[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.lvl[aria-pressed="true"] .n{color:var(--accent)}
+
+.brief{margin-top:20px;background:var(--surface);border:1px solid var(--line);
+  border-left:3px solid var(--accent);border-radius:var(--radius);padding:14px 16px;
+  display:grid;gap:10px;box-shadow:var(--shadow)}
+.brief h2{font-family:"Fraunces",Georgia,serif;font-size:19px;margin:0;font-weight:600}
+.brief p{margin:0;color:var(--ink-2);max-width:72ch}
+.briefstats{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:"IBM Plex Mono",monospace;font-size:12px}
+.briefstats b{font-weight:600;color:var(--ink)}
+.briefstats span{color:var(--muted)}
+
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin-top:20px;padding:10px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;box-shadow:var(--shadow)}
+.palette{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;cursor:pointer;border-radius:5px;padding:5px 10px;border:1px solid var(--line);
+  background:var(--surface-2);color:var(--ink-2);display:flex;align-items:center;gap:7px;line-height:1.2}
+.chip .key{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--muted);
+  border:1px solid var(--line-strong);border-radius:3px;padding:0 3px}
+.chip .sw{width:10px;height:10px;border-radius:2px;flex:none}
+.chip .hh{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.chip:hover{border-color:var(--line-strong)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip[aria-pressed="true"] .hh,.chip[aria-pressed="true"] .key{color:var(--surface);opacity:.75;border-color:currentColor}
+.spacer{flex:1 1 auto;min-width:8px}
+.btn{font:inherit;cursor:pointer;border-radius:5px;padding:6px 14px;
+  border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink)}
+.btn:hover{background:var(--line)}
+.btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:600}
+.btn.primary:hover{opacity:.88}
+
+.gridwrap{margin-top:14px;overflow-x:auto;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.grid{display:grid;grid-template-columns:186px repeat(7,minmax(94px,1fr)) 104px;min-width:920px}
+.grid>*{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:7px 8px;min-height:44px}
+.grid>.r-end{border-right:none}
+.hd{background:var(--surface-2);font-family:"IBM Plex Mono",monospace;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;z-index:5;
+  border-bottom:1px solid var(--line-strong);display:flex;flex-direction:column;justify-content:center;gap:1px}
+.hd .dn{color:var(--ink);font-size:12px;letter-spacing:.04em}
+.hd.closed .dn{color:var(--muted);text-decoration:line-through}
+.namecell{position:sticky;left:0;z-index:4;background:var(--surface);
+  display:flex;flex-direction:column;justify-content:center;gap:1px}
+.hd.namecell{z-index:6;background:var(--surface-2)}
+.namecell .nm{font-weight:600;font-size:13px;line-height:1.25}
+.namecell .rl{font-size:11px;color:var(--muted)}
+.namecell .rl .pole{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.08em;
+  text-transform:uppercase;border:1px solid var(--line-strong);border-radius:3px;padding:0 3px;margin-right:4px}
+.namecell.cuisine{box-shadow:inset 3px 0 0 var(--midi)}
+.namecell.salle{box-shadow:inset 3px 0 0 var(--soir)}
+
+.cell{cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:center;
+  gap:1px;user-select:none;-webkit-user-select:none;transition:box-shadow .1s}
+.cell .code{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;letter-spacing:.04em}
+.cell .hrs{font-family:"IBM Plex Mono",monospace;font-size:10px;opacity:.72}
+.cell:hover{box-shadow:inset 0 0 0 2px var(--line-strong)}
+.cell:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.cell.s-R{background:var(--repos-soft);color:var(--repos)}
+.cell.s-P{background:var(--prep-soft);color:var(--prep)}
+.cell.s-M{background:var(--midi-soft);color:var(--midi)}
+.cell.s-S{background:var(--soir-soft);color:var(--soir)}
+.cell.s-C{background:var(--coup-soft);color:var(--coup)}
+.cell.locked{cursor:not-allowed;color:var(--muted);
+  background:repeating-linear-gradient(135deg,var(--surface-2),var(--surface-2) 5px,var(--line) 5px,var(--line) 6px)}
+.cell.locked:hover{box-shadow:none}
+.cell.closedday{opacity:.45}
+.cell.flagged{box-shadow:inset 0 0 0 2px var(--bad)}
+.cell.flagged::after{content:"";position:absolute;top:3px;right:3px;width:6px;height:6px;
+  border-radius:50%;background:var(--bad)}
+
+.totcell{display:flex;flex-direction:column;justify-content:center;gap:1px;
+  font-family:"IBM Plex Mono",monospace;background:var(--surface-2);font-variant-numeric:tabular-nums}
+.totcell .big{font-size:14px;font-weight:600}
+.totcell .sub{font-size:10px;color:var(--muted)}
+.totcell.over .big{color:var(--warn)}
+.totcell.way .big{color:var(--bad)}
+.totcell.under .big{color:var(--soir)}
+
+.covrow{background:var(--surface-2)}
+.covlabel{position:sticky;left:0;z-index:4;background:var(--surface-2);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);display:flex;align-items:center}
+.covcell{display:flex;flex-direction:column;justify-content:center;gap:2px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-variant-numeric:tabular-nums}
+.covcell .ln{display:flex;justify-content:space-between;gap:6px}
+.covcell .ln b{font-weight:600}
+.covcell .short b{color:var(--bad)}
+.covcell .okk b{color:var(--ok)}
+.covcell .plus b{color:var(--warn)}
+.covcell.none{color:var(--muted)}
+
+.cols{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+.cols>*{min-width:0}
+@media(min-width:980px){.cols{grid-template-columns:minmax(0,1fr) 340px;align-items:start}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden}
+.panel h3{margin:0;padding:11px 14px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  border-bottom:1px solid var(--line);background:var(--surface-2);font-weight:500}
+.scorebox{padding:14px;display:grid;gap:12px}
+.scoreline{display:flex;align-items:baseline;gap:10px}
+.scorenum{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:46px;line-height:.9;
+  font-variant-numeric:tabular-nums}
+.scoreof{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted)}
+.rank{margin-left:auto;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px}
+.rank.g{background:var(--ok-soft);color:var(--ok)}
+.rank.w{background:var(--warn-soft);color:var(--warn)}
+.rank.b{background:var(--bad-soft);color:var(--bad)}
+.meter{display:grid;gap:4px}
+.meter .mtop{display:flex;justify-content:space-between;gap:8px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-variant-numeric:tabular-nums}
+.meter .mtop span{color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px;transition:width .3s ease}
+.sharebtn{width:100%;justify-content:center;display:flex}
+
+.issues{list-style:none;margin:0;padding:0}
+.issues li{display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line);align-items:flex-start}
+.issues li:last-child{border-bottom:none}
+.issues .dot{width:7px;height:7px;border-radius:50%;flex:none;margin-top:6px}
+.issues .txt{flex:1;font-size:12.5px;line-height:1.45}
+.issues .txt b{font-weight:600}
+.issues .who{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.issues .pts{font-family:"IBM Plex Mono",monospace;font-size:11px;flex:none}
+.issues li.legal .dot{background:var(--bad)} .issues li.legal .pts{color:var(--bad)}
+.issues li.couv .dot{background:var(--warn)} .issues li.couv .pts{color:var(--warn)}
+.issues li.eco .dot{background:var(--soir)} .issues li.eco .pts{color:var(--soir)}
+.issues li.conf .dot{background:var(--coup)} .issues li.conf .pts{color:var(--coup)}
+.issues li.clean{color:var(--ok)}
+.issues li.clean .dot{background:var(--ok)}
+
+.rules{padding:0 14px 14px}
+.rules summary{cursor:pointer;padding:11px 0;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.rules summary:hover{color:var(--ink)}
+.rules ul{margin:0 0 10px;padding-left:18px;color:var(--ink-2);font-size:12.5px;display:grid;gap:5px}
+.rules code{font-family:"IBM Plex Mono",monospace;font-size:11px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.disclaim{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:9px;margin:0}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);
+  padding:10px 18px;border-radius:999px;font-size:13px;z-index:60;box-shadow:var(--shadow);
+  max-width:min(90vw,520px);text-align:center}
+.hint{font-size:12px;color:var(--muted);margin:10px 2px 0}
+kbd{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--line-strong);
+  border-bottom-width:2px;border-radius:3px;padding:0 4px;background:var(--surface-2);color:var(--ink-2)}
+footer.foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+footer.foot a{color:var(--ink-2)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <div>
+    <p class="brandline" id="brandline"></p>
+    <h1>Planning <em>Coup de Feu</em></h1>
+    <p class="tagline" id="tagline"></p>
+  </div>
+  <div class="hdbtns">
+    <button class="themebtn" id="langbtn" type="button">EN</button>
+    <button class="themebtn" id="themebtn" type="button">Thème</button>
+  </div>
+</header>
+
+<div class="levels" id="levels"></div>
+
+<section class="brief">
+  <h2 id="briefTitle"></h2>
+  <p id="briefText"></p>
+  <div class="briefstats" id="briefStats"></div>
+</section>
+
+<div class="toolbar">
+  <div class="palette" id="palette"></div>
+  <div class="spacer"></div>
+  <button class="btn" id="btnClear" type="button"></button>
+  <button class="btn" id="btnDraft" type="button"></button>
+  <button class="btn primary" id="btnCheck" type="button"></button>
+</div>
+
+<div class="cols">
+  <div>
+    <div class="gridwrap"><div class="grid" id="grid"></div></div>
+    <p class="hint" id="hint"></p>
+  </div>
+
+  <aside style="display:grid;gap:16px">
+    <div class="panel">
+      <h3 id="h3board"></h3>
+      <div class="scorebox">
+        <div class="scoreline">
+          <span class="scorenum" id="score">—</span>
+          <span class="scoreof">/ 100</span>
+          <span class="rank" id="rank"></span>
+        </div>
+        <div class="meter">
+          <div class="mtop"><span id="lblCost"></span><b id="costTxt">—</b></div>
+          <div class="bar"><i id="costBar" style="width:0%;background:var(--ok)"></i></div>
+        </div>
+        <div class="meter">
+          <div class="mtop"><span id="lblCov"></span><b id="covTxt">—</b></div>
+          <div class="bar"><i id="covBar" style="width:0%;background:var(--ok)"></i></div>
+        </div>
+        <button class="btn sharebtn" id="btnShare" type="button"></button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 id="h3live"></h3>
+      <ul class="issues" id="issues"></ul>
+    </div>
+
+    <div class="panel">
+      <h3 id="h3rules"></h3>
+      <div class="rules">
+        <details>
+          <summary id="sumLegal"></summary>
+          <ul id="ulLegal"></ul>
+        </details>
+        <details>
+          <summary id="sumHouse"></summary>
+          <ul id="ulHouse"></ul>
+        </details>
+        <p class="disclaim" id="disclaim"></p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer class="foot">
+  <span id="footL"></span>
+  <span id="footR"></span>
+</footer>
+</div>
+
+<script>
+"use strict";
+const SITE = "jeu.arthurhugard.com";
+const REPO_URL = ""; // renseigné après création du dépôt GitHub
+
+/* ===================== i18n ===================== */
+const T = {
+fr:{
+  html:"fr", other:"EN",
+  brandline:"Simulateur de planning · Restauration · Convention HCR",
+  tagline:"Vous êtes responsable d'exploitation. Sept jours, une équipe, un budget. Placez les services sans casser le droit du travail — ni la marge.",
+  theme:"Thème",
+  days:["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"],
+  daysShort:["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"],
+  shifts:{R:"Repos",P:"Prépa",M:"Midi",S:"Soir",C:"Coupure"},
+  services:{midi:"midi",soir:"soir"},
+  poles:{cuisine:"cuisine",salle:"salle"},
+  poleShort:{cuisine:"CUI",salle:"SAL"},
+  roles:{
+    chef:"Chef de cuisine", second:"Seconde de cuisine", commis:"Commis",
+    cuisinier:"Cuisinier", plongeur:"Plongeur-commis", extra:"Extra",
+    mh:"Maître d'hôtel", rang:"Cheffe de rang", rangM:"Chef de rang",
+    serveur:"Serveur", serveuse:"Serveuse"
+  },
+  motifs:{cours:"Cours", conge:"Congé", arret:"Arrêt", ferme:"Fermé"},
+  notes:{ferme:"Fermé", soirFerme:"Soir fermé", ferie:"8 mai"},
+  resp:"resp.",
+  team:"Équipe", total:"Total", contract:"contrat",
+  midiCount:(a)=>`${a} midi`, soirCount:(a)=>`${a} soir`,
+  needFor:(sv)=>`Besoin ${sv}`,
+  statTeam:"Équipe", statHours:"Heures contractuelles", statCA:"CA prévisionnel", statBudget:"Budget masse salariale",
+  btnClear:"Vider", btnDraft:"Brouillon du chef", btnCheck:"Valider la semaine", btnShare:"Partager mon score",
+  hint:'Choisissez un service puis cliquez (ou glissez) sur les cases. Raccourcis : <kbd>0</kbd> repos · <kbd>1</kbd> prépa · <kbd>2</kbd> midi · <kbd>3</kbd> soir · <kbd>4</kbd> coupure. Les cases hachurées sont verrouillées (congé, arrêt, indisponibilité).',
+  h3board:"Tableau de bord", h3live:"Contrôle en direct", h3rules:"Les règles",
+  lblCost:"Masse salariale", lblCov:"Postes couverts",
+  rankGood:"Planning validable", rankMid:"À retoucher", rankBad:"Non conforme",
+  sumLegal:"Contraintes légales (simplifiées)",
+  ulLegal:[
+    "<b>11 h de repos</b> entre la fin d'un service et la reprise le lendemain. Un <code>Soir</code> ou une <code>Coupure</code> (fin 23:45) suivi d'une <code>Prépa</code> (début 08:00) ne laisse que 8 h 15.",
+    "<b>2 jours de repos</b> par semaine minimum.",
+    "<b>48 h</b> maximum sur la semaine, quelle que soit la charge.",
+    "<b>Heures supplémentaires</b> au-delà de 35 h : +10 % (36-39 h), +20 % (40-43 h), +50 % (44 h et plus)."
+  ],
+  sumHouse:"Règles d'établissement",
+  ulHouse:[
+    "Chaque service ouvert doit avoir l'<b>effectif demandé</b> en cuisine et en salle.",
+    "Un <b>responsable</b> par pôle et par service (chef ou seconde en cuisine, maître d'hôtel ou cheffe de rang en salle).",
+    "Les <b>heures payées non travaillées</b> coûtent : un contrat 35 h utilisé 28 h, c'est 7 h perdues.",
+    "Les <b>souhaits de l'équipe</b> comptent peu au score, beaucoup dans la vraie vie."
+  ],
+  disclaim:"Modèle pédagogique inspiré de la convention collective HCR et du Code du travail, volontairement simplifié. Ne remplace ni un conseil juridique, ni votre logiciel de paie.",
+  clean:"<b>Semaine conforme.</b><span class='who'>Couverture complète, repos respectés, budget tenu. Passez au niveau suivant.</span>",
+  more:(n)=>`… et ${n} autre${n>1?'s':''} point${n>1?'s':''} à corriger`,
+  iRest:(h,d1,d2)=>`Repos quotidien de ${h} entre ${d1} et ${d2}`,
+  iRestWho:(n)=>`${n} — il en faut 11 h`,
+  iOff:"Moins de 2 jours de repos hebdomadaires",
+  iOffWho:(n,r)=>`${n} — ${r} jour${r>1?'s':''} de repos sur la semaine`,
+  iConsec:"Pas de repos consécutif",
+  iConsecWho:(n)=>`${n} — la règle maison en demande deux d'affilée`,
+  i48:(h)=>`Plus de 48 h travaillées (${h})`,
+  i48Who:(n)=>`${n} — plafond absolu dépassé`,
+  iPaid:(h)=>`${h} payées et non travaillées`,
+  iPaidWho:(n,c,h)=>`${n} — contrat ${c} h, planifié ${h}`,
+  iCover:(d,sv,m,pole)=>`${d} ${sv} : ${m} ${pole==='cuisine'?(m>1?'cuisiniers':'cuisinier'):(m>1?'personnes':'personne')} en moins${pole==='salle'?' en salle':''}`,
+  iCoverWho:(g,n,pole)=>`${g} sur ${n} en ${pole==='cuisine'?'cuisine':'salle'}`,
+  iResp:(d,sv,pole)=>`${d} ${sv} : aucun responsable en ${pole==='cuisine'?'cuisine':'salle'}`,
+  iRespWho:(pole)=>`Il faut ${pole==='cuisine'?'le chef ou la seconde':"le maître d'hôtel ou la cheffe de rang"}`,
+  iWish:"Souhait non respecté",
+  iBudget:(o)=>`Budget dépassé de ${o} €`,
+  iBudgetWho:(t,b)=>`${t} € pour un objectif de ${b} €`,
+  tClear:"Grille vidée. À vous de construire la semaine.",
+  tNoDraft:"Pas de brouillon sur ce niveau — celui-là, vous le montez de zéro.",
+  tDraft:"Brouillon rechargé — il contient plusieurs erreurs, à vous de les trouver.",
+  tPerfect:"Parfait : 100/100. Semaine conforme, couverte et dans le budget.",
+  tLegal:(s,n)=>`${s}/100 — ${n} infraction${n>1?'s':''} au droit du travail. Corrigez-les d'abord : ce sont les plus chères.`,
+  tCouv:(s,n)=>`${s}/100 — pas d'infraction, mais ${n} problème${n>1?'s':''} de couverture en salle ou en cuisine.`,
+  tOpti:(s)=>`${s}/100 — légalement propre. Reste l'optimisation : budget, heures perdues, souhaits.`,
+  tCopied:"Score copié — plus qu'à le coller où vous voulez.",
+  tCopyFail:"Copie impossible sur ce navigateur. Sélectionnez le texte à la main.",
+  shareTxt:(lvl,score,cost,budget)=>
+    `Planning Coup de Feu — ${lvl} : ${score}/100, masse salariale ${cost} € sur un budget de ${budget} €. À vous d'essayer : https://${SITE}`,
+  footL:"Simulateur pédagogique · données et équipe fictives",
+  footR:"Code ouvert sur GitHub"
+},
+en:{
+  html:"en", other:"FR",
+  brandline:"Shift-planning simulator · Restaurants · French labour rules",
+  tagline:"You run the floor. Seven days, one team, one budget. Build the roster without breaking the law — or the margin.",
+  theme:"Theme",
+  days:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+  daysShort:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+  shifts:{R:"Day off",P:"Prep",M:"Lunch",S:"Dinner",C:"Split"},
+  services:{midi:"lunch",soir:"dinner"},
+  poles:{cuisine:"the kitchen",salle:"the floor"},
+  poleShort:{cuisine:"KIT",salle:"FOH"},
+  roles:{
+    chef:"Head chef", second:"Sous-chef", commis:"Commis chef",
+    cuisinier:"Line cook", plongeur:"Kitchen porter", extra:"Casual staff",
+    mh:"Head waiter", rang:"Section head", rangM:"Section head",
+    serveur:"Server", serveuse:"Server"
+  },
+  motifs:{cours:"Class", conge:"Leave", arret:"Sick leave", ferme:"Closed"},
+  notes:{ferme:"Closed", soirFerme:"No dinner", ferie:"Public holiday"},
+  resp:"lead",
+  team:"Team", total:"Total", contract:"contract",
+  midiCount:(a)=>`${a} lunch`, soirCount:(a)=>`${a} dinner`,
+  needFor:(sv)=>`${sv} needs`,
+  statTeam:"Team", statHours:"Contracted hours", statCA:"Forecast revenue", statBudget:"Payroll budget",
+  btnClear:"Clear", btnDraft:"Chef's draft", btnCheck:"Check the week", btnShare:"Share my score",
+  hint:'Pick a shift, then click or drag across the cells. Shortcuts: <kbd>0</kbd> day off · <kbd>1</kbd> prep · <kbd>2</kbd> lunch · <kbd>3</kbd> dinner · <kbd>4</kbd> split. Hatched cells are locked (leave, sick leave, unavailability).',
+  h3board:"Dashboard", h3live:"Live check", h3rules:"The rules",
+  lblCost:"Payroll", lblCov:"Posts covered",
+  rankGood:"Ready to post", rankMid:"Needs work", rankBad:"Non-compliant",
+  sumLegal:"Legal constraints (simplified)",
+  ulLegal:[
+    "<b>11 hours of rest</b> between the end of one shift and the start of the next day. A <code>Dinner</code> or <code>Split</code> (ending 23:45) followed by <code>Prep</code> (starting 08:00) leaves only 8h15.",
+    "<b>2 days off</b> per week, minimum.",
+    "<b>48 hours</b> maximum per week, however busy the service.",
+    "<b>Overtime</b> above 35h: +10% (36-39h), +20% (40-43h), +50% (44h and over)."
+  ],
+  sumHouse:"House rules",
+  ulHouse:[
+    "Every open service needs the <b>headcount requested</b> in the kitchen and on the floor.",
+    "One <b>lead</b> per area per service (head chef or sous-chef in the kitchen, head waiter or section head on the floor).",
+    "<b>Paid hours nobody worked</b> still cost you: a 35h contract used for 28h is 7h lost.",
+    "<b>Staff requests</b> cost little on the score, a lot in real life."
+  ],
+  disclaim:"Teaching model based on the French HCR collective agreement and Labour Code, deliberately simplified. Not legal advice, and not a payroll system.",
+  clean:"<b>Compliant week.</b><span class='who'>Every post covered, rest respected, budget held. On to the next level.</span>",
+  more:(n)=>`… and ${n} more issue${n>1?'s':''} to fix`,
+  iRest:(h,d1,d2)=>`Only ${h} of rest between ${d1} and ${d2}`,
+  iRestWho:(n)=>`${n} — 11 hours are required`,
+  iOff:"Fewer than 2 days off this week",
+  iOffWho:(n,r)=>`${n} — ${r} day${r>1?'s':''} off across the week`,
+  iConsec:"No consecutive days off",
+  iConsecWho:(n)=>`${n} — the house rule asks for two in a row`,
+  i48:(h)=>`More than 48 hours worked (${h})`,
+  i48Who:(n)=>`${n} — absolute ceiling exceeded`,
+  iPaid:(h)=>`${h} paid but not worked`,
+  iPaidWho:(n,c,h)=>`${n} — ${c}h contract, ${h} rostered`,
+  iCover:(d,sv,m,pole)=>`${d} ${sv}: ${m} ${pole==='cuisine'?(m>1?'cooks':'cook'):(m>1?'people':'person')} short${pole==='salle'?' on the floor':''}`,
+  iCoverWho:(g,n,pole)=>`${g} of ${n} in ${pole==='cuisine'?'the kitchen':'the floor team'}`,
+  iResp:(d,sv,pole)=>`${d} ${sv}: no lead ${pole==='cuisine'?'in the kitchen':'on the floor'}`,
+  iRespWho:(pole)=>`You need ${pole==='cuisine'?'the head chef or sous-chef':'the head waiter or section head'}`,
+  iWish:"Staff request ignored",
+  iBudget:(o)=>`Budget exceeded by €${o}`,
+  iBudgetWho:(t,b)=>`€${t} against a €${b} target`,
+  tClear:"Grid cleared. Build the week from scratch.",
+  tNoDraft:"No draft on this level — you build this one yourself.",
+  tDraft:"Draft reloaded — it contains several mistakes. Find them.",
+  tPerfect:"Perfect: 100/100. Compliant, covered and on budget.",
+  tLegal:(s,n)=>`${s}/100 — ${n} labour-law breach${n>1?'es':''}. Fix those first: they cost the most.`,
+  tCouv:(s,n)=>`${s}/100 — no breaches, but ${n} coverage problem${n>1?'s':''} in the kitchen or on the floor.`,
+  tOpti:(s)=>`${s}/100 — legally clean. What's left is optimisation: budget, wasted hours, staff requests.`,
+  tCopied:"Score copied — paste it wherever you like.",
+  tCopyFail:"Copying isn't available in this browser. Select the text manually.",
+  shareTxt:(lvl,score,cost,budget)=>
+    `Planning Coup de Feu — ${lvl}: ${score}/100, payroll €${cost} against a €${budget} budget. Try it: https://${SITE}`,
+  footL:"Teaching simulator · fictional team and figures",
+  footR:"Source on GitHub"
+}};
+
+let lang = "fr";
+const t = k => T[lang][k];
+const X = o => (o && typeof o==='object' && o.fr!==undefined) ? o[lang] : o;
+
+/* ===================== modèle ===================== */
+const SHIFTS = {
+  R:{code:'R', h:0,    deb:null, fin:null,  couvre:[],              col:'--repos', label:'—'},
+  P:{code:'P', h:7,    deb:8,    fin:15,    couvre:['midi'],        col:'--prep',  label:'08:00–15:00'},
+  M:{code:'M', h:4,    deb:11,   fin:15,    couvre:['midi'],        col:'--midi',  label:'11:00–15:00'},
+  S:{code:'S', h:5.75, deb:18,   fin:23.75, couvre:['soir'],        col:'--soir',  label:'18:00–23:45'},
+  C:{code:'C', h:9.75, deb:11,   fin:23.75, couvre:['midi','soir'], col:'--coup',  label:'11:00–15:00 + 18:00–23:45'},
+};
+const ORDER = ['R','P','M','S','C'];
+const KEYMAP = {'0':'R','1':'P','2':'M','3':'S','4':'C'};
+
+function e(id,nom,pole,role,contrat,taux,resp,opts){
+  return Object.assign({id,nom,pole,role,contrat,taux,resp:!!resp},opts||{});
+}
+function b(cm,cs,sm,ss){return {midi:{cuisine:cm,salle:cs}, soir:{cuisine:sm,salle:ss}};}
+
+const LEVELS = [
+{
+  id:'l1',
+  n:{fr:'Niveau 1',en:'Level 1'},
+  titre:{fr:'Novembre, semaine calme',en:'November, a quiet week'},
+  sous:{fr:'6 salariés · fermé le lundi',en:'6 staff · closed Mondays'},
+  brief:{
+    fr:"Basse saison à Bayeux. Le restaurant est fermé le lundi et le dimanche soir. L'équipe est au complet, les besoins sont modestes : le vrai enjeu, c'est de coller aux contrats sans payer d'heures dans le vide. Léa a cours le mardi et le mercredi.",
+    en:"Low season in Bayeux. The restaurant closes on Mondays and on Sunday evenings. The team is complete and demand is modest: the real challenge is matching the contracts without paying for hours nobody works. Léa has classes on Tuesday and Wednesday."},
+  ca:12500, budget:4100, reposConsecutifs:false,
+  jours:[
+    {ferme:true,  besoin:b(0,0,0,0), note:'ferme'},
+    {ferme:false, besoin:b(1,1,2,2)},
+    {ferme:false, besoin:b(1,1,2,2)},
+    {ferme:false, besoin:b(2,1,2,2)},
+    {ferme:false, besoin:b(2,2,3,3)},
+    {ferme:false, besoin:b(2,2,3,3)},
+    {ferme:false, besoin:b(2,2,0,0), note:'soirFerme'},
+  ],
+  equipe:[
+    e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+    e('c2','Inès Diallo','cuisine','second',35,19,true),
+    e('c3','Tom Berger','cuisine','commis',35,15,false),
+    e('s1','Claire Aubert','salle','mh',39,21,true),
+    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
+    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{1:'cours',2:'cours'}}),
+  ],
+  prefs:[{emp:'s2',jour:6,veut:'R',txt:{fr:"Yanis a demandé son dimanche",en:"Yanis asked for Sunday off"}}],
+  draft:{
+    c1:['R','C','S','P','C','C','R'],
+    c2:['R','R','C','C','C','S','R'],
+    c3:['R','S','R','C','S','C','M'],
+    s1:['R','C','S','R','C','C','M'],
+    s2:['R','S','C','C','S','S','R'],
+    s3:['R','R','R','S','C','C','M'],
+  }
+},
+{
+  id:'l2',
+  n:{fr:'Niveau 2',en:'Level 2'},
+  titre:{fr:'Le pont du 8 mai',en:'The May bank-holiday weekend'},
+  sous:{fr:'8 salariés · ouvert 7 jours',en:'8 staff · open all week'},
+  brief:{
+    fr:"Premier vrai coup de chaud de l'année : le restaurant ouvre tous les jours, le 8 mai tombe un jeudi et les tables du soir sont pleines. Inès a posé ses congés vendredi et samedi — les deux services où vous auriez le plus besoin d'elle. Hugo est en contrat d'extra 20 h.",
+    en:"The first real rush of the year: open every day, the public holiday falls on Thursday and every dinner table is booked. Inès has taken leave on Friday and Saturday — the two services where you need her most. Hugo is on a 20-hour casual contract."},
+  ca:16500, budget:4950, reposConsecutifs:false,
+  jours:[
+    {ferme:false, besoin:b(1,1,2,2)},
+    {ferme:false, besoin:b(1,1,2,2)},
+    {ferme:false, besoin:b(2,2,2,2)},
+    {ferme:false, besoin:b(2,2,3,3), note:'ferie'},
+    {ferme:false, besoin:b(2,2,3,2)},
+    {ferme:false, besoin:b(2,2,3,3)},
+    {ferme:false, besoin:b(2,2,0,0), note:'soirFerme'},
+  ],
+  equipe:[
+    e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+    e('c2','Inès Diallo','cuisine','second',35,19,true,{indispo:{4:'conge',5:'conge'}}),
+    e('c3','Tom Berger','cuisine','commis',35,15,false),
+    e('c4','Hugo Pellerin','cuisine','extra',20,16,false),
+    e('s1','Claire Aubert','salle','mh',39,21,true),
+    e('s4','Nora Benali','salle','rang',30,17,true),
+    e('s2','Yanis Roux','salle','serveur',35,15.5,false),
+    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{1:'cours'}}),
+  ],
+  prefs:[
+    {emp:'s2',jour:6,veut:'R',txt:{fr:"Yanis a demandé son dimanche",en:"Yanis asked for Sunday off"}},
+    {emp:'c3',jour:5,veut:'R',txt:{fr:"Tom ne peut pas fermer le samedi",en:"Tom cannot close on Saturday"}},
+  ],
+},
+{
+  id:'l3',
+  n:{fr:'Niveau 3',en:'Level 3'},
+  titre:{fr:'Plein été, semaine du 6 juin',en:'High summer, D-Day week'},
+  sous:{fr:'10 salariés · budget sous tension',en:'10 staff · budget under pressure'},
+  brief:{
+    fr:"Les commémorations remplissent Bayeux, la salle tourne midi et soir sept jours sur sept. Tom est en arrêt maladie jusqu'à mercredi inclus, l'équipe doit absorber. Le budget est calé sur 31 % du chiffre d'affaires : chaque heure supplémentaire se voit. Règle maison ce mois-ci : deux jours de repos consécutifs pour tout le monde.",
+    en:"The commemorations fill Bayeux and the dining room turns over at lunch and dinner, seven days a week. Tom is on sick leave through Wednesday and the team has to absorb it. Payroll is capped at 31% of revenue, so every overtime hour shows. House rule this month: two consecutive days off for everyone."},
+  ca:21000, budget:6600, reposConsecutifs:true,
+  jours:[
+    {ferme:false, besoin:b(2,2,2,2)},
+    {ferme:false, besoin:b(2,2,2,2)},
+    {ferme:false, besoin:b(2,2,3,3)},
+    {ferme:false, besoin:b(2,2,3,3)},
+    {ferme:false, besoin:b(3,3,3,3)},
+    {ferme:false, besoin:b(3,3,4,4)},
+    {ferme:false, besoin:b(3,3,2,2)},
+  ],
+  equipe:[
+    e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+    e('c2','Inès Diallo','cuisine','second',35,19,true),
+    e('c3','Tom Berger','cuisine','commis',35,15,false,{indispo:{0:'arret',1:'arret',2:'arret'}}),
+    e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
+    e('c5','Sami Ouaddah','cuisine','plongeur',24,15,false),
+    e('s1','Claire Aubert','salle','mh',39,21,true),
+    e('s4','Nora Benali','salle','rang',30,17,true),
+    e('s2','Yanis Roux','salle','serveur',35,15.5,false),
+    e('s5','Emma Caron','salle','rang',35,16.5,true),
+    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{3:'cours'}}),
+  ],
+  prefs:[
+    {emp:'s2',jour:6,veut:'R',txt:{fr:"Yanis a demandé son dimanche",en:"Yanis asked for Sunday off"}},
+    {emp:'c5',jour:0,veut:'R',txt:{fr:"Sami a un rendez-vous lundi",en:"Sami has an appointment on Monday"}},
+    {emp:'s5',jour:2,veut:'R',txt:{fr:"Emma a demandé son mercredi",en:"Emma asked for Wednesday off"}},
+  ],
+}];
+
+/* ===================== état ===================== */
+let lvlIndex = 0, brush = 'C', plans = {}, painting = false;
+
+function emptyPlan(L){ const p={}; L.equipe.forEach(em=>{p[em.id]=[0,1,2,3,4,5,6].map(()=> 'R');}); return p; }
+function applyLocks(L,p){
+  L.equipe.forEach(em=>{ if(em.indispo) Object.keys(em.indispo).forEach(d=>{p[em.id][+d]='R';}); });
+  L.jours.forEach((j,d)=>{ if(j.ferme) L.equipe.forEach(em=>{p[em.id][d]='R';}); });
+  return p;
+}
+function planFor(i){
+  const L = LEVELS[i];
+  if(!plans[L.id]){
+    let p = emptyPlan(L);
+    if(L.draft) L.equipe.forEach(em=>{ if(L.draft[em.id]) p[em.id]=L.draft[em.id].slice(); });
+    plans[L.id] = applyLocks(L,p);
+  }
+  return plans[L.id];
+}
+function isLocked(L,em,d){ return (em.indispo && em.indispo[d]!==undefined) || L.jours[d].ferme; }
+
+function save(){ try{ localStorage.setItem('cdf_v2', JSON.stringify({plans,lvlIndex,lang})); }catch(_){} }
+function load(){
+  try{
+    const raw = localStorage.getItem('cdf_v2'); if(!raw) return;
+    const d = JSON.parse(raw);
+    if(d.plans) plans = d.plans;
+    if(typeof d.lvlIndex==='number' && LEVELS[d.lvlIndex]) lvlIndex = d.lvlIndex;
+    if(d.lang && T[d.lang]) lang = d.lang;
+  }catch(_){}
+}
+
+/* ===================== moteur ===================== */
+function coutSalarie(em,h){
+  const paye = Math.max(h, em.contrat), tx = em.taux;
+  let c = Math.min(paye,35)*tx;
+  if(paye>35) c += (Math.min(paye,39)-35)*tx*1.10;
+  if(paye>39) c += (Math.min(paye,43)-39)*tx*1.20;
+  if(paye>43) c += (paye-43)*tx*1.50;
+  return c;
+}
+function fmtH(h){
+  const hh = Math.floor(h+1e-9), mm = Math.round((h-hh)*60);
+  if(lang==='en') return mm ? `${hh}h${String(mm).padStart(2,'0')}` : `${hh}h`;
+  return mm ? `${hh} h ${String(mm).padStart(2,'0')}` : `${hh} h`;
+}
+const nf = n => Math.round(n).toLocaleString(lang==='en'?'en-GB':'fr-FR');
+
+function evaluate(L,p){
+  const issues=[], flags=new Set(), hours={}, cost={};
+  let total=0;
+  const D = t('days'), Ds = t('daysShort'), SV = t('services');
+
+  L.equipe.forEach(em=>{
+    const row = p[em.id];
+    let h=0, repos=0;
+    row.forEach(c=>{ h+=SHIFTS[c].h; if(c==='R') repos++; });
+    hours[em.id]=h; cost[em.id]=coutSalarie(em,h); total+=cost[em.id];
+
+    for(let d=0; d<6; d++){
+      const a=SHIFTS[row[d]], n=SHIFTS[row[d+1]];
+      if(a.fin===null || n.deb===null) continue;
+      const rep = (n.deb+24)-a.fin;
+      if(rep < 11){
+        issues.push({cat:'legal',pts:20,txt:t('iRest')(fmtH(rep),Ds[d],Ds[d+1]),who:t('iRestWho')(em.nom)});
+        flags.add(em.id+'-'+d); flags.add(em.id+'-'+(d+1));
+      }
+    }
+    if(repos<2){
+      issues.push({cat:'legal',pts:20,txt:t('iOff'),who:t('iOffWho')(em.nom,repos)});
+      row.forEach((c,d)=>{ if(c!=='R') flags.add(em.id+'-'+d); });
+    }
+    if(L.reposConsecutifs && repos>=2){
+      let ok=false;
+      for(let d=0;d<6;d++) if(row[d]==='R'&&row[d+1]==='R') ok=true;
+      if(!ok) issues.push({cat:'conf',pts:5,txt:t('iConsec'),who:t('iConsecWho')(em.nom)});
+    }
+    if(h>48){
+      issues.push({cat:'legal',pts:20,txt:t('i48')(fmtH(h)),who:t('i48Who')(em.nom)});
+      row.forEach((c,d)=>{ if(c!=='R') flags.add(em.id+'-'+d); });
+    }
+    if(h < em.contrat-0.01){
+      const perdu = em.contrat-h;
+      issues.push({cat:'eco',pts:Math.min(10,Math.round(perdu)),
+        txt:t('iPaid')(fmtH(perdu)), who:t('iPaidWho')(em.nom,em.contrat,fmtH(h))});
+    }
+  });
+
+  let postesOK=0, postesTot=0;
+  L.jours.forEach((j,d)=>{
+    ['midi','soir'].forEach(sv=>{
+      ['cuisine','salle'].forEach(pole=>{
+        const need = j.besoin[sv][pole];
+        if(need<=0) return;
+        postesTot += need;
+        const present = L.equipe.filter(em=>em.pole===pole && SHIFTS[p[em.id][d]].couvre.includes(sv));
+        postesOK += Math.min(present.length,need);
+        if(present.length < need){
+          const m = need-present.length;
+          issues.push({cat:'couv',pts:12*m,
+            txt:t('iCover')(D[d],SV[sv],m,pole), who:t('iCoverWho')(present.length,need,pole)});
+        }
+        if(present.length>0 && !present.some(em=>em.resp)){
+          issues.push({cat:'couv',pts:8,txt:t('iResp')(D[d],SV[sv],pole),who:t('iRespWho')(pole)});
+        }
+      });
+    });
+  });
+
+  (L.prefs||[]).forEach(pr=>{
+    if(p[pr.emp] && p[pr.emp][pr.jour] !== pr.veut)
+      issues.push({cat:'conf',pts:3,txt:t('iWish'),who:X(pr.txt)});
+  });
+
+  const over = total - L.budget;
+  if(over>0){
+    const pct = over/L.budget*100;
+    issues.push({cat:'eco',pts:Math.min(25,Math.round(pct*1.5)),
+      txt:t('iBudget')(nf(over)), who:t('iBudgetWho')(nf(total),nf(L.budget))});
+  }
+
+  const score = Math.max(0, 100 - issues.reduce((s,i)=>s+i.pts,0));
+  return {issues,flags,hours,cost,total,score,postesOK,postesTot};
+}
+
+/* ===================== rendu ===================== */
+const $ = s => document.querySelector(s);
+
+function renderChrome(){
+  document.documentElement.setAttribute('lang', t('html'));
+  $('#langbtn').textContent = t('other');
+  $('#themebtn').textContent = t('theme');
+  $('#brandline').textContent = t('brandline');
+  $('#tagline').textContent = t('tagline');
+  $('#btnClear').textContent = t('btnClear');
+  $('#btnDraft').textContent = t('btnDraft');
+  $('#btnCheck').textContent = t('btnCheck');
+  $('#btnShare').textContent = t('btnShare');
+  $('#hint').innerHTML = t('hint');
+  $('#h3board').textContent = t('h3board');
+  $('#h3live').textContent = t('h3live');
+  $('#h3rules').textContent = t('h3rules');
+  $('#lblCost').textContent = t('lblCost');
+  $('#lblCov').textContent = t('lblCov');
+  $('#sumLegal').textContent = t('sumLegal');
+  $('#sumHouse').textContent = t('sumHouse');
+  $('#ulLegal').innerHTML = t('ulLegal').map(x=>`<li>${x}</li>`).join('');
+  $('#ulHouse').innerHTML = t('ulHouse').map(x=>`<li>${x}</li>`).join('');
+  $('#disclaim').textContent = t('disclaim');
+  $('#footL').textContent = t('footL');
+  const fr = $('#footR');
+  if(REPO_URL){ fr.innerHTML = `<a href="${REPO_URL}" rel="noopener">${t('footR')}</a>`; fr.hidden = false; }
+  else fr.hidden = true;
+}
+
+function renderLevels(){
+  const w = $('#levels'); w.innerHTML='';
+  LEVELS.forEach((L,i)=>{
+    const btn = document.createElement('button');
+    btn.className='lvl'; btn.type='button';
+    btn.setAttribute('aria-pressed', String(i===lvlIndex));
+    btn.innerHTML = `<span class="n">${X(L.n)}</span><span class="t">${X(L.titre)}</span><span class="d">${X(L.sous)}</span>`;
+    btn.onclick = ()=>{ lvlIndex=i; save(); renderAll(); };
+    w.appendChild(btn);
+  });
+}
+
+function renderPalette(){
+  const w = $('#palette'); w.innerHTML='';
+  ORDER.forEach(code=>{
+    const s = SHIFTS[code];
+    const btn = document.createElement('button');
+    btn.className='chip'; btn.type='button';
+    btn.setAttribute('aria-pressed', String(code===brush));
+    const k = Object.keys(KEYMAP).find(x=>KEYMAP[x]===code);
+    btn.innerHTML = `<span class="sw" style="background:var(${s.col})"></span>${t('shifts')[code]}
+      <span class="hh">${s.h?fmtH(s.h):s.label}</span><span class="key">${k}</span>`;
+    btn.title = s.label;
+    btn.onclick = ()=>{ brush=code; renderPalette(); };
+    w.appendChild(btn);
+  });
+}
+
+function renderBrief(L){
+  $('#briefTitle').textContent = `${X(L.n)} — ${X(L.titre)}`;
+  $('#briefText').textContent = X(L.brief);
+  const hTot = L.equipe.reduce((s,x)=>s+x.contrat,0);
+  const cur = lang==='en' ? v=>`€${nf(v)}` : v=>`${nf(v)} €`;
+  $('#briefStats').innerHTML =
+    `<span>${t('statTeam')} <b>${L.equipe.length}</b></span>
+     <span>${t('statHours')} <b>${hTot} h</b></span>
+     <span>${t('statCA')} <b>${cur(L.ca)}</b></span>
+     <span>${t('statBudget')} <b>${cur(L.budget)}</b> (${Math.round(L.budget/L.ca*100)} %)</span>`;
+}
+
+function renderGrid(L,p,ev){
+  const g = $('#grid'); g.innerHTML='';
+  const D = t('days');
+  const add = (cls,html,last)=>{
+    const d=document.createElement('div');
+    d.className=cls+(last?' r-end':''); d.innerHTML=html; g.appendChild(d); return d;
+  };
+  add('hd namecell',`<span class="dn">${t('team')}</span>`);
+  L.jours.forEach((j,d)=>{
+    const sub = j.note ? t('notes')[j.note]
+      : `${t('midiCount')(j.besoin.midi.cuisine+j.besoin.midi.salle)} · ${t('soirCount')(j.besoin.soir.cuisine+j.besoin.soir.salle)}`;
+    add('hd'+(j.ferme?' closed':''), `<span class="dn">${D[d]}</span><span>${sub}</span>`);
+  });
+  add('hd',`<span class="dn">${t('total')}</span><span>${t('contract')}</span>`,true);
+
+  L.equipe.forEach(em=>{
+    add('namecell '+em.pole,
+      `<span class="nm">${em.nom}</span><span class="rl"><span class="pole">${t('poleShort')[em.pole]}</span>${t('roles')[em.role]}${em.resp?' ·&nbsp;'+t('resp'):''}</span>`);
+    L.jours.forEach((j,d)=>{
+      const code = p[em.id][d], s = SHIFTS[code];
+      const lock = isLocked(L,em,d);
+      const motif = em.indispo && em.indispo[d];
+      const cls = ['cell','s-'+code];
+      if(lock) cls.push('locked');
+      if(j.ferme) cls.push('closedday');
+      if(ev.flags.has(em.id+'-'+d)) cls.push('flagged');
+      const label = lock ? (motif ? t('motifs')[motif] : t('motifs').ferme) : t('shifts')[code];
+      const sub = lock ? '' : (s.h?fmtH(s.h):'—');
+      const c = add(cls.join(' '), `<span class="code">${lock?'· '+label:code+' · '+label}</span><span class="hrs">${sub}</span>`);
+      c.dataset.emp = em.id; c.dataset.day = d;
+      c.title = lock ? label : `${t('shifts')[code]} — ${s.label}`;
+      if(!lock){
+        c.tabIndex = 0;
+        c.addEventListener('pointerdown', ev2=>{ ev2.preventDefault(); painting=true; setCell(em.id,d,brush); });
+        c.addEventListener('pointerenter', ()=>{ if(painting) setCell(em.id,d,brush); });
+        c.addEventListener('keydown', ke=>{
+          if(KEYMAP[ke.key]){ ke.preventDefault(); setCell(em.id,d,KEYMAP[ke.key]); }
+          else if(ke.key==='Enter'||ke.key===' '){ ke.preventDefault(); setCell(em.id,d,brush); }
+        });
+      }
+    });
+    const h = ev.hours[em.id], diff = h-em.contrat;
+    let tc='totcell';
+    if(diff>4) tc+=' way'; else if(diff>0.01) tc+=' over'; else if(diff<-0.01) tc+=' under';
+    const cur = lang==='en' ? `€${nf(ev.cost[em.id])}` : `${nf(ev.cost[em.id])} €`;
+    add(tc, `<span class="big">${fmtH(h)}</span><span class="sub">/ ${em.contrat} h · ${cur}</span>`, true);
+  });
+
+  ['midi','soir'].forEach(sv=>{
+    add('covrow covlabel', t('needFor')(t('services')[sv]));
+    L.jours.forEach((j,d)=>{
+      const nc=j.besoin[sv].cuisine, ns=j.besoin[sv].salle;
+      if(nc+ns===0){ add('covrow covcell none','<span class="ln">—</span>'); return; }
+      const cnt = pole => L.equipe.filter(em=>em.pole===pole && SHIFTS[p[em.id][d]].couvre.includes(sv)).length;
+      const line = (lab,got,need)=>{
+        if(need===0) return '';
+        const k = got<need?'short':(got>need?'plus':'okk');
+        return `<span class="ln ${k}">${lab}<b>${got}/${need}</b></span>`;
+      };
+      add('covrow covcell', line(t('poleShort').cuisine+' ',cnt('cuisine'),nc)+line(t('poleShort').salle+' ',cnt('salle'),ns));
+    });
+    add('covrow covcell none','',true);
+  });
+}
+
+function renderPanel(L,ev){
+  $('#score').textContent = ev.score;
+  const r = $('#rank');
+  if(ev.score>=90){ r.className='rank g'; r.textContent=t('rankGood'); }
+  else if(ev.score>=70){ r.className='rank w'; r.textContent=t('rankMid'); }
+  else { r.className='rank b'; r.textContent=t('rankBad'); }
+
+  const cur = lang==='en' ? v=>`€${nf(v)}` : v=>`${nf(v)} €`;
+  const pctCost = ev.total/L.budget*100;
+  $('#costTxt').textContent = `${cur(ev.total)} / ${cur(L.budget)}`;
+  const cb = $('#costBar');
+  cb.style.width = Math.min(100,pctCost)+'%';
+  cb.style.background = pctCost>100 ? 'var(--bad)' : (pctCost>92 ? 'var(--warn)' : 'var(--ok)');
+
+  const pctCov = ev.postesTot ? ev.postesOK/ev.postesTot*100 : 100;
+  $('#covTxt').textContent = `${ev.postesOK} / ${ev.postesTot}`;
+  const vb = $('#covBar');
+  vb.style.width = pctCov+'%';
+  vb.style.background = pctCov>=100 ? 'var(--ok)' : (pctCov>=90 ? 'var(--warn)' : 'var(--bad)');
+
+  const ul = $('#issues'); ul.innerHTML='';
+  if(!ev.issues.length){
+    ul.innerHTML = `<li class="clean"><span class="dot"></span><span class="txt">${t('clean')}</span></li>`;
+    return;
+  }
+  const rank = {legal:0,couv:1,eco:2,conf:3};
+  const sorted = ev.issues.slice().sort((a,c)=>(rank[a.cat]-rank[c.cat])||(c.pts-a.pts));
+  sorted.slice(0,14).forEach(i=>{
+    const li = document.createElement('li');
+    li.className = i.cat;
+    li.innerHTML = `<span class="dot"></span><span class="txt"><b>${i.txt}</b><span class="who">${i.who||''}</span></span><span class="pts">−${i.pts}</span>`;
+    ul.appendChild(li);
+  });
+  if(sorted.length>14){
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="dot" style="background:var(--muted)"></span><span class="txt">${t('more')(sorted.length-14)}</span>`;
+    ul.appendChild(li);
+  }
+}
+
+function renderAll(){
+  const L = LEVELS[lvlIndex], p = planFor(lvlIndex), ev = evaluate(L,p);
+  renderChrome(); renderLevels(); renderPalette(); renderBrief(L);
+  renderGrid(L,p,ev); renderPanel(L,ev);
+}
+
+function setCell(empId,d,code){
+  const L = LEVELS[lvlIndex], p = planFor(lvlIndex);
+  const em = L.equipe.find(x=>x.id===empId);
+  if(!em || isLocked(L,em,d) || p[empId][d]===code) return;
+  p[empId][d] = code; save(); renderAll();
+}
+
+/* ===================== actions ===================== */
+let toastT;
+function toast(msg){
+  clearTimeout(toastT);
+  let el = document.querySelector('.toast');
+  if(!el){ el = document.createElement('div'); el.className='toast'; document.body.appendChild(el); }
+  el.textContent = msg;
+  toastT = setTimeout(()=>{ el.remove(); }, 5600);
+}
+
+$('#btnClear').onclick = ()=>{
+  const L = LEVELS[lvlIndex];
+  plans[L.id] = applyLocks(L, emptyPlan(L));
+  save(); renderAll(); toast(t('tClear'));
+};
+$('#btnDraft').onclick = ()=>{
+  const L = LEVELS[lvlIndex];
+  if(!L.draft){ toast(t('tNoDraft')); return; }
+  let p = emptyPlan(L);
+  L.equipe.forEach(em=>{ if(L.draft[em.id]) p[em.id]=L.draft[em.id].slice(); });
+  plans[L.id] = applyLocks(L,p);
+  save(); renderAll(); toast(t('tDraft'));
+};
+$('#btnCheck').onclick = ()=>{
+  const L = LEVELS[lvlIndex], ev = evaluate(L, planFor(lvlIndex));
+  const legal = ev.issues.filter(i=>i.cat==='legal').length;
+  const couv  = ev.issues.filter(i=>i.cat==='couv').length;
+  if(!ev.issues.length) toast(t('tPerfect'));
+  else if(legal) toast(t('tLegal')(ev.score,legal));
+  else if(couv) toast(t('tCouv')(ev.score,couv));
+  else toast(t('tOpti')(ev.score));
+};
+$('#btnShare').onclick = async ()=>{
+  const L = LEVELS[lvlIndex], ev = evaluate(L, planFor(lvlIndex));
+  const txt = t('shareTxt')(`${X(L.n)} « ${X(L.titre)} »`, ev.score, nf(ev.total), nf(L.budget));
+  try{
+    if(navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)){
+      await navigator.share({title:'Planning Coup de Feu', text:txt});
+      return;
+    }
+    await navigator.clipboard.writeText(txt);
+    toast(t('tCopied'));
+  }catch(_){
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+      toast(t('tCopied'));
+    }catch(__){ toast(t('tCopyFail')); }
+  }
+};
+
+document.addEventListener('pointerup', ()=>{ painting=false; });
+document.addEventListener('pointercancel', ()=>{ painting=false; });
+document.addEventListener('keydown', ev=>{
+  if(ev.target && /input|textarea/i.test(ev.target.tagName)) return;
+  if(KEYMAP[ev.key] && !(document.activeElement && document.activeElement.classList.contains('cell'))){
+    brush = KEYMAP[ev.key]; renderPalette();
+  }
+});
+
+$('#themebtn').onclick = ()=>{
+  const cur = document.documentElement.getAttribute('data-theme');
+  const dark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', dark?'light':'dark');
+};
+$('#langbtn').onclick = ()=>{ lang = (lang==='fr'?'en':'fr'); save(); renderAll(); };
+
+(function start(){
+  let hadSave = false;
+  try{ hadSave = !!localStorage.getItem('cdf_v2'); }catch(_){}
+  load();
+  if(!hadSave && /^en/i.test(navigator.language||'')) lang='en';
+  renderAll();
+})();
+</script>
+</body>
+</html>
