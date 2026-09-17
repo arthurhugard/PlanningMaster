@@ -138,6 +138,12 @@ Deno.serve(async (req) => {
     .eq("ref", ref)
     .maybeSingle();
 
+  // Historique : une ligne à chaque tentative, avant même de savoir
+  // si elle améliore le record. C'est ce qui permet la courbe.
+  await admin.from("attempts").insert({
+    user_id: user.id, mode, ref, score, payroll, treasury,
+  });
+
   if (prev && prev.score >= score) {
     return json({ ok: true, score, best: prev.score, improved: false });
   }

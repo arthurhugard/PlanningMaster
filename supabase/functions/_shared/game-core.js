@@ -1,12 +1,12 @@
 /* =====================================================================
-   PlanningMaster — moteur de jeu
+   PlanningMaster, moteur de jeu
    Aucune dépendance au DOM ni à la langue : ce module tourne à l'identique
    dans le navigateur et dans l'Edge Function Supabase qui revalide les
    scores. Les infractions sortent sous forme de codes, l'interface les
    traduit. Ne rien ajouter ici qui touche à l'affichage.
    ===================================================================== */
 const SHIFTS = {
-  R:{code:'R',h:0,   deb:null,fin:null, couvre:[],              col:'--repos',label:'—'},
+  R:{code:'R',h:0,   deb:null,fin:null, couvre:[],              col:'--repos',label:''},
   P:{code:'P',h:7,   deb:8,   fin:15,   couvre:['midi'],        col:'--prep', label:'08:00–15:00'},
   M:{code:'M',h:4,   deb:11,  fin:15,   couvre:['midi'],        col:'--midi', label:'11:00–15:00'},
   S:{code:'S',h:5.75,deb:18,  fin:23.75,couvre:['soir'],        col:'--soir', label:'18:00–23:45'},
@@ -123,8 +123,8 @@ const LEVELS=[
 { id:'l2', n:{fr:'Niveau 2',en:'Level 2'},
   titre:{fr:'Le pont du 8 mai',en:'The May bank holiday'},
   sous:{fr:'8 salariés · ouvert 7 jours',en:'8 staff · open all week'},
-  brief:{fr:"Premier coup de chaud de l'année : ouvert tous les jours, le 8 mai tombe un jeudi et les tables du soir sont pleines. Inès a posé ses congés vendredi et samedi — les deux services où vous auriez le plus besoin d'elle. Hugo est en contrat d'extra 20 h.",
-    en:"The first rush of the year: open every day, the holiday falls on Thursday and every dinner table is booked. Inès has taken leave on Friday and Saturday — the two services where you need her most. Hugo is on a 20-hour casual contract."},
+  brief:{fr:"Premier coup de chaud de l'année : ouvert tous les jours, le 8 mai tombe un jeudi et les tables du soir sont pleines. Inès a posé ses congés vendredi et samedi, les deux services où vous auriez le plus besoin d'elle. Hugo est en contrat d'extra 20 h.",
+    en:"The first rush of the year: open every day, the holiday falls on Thursday and every dinner table is booked. Inès has taken leave on Friday and Saturday, the two services where you need her most. Hugo is on a 20-hour casual contract."},
   ca:16500,budget:4950,reposConsecutifs:false,
   jours:[{besoin:b(1,1,2,2)},{besoin:b(1,1,2,2)},{besoin:b(2,2,2,2)},{besoin:b(2,2,3,3),note:'ferie'},
     {besoin:b(2,2,3,2)},{besoin:b(2,2,3,3)},{besoin:b(2,2,0,0),note:'soirFerme'}],
@@ -217,43 +217,43 @@ const SEASON_TEAM=[
   e('s3','Léa Marchand','salle','serveuse',30,15.5,false),
 ];
 const SEASON_WEEKS=[
- {nom:{fr:"Mars — reprise",en:"March — back open"},ca:13000,mult:.62,
+ {nom:{fr:"Mars, reprise",en:"March, back open"},ca:13000,mult:.62,
   txt:{fr:"On rouvre après la coupure d'hiver. Peu de monde en semaine, un peu de passage le week-end. Semaine idéale pour caler les contrats sans creuser la trésorerie.",
        en:"Reopening after the winter break. Quiet midweek, a little weekend trade. A good week to settle into the contracts without burning cash."},
   ferme:[0], staff:['c1','c2','c3','s1','s4','s2']},
- {nom:{fr:"Mars — premiers cars",en:"March — first coaches"},ca:14500,mult:.68,
+ {nom:{fr:"Mars, premiers cars",en:"March, first coaches"},ca:14500,mult:.68,
   txt:{fr:"Les premiers autocars de touristes s'arrêtent à Bayeux. Les midis se remplissent, les soirs restent calmes.",
        en:"The first tourist coaches stop in Bayeux. Lunches fill up, evenings stay quiet."},
   ferme:[0], staff:['c1','c2','c3','s1','s4','s2']},
- {nom:{fr:"Avril — vacances de Pâques",en:"April — Easter holidays"},ca:17000,mult:.80,
+ {nom:{fr:"Avril, vacances de Pâques",en:"April, Easter holidays"},ca:17000,mult:.80,
   txt:{fr:"Vacances scolaires : familles au déjeuner, couples le soir. Vous ouvrez sept jours sur sept à partir de maintenant.",
        en:"School holidays: families at lunch, couples at dinner. You are open seven days a week from now on."},
   ferme:[], staff:['c1','c2','c3','c4','s1','s4','s2','s5']},
- {nom:{fr:"Avril — creux",en:"April — the dip"},ca:14000,mult:.66,
+ {nom:{fr:"Avril, creux",en:"April, the dip"},ca:14000,mult:.66,
   txt:{fr:"Fin des vacances, la fréquentation retombe d'un coup. Profitez-en pour faire souffler ceux qui ont tiré.",
        en:"Holidays over, footfall drops sharply. Use it to rest whoever has been pushing hardest."},
   ferme:[0], staff:['c1','c2','c3','s1','s4','s2']},
- {nom:{fr:"Mai — le pont",en:"May — bank holiday"},ca:19000,mult:.88,
+ {nom:{fr:"Mai, le pont",en:"May, bank holiday"},ca:19000,mult:.88,
   txt:{fr:"Long week-end férié, la ville est pleine. Trois services du soir à quatre en cuisine.",
        en:"A long weekend and the town is full. Three dinner services need four in the kitchen."},
   ferme:[], staff:['c1','c2','c3','c4','s1','s4','s2','s5']},
- {nom:{fr:"Mai — mariages",en:"May — wedding season"},ca:18000,mult:.84,
+ {nom:{fr:"Mai, mariages",en:"May, wedding season"},ca:18000,mult:.84,
   txt:{fr:"Deux mariages en ville : les samedis sont saturés, le reste de la semaine respire.",
        en:"Two weddings in town: Saturdays are packed, the rest of the week breathes."},
   ferme:[], staff:['c1','c2','c3','c4','s1','s4','s2','s5']},
- {nom:{fr:"Juin — le 6",en:"June — the 6th"},ca:22000,mult:1.0,
+ {nom:{fr:"Juin, le 6",en:"June, the 6th"},ca:22000,mult:1.0,
   txt:{fr:"Commémorations du Débarquement. La semaine la plus dense de la saison, midi et soir, tous les jours.",
        en:"D-Day commemorations. The busiest week of the season, lunch and dinner, every day."},
   ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
- {nom:{fr:"Juin — après la vague",en:"June — after the wave"},ca:18500,mult:.86,
+ {nom:{fr:"Juin, après la vague",en:"June, after the wave"},ca:18500,mult:.86,
   txt:{fr:"La ville se vide un peu. L'équipe, elle, sort de la semaine la plus dure de l'année.",
        en:"The town empties a little. The team, on the other hand, is coming off the hardest week of the year."},
   ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
- {nom:{fr:"Juillet — plein été",en:"July — high summer"},ca:21000,mult:.96,
+ {nom:{fr:"Juillet, plein été",en:"July, high summer"},ca:21000,mult:.96,
   txt:{fr:"Saison pleine et stable. C'est le moment où les compteurs d'heures explosent si vous n'avez rien anticipé.",
        en:"Full, steady season. This is when the overtime banks blow up if you haven't planned ahead."},
   ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
- {nom:{fr:"Juillet — le 14",en:"July — Bastille Day"},ca:23000,mult:1.05,
+ {nom:{fr:"Juillet, le 14",en:"July, Bastille Day"},ca:23000,mult:1.05,
   txt:{fr:"Dernière semaine de la campagne, et la plus chargée. Terminez sans casser personne.",
        en:"Final week of the campaign, and the heaviest. Finish without breaking anyone."},
   ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
@@ -521,7 +521,7 @@ function dailyScenario(date){
 /* --------------------------------------------------------------------
    Tutoriel : deux salariés, quatre jours ouverts, un besoin d'une
    personne par service. La solution tient en quatre coupures chacun,
-   soit exactement leur contrat — ce qui permet de faire découvrir la
+   soit exactement leur contrat, ce qui permet de faire découvrir la
    palette, la ligne de besoin, le compteur d'heures et le repos de 11 h
    sans jamais noyer le joueur.
    -------------------------------------------------------------------- */

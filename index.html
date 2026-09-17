@@ -178,6 +178,24 @@ h1,h2,h3{text-wrap:balance}
 .mini-board .sc{font-family:"IBM Plex Mono",monospace;font-weight:600;font-variant-numeric:tabular-nums}
 .mini-board .empty{color:var(--muted);font-size:12.5px}
 
+/* Les classements ne sont pas un mode de jeu : bande pleine largeur,
+   en négatif, pour qu'on ne la confonde pas avec les trois autres. */
+.boardband{width:100%;text-align:left;font:inherit;cursor:pointer;margin-top:14px;
+  background:var(--ink);color:var(--surface);border:1px solid var(--ink);
+  border-radius:var(--radius);padding:16px 20px;display:flex;flex-wrap:wrap;
+  gap:12px 24px;align-items:center;box-shadow:var(--shadow);
+  transition:transform .15s,box-shadow .15s}
+.boardband:hover{transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(0,0,0,.55)}
+.boardband .bk{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;opacity:.6;display:block;margin-bottom:3px}
+.boardband .bt{font-family:"Fraunces",Georgia,serif;font-size:24px;font-weight:600;
+  line-height:1.05;letter-spacing:-.01em;display:block}
+.boardband .bd{flex:1 1 280px;font-size:13px;opacity:.78;line-height:1.45}
+.boardband .barrow{font-family:"Fraunces",Georgia,serif;font-size:26px;flex:none;opacity:.7}
+.boardband .bchips{display:flex;gap:6px;flex-wrap:wrap}
+.boardband .bchip{font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:3px 9px;opacity:.85}
+
 /* entrée : une seule fois, au chargement */
 /* L'état au repos est VISIBLE : l'animation ne fait que retarder l'entrée.
    Avec `backwards`, si elle ne se déclenche pas, le contenu s'affiche
@@ -203,6 +221,26 @@ h1,h2,h3{text-wrap:balance}
 .tutobar .tbtn.go{background:var(--surface);color:var(--ink);border-color:var(--surface);font-weight:600}
 .tutobar .tbtn[disabled]{opacity:.4;cursor:default}
 .tutobar .tdone{color:#7BC496;font-weight:600;font-size:13px}
+
+/* ---------- rejeu d'une grille du classement ---------- */
+.tutobar.replay{background:var(--soir);color:#fff}
+.tutobar.replay .tbtn{border-color:rgba(255,255,255,.4)}
+.cell.ro{cursor:default}
+.cell.ro:hover{box-shadow:none}
+
+/* ---------- historique ---------- */
+.hist{list-style:none;margin:0;padding:0}
+.hist li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
+  padding:8px 14px;border-bottom:1px solid var(--line)}
+.hist li:last-child{border-bottom:none}
+.hist .hd2{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--muted);
+  white-space:nowrap}
+.hist .hbar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:40px}
+.hist .hbar i{display:block;height:100%;border-radius:4px}
+.hist .hs{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+  font-variant-numeric:tabular-nums;min-width:26px;text-align:right}
+.hist .hl{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
 
 /* ---------- sélection de niveaux ---------- */
 .pagehead{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:18px}
@@ -526,6 +564,7 @@ footer.foot a{color:var(--ink-2)}
   </div>
 
   <div class="modes anim-in" id="modes" style="animation-delay:.32s"></div>
+  <button class="boardband anim-in" id="h-board" type="button" style="animation-delay:.4s"></button>
   <footer class="foot"><span id="h-footL"></span><span id="h-footR"></span></footer>
 </section>
 
@@ -600,6 +639,10 @@ footer.foot a{color:var(--ink-2)}
     <h3 id="bd-h3"></h3>
     <ul class="issues" id="bd-list"></ul>
   </div>
+  <div class="panel" style="margin-top:16px">
+    <h3 id="bd-histttl"></h3>
+    <ul class="hist" id="bd-hist"></ul>
+  </div>
 </section>
 
 <!-- ===== écran : jeu ===== -->
@@ -629,16 +672,16 @@ footer.foot a{color:var(--ink-2)}
         <h3 id="h3board"></h3>
         <div class="scorebox">
           <div class="scoreline">
-            <span class="scorenum" id="score">—</span>
+            <span class="scorenum" id="score">·</span>
             <span class="scoreof">/ 100</span>
             <span class="rank" id="rank"></span>
           </div>
           <div class="meter">
-            <div class="mtop"><span id="lblCost"></span><b id="costTxt">—</b></div>
+            <div class="mtop"><span id="lblCost"></span><b id="costTxt">·</b></div>
             <div class="bar"><i id="costBar" style="width:0%;background:var(--ok)"></i></div>
           </div>
           <div class="meter">
-            <div class="mtop"><span id="lblCov"></span><b id="covTxt">—</b></div>
+            <div class="mtop"><span id="lblCov"></span><b id="covTxt">·</b></div>
             <div class="bar"><i id="covBar" style="width:0%;background:var(--ok)"></i></div>
           </div>
           <button class="btn" id="btnShare" type="button" style="justify-content:center"></button>
@@ -681,7 +724,7 @@ const T = {
 fr:{
   html:"fr", other:"EN", theme:"Thème", menu:"← Menu",
   brand:"Simulateur de planning · Restauration · Convention HCR",
-  tag:"Vous êtes responsable d'exploitation d'un restaurant à Bayeux. Sept jours, une équipe, un budget. Placez les services sans casser le droit du travail — ni la marge.",
+  tag:"Vous êtes responsable d'exploitation d'un restaurant à Bayeux. Sept jours, une équipe, un budget. Placez les services sans casser le droit du travail, ni la marge.",
   days:["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"],
   daysShort:["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"],
   shifts:{R:"Repos",P:"Prépa",M:"Midi",S:"Soir",C:"Coupure"},
@@ -718,15 +761,15 @@ fr:{
   clean:"<b>Semaine conforme.</b><span class='who'>Couverture complète, repos respectés, budget tenu.</span>",
   more:n=>`… et ${n} autre${n>1?'s':''} point${n>1?'s':''} à corriger`,
   iRest:(h,d1,d2)=>`Repos quotidien de ${h} entre ${d1} et ${d2}`,
-  iRestWho:n=>`${n} — il en faut 11 h`,
+  iRestWho:n=>`${n} : il en faut 11 h`,
   iOff:"Moins de 2 jours de repos hebdomadaires",
-  iOffWho:(n,r)=>`${n} — ${r} jour${r>1?'s':''} de repos sur la semaine`,
+  iOffWho:(n,r)=>`${n} : ${r} jour${r>1?'s':''} de repos sur la semaine`,
   iConsec:"Pas de repos consécutif",
-  iConsecWho:n=>`${n} — la règle maison en demande deux d'affilée`,
+  iConsecWho:n=>`${n} : la règle maison en demande deux d'affilée`,
   i48:h=>`Plus de 48 h travaillées (${h})`,
-  i48Who:n=>`${n} — plafond absolu dépassé`,
+  i48Who:n=>`${n} : plafond absolu dépassé`,
   iPaid:h=>`${h} payées et non travaillées`,
-  iPaidWho:(n,c,h)=>`${n} — contrat ${c} h, planifié ${h}`,
+  iPaidWho:(n,c,h)=>`${n} : contrat ${c} h, planifié ${h}`,
   iCover:(d,sv,m,pole)=>`${d} ${sv} : ${m} ${pole==='cuisine'?(m>1?'cuisiniers':'cuisinier'):(m>1?'personnes':'personne')} en moins${pole==='salle'?' en salle':''}`,
   iCoverWho:(g,n,pole)=>`${g} sur ${n} en ${pole==='cuisine'?'cuisine':'salle'}`,
   iResp:(d,sv,pole)=>`${d} ${sv} : aucun responsable en ${pole==='cuisine'?'cuisine':'salle'}`,
@@ -735,20 +778,21 @@ fr:{
   iBudget:o=>`Budget dépassé de ${o} €`,
   iBudgetWho:(t,b)=>`${t} € pour un objectif de ${b} €`,
   tClear:"Grille vidée.", tNoDraft:"Pas de brouillon sur cette semaine.",
-  tDraft:"Brouillon rechargé — il contient plusieurs erreurs.",
+  tDraft:"Brouillon rechargé, il contient plusieurs erreurs.",
   tPerfect:"Parfait : 100/100. Semaine conforme, couverte et dans le budget.",
-  tLegal:(s,n)=>`${s}/100 — ${n} infraction${n>1?'s':''} au droit du travail. Corrigez-les d'abord.`,
-  tCouv:(s,n)=>`${s}/100 — pas d'infraction, mais ${n} problème${n>1?'s':''} de couverture.`,
-  tOpti:s=>`${s}/100 — légalement propre. Reste l'optimisation : budget, heures perdues, souhaits.`,
+  tLegal:(s,n)=>`${s}/100 : ${n} infraction${n>1?'s':''} au droit du travail. Corrigez-les d'abord.`,
+  tCouv:(s,n)=>`${s}/100 : pas d'infraction, mais ${n} problème${n>1?'s':''} de couverture.`,
+  tOpti:s=>`${s}/100 : légalement propre. Reste l'optimisation : budget, heures perdues, souhaits.`,
   tCopied:"Score copié.", tCopyFail:"Copie impossible sur ce navigateur.",
-  shareTxt:(lvl,score,cost,budget)=>`PlanningMaster — ${lvl} : ${score}/100, masse salariale ${cost} € sur un budget de ${budget} €. À vous d'essayer : https://${SITE}`,
+  shareTxt:(lvl,score,cost,budget)=>`PlanningMaster, ${lvl} : ${score}/100, masse salariale ${cost} € sur un budget de ${budget} €. À vous d'essayer : https://${SITE}`,
   footL:"Simulateur pédagogique · données et équipe fictives", footR:"Code ouvert sur GitHub",
   /* modes */
   modes:[
-    {k:"Apprentissage",t:"Les niveaux",d:"Cinq semaines écrites à la main, chacune avec son piège. Chaque niveau a une solution à 100/100 — à vous de la trouver.",f:"5 niveaux · étoiles"},
+    {k:"Apprentissage",t:"Les niveaux",d:"Cinq semaines écrites à la main, chacune avec son piège. Chaque niveau a une solution à 100/100, à vous de la trouver.",f:"5 niveaux · étoiles"},
     {k:"Campagne",t:"La saison",d:"Dix semaines qui s'enchaînent. Les heures supplémentaires s'accumulent, la fatigue monte, le moral baisse. Vos choix de la semaine 3 se paient semaine 7.",f:"10 semaines · état reporté"},
     {k:"Sans fin",t:"Aléatoire",d:"Des semaines générées à l'infini, difficulté réglable. Chaque semaine a une graine : partagez-la pour défier quelqu'un sur exactement la même.",f:"illimité · graine partageable"},
-    {k:"Comparaison",t:"Classements",d:"Qui tient le mieux le budget, sur les niveaux, sur une graine donnée ou sur la saison complète. Les scores sont revérifiés par le serveur.",f:"comptes · scores vérifiés"}],
+]
+,
   /* niveaux */
   lvTitle:"Les niveaux", lvSub:"Terminez un niveau à 60 minimum pour débloquer le suivant.",
   lvLocked:"Verrouillé", lvBest:"Meilleur", lvNever:"Jamais jouée",
@@ -767,7 +811,7 @@ fr:{
   dFatigue:n=>`${n} termine la semaine épuisé`,
   dArret:n=>`${n} est en arrêt la semaine prochaine`,
   dMoral:n=>`Le moral de ${n} est au plus bas`,
-  dQuit:n=>`${n} démissionne — remplacé par un extra en intérim, plus cher et sans responsabilité`,
+  dQuit:n=>`${n} démissionne, remplacé par un extra en intérim, plus cher et sans responsabilité`,
   dHS:(n,h)=>`${n} cumule ${h} d'heures supplémentaires`,
   dHSwarn:n=>`${n} dépasse le compteur d'heures autorisé : prévoyez des semaines courtes`,
   dGoodRest:"Toute l'équipe a eu ses deux jours de repos",
@@ -791,6 +835,9 @@ fr:{
   authMail:"Un e-mail de confirmation vous a été envoyé.",
   authDone:p=>`Bienvenue, ${p}.`,
   bdTitle:"Classements", bdSub:"Scores recalculés côté serveur à partir de votre grille.",
+  bandK:"Se mesurer aux autres", bandT:"Classements",
+  bandD:"Qui tient le mieux le budget, sur les niveaux, sur une graine donnée ou sur la saison complète.",
+  bandC:["5 niveaux","Défi du jour","Saison","Scores vérifiés"],
   bdH3:"Meilleurs scores", bdEmpty:"Personne n'a encore de score ici.",
   bdSeason:"Saison", bdSeed:"Graine en cours",
   bdMe:"vous",
@@ -802,7 +849,7 @@ fr:{
   snSubmit:"Enregistrer ma saison",
   /* accueil */
   ctaTuto:"Commencer le tutoriel", ctaResume:n=>`Continuer : ${n}`,
-  ctaSeason:w=>`Reprendre la saison — semaine ${w}`, ctaModes:"Tous les modes",
+  ctaSeason:w=>`Reprendre la saison, semaine ${w}`, ctaModes:"Tous les modes",
   pbStars:"Étoiles", pbBest:"Meilleur score", pbRank:"Niveaux terminés",
   pbGuest:"Vous jouez sans compte : la progression reste sur ce navigateur.",
   pbGuestGo:"Se connecter",
@@ -814,12 +861,22 @@ fr:{
   tuStep:(n,tot)=>`Étape ${n} / ${tot}`, tuNext:"Suivant", tuSkip:"Passer",
   tuDone:"Tutoriel terminé", tuGoLevel:"Passer au niveau 1",
   tuFin:"C'est tout : vous savez lire une grille, couvrir un service et repérer une infraction.",
+  /* partage, rejeu, historique */
+  shLegend:"Repos · Prépa · Midi · Soir · Coupure",
+  shCopied:"Planning copié, prêt à coller.",
+  rpTtl:(p,sc)=>`Planning de ${p} · ${sc}/100`,
+  rpSub:"Lecture seule. Comparez avec le vôtre.",
+  rpQuit:"Fermer",
+  rpNone:"Cette grille n'est pas consultable.",
+  histTtl:"Ma progression", histEmpty:"Aucune tentative enregistrée pour l'instant.",
+  histGuest:"Connectez-vous pour suivre votre progression.",
+  histAttempts:n=>`${n} tentative${n>1?'s':''}`,
   snNotDone:"Terminez les dix semaines d'abord.",
 },
 en:{
   html:"en", other:"FR", theme:"Theme", menu:"← Menu",
   brand:"Shift-planning simulator · Restaurants · French labour rules",
-  tag:"You run a restaurant in Bayeux. Seven days, one team, one budget. Build the roster without breaking the law — or the margin.",
+  tag:"You run a restaurant in Bayeux. Seven days, one team, one budget. Build the roster without breaking the law, or the margin.",
   days:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
   daysShort:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
   shifts:{R:"Day off",P:"Prep",M:"Lunch",S:"Dinner",C:"Split"},
@@ -856,15 +913,15 @@ en:{
   clean:"<b>Compliant week.</b><span class='who'>Every post covered, rest respected, budget held.</span>",
   more:n=>`… and ${n} more issue${n>1?'s':''} to fix`,
   iRest:(h,d1,d2)=>`Only ${h} of rest between ${d1} and ${d2}`,
-  iRestWho:n=>`${n} — 11 hours are required`,
+  iRestWho:n=>`${n}: 11 hours are required`,
   iOff:"Fewer than 2 days off this week",
-  iOffWho:(n,r)=>`${n} — ${r} day${r>1?'s':''} off across the week`,
+  iOffWho:(n,r)=>`${n}: ${r} day${r>1?'s':''} off across the week`,
   iConsec:"No consecutive days off",
-  iConsecWho:n=>`${n} — the house rule asks for two in a row`,
+  iConsecWho:n=>`${n}: the house rule asks for two in a row`,
   i48:h=>`More than 48 hours worked (${h})`,
-  i48Who:n=>`${n} — absolute ceiling exceeded`,
+  i48Who:n=>`${n}: absolute ceiling exceeded`,
   iPaid:h=>`${h} paid but not worked`,
-  iPaidWho:(n,c,h)=>`${n} — ${c}h contract, ${h} rostered`,
+  iPaidWho:(n,c,h)=>`${n}: ${c}h contract, ${h} rostered`,
   iCover:(d,sv,m,pole)=>`${d} ${sv}: ${m} ${pole==='cuisine'?(m>1?'cooks':'cook'):(m>1?'people':'person')} short${pole==='salle'?' on the floor':''}`,
   iCoverWho:(g,n,pole)=>`${g} of ${n} in ${pole==='cuisine'?'the kitchen':'the floor team'}`,
   iResp:(d,sv,pole)=>`${d} ${sv}: no lead ${pole==='cuisine'?'in the kitchen':'on the floor'}`,
@@ -873,19 +930,20 @@ en:{
   iBudget:o=>`Budget exceeded by €${o}`,
   iBudgetWho:(t,b)=>`€${t} against a €${b} target`,
   tClear:"Grid cleared.", tNoDraft:"No draft on this week.",
-  tDraft:"Draft reloaded — it contains several mistakes.",
+  tDraft:"Draft reloaded, it contains several mistakes.",
   tPerfect:"Perfect: 100/100. Compliant, covered and on budget.",
-  tLegal:(s,n)=>`${s}/100 — ${n} labour-law breach${n>1?'es':''}. Fix those first.`,
-  tCouv:(s,n)=>`${s}/100 — no breaches, but ${n} coverage problem${n>1?'s':''}.`,
-  tOpti:s=>`${s}/100 — legally clean. What's left is optimisation: budget, wasted hours, requests.`,
+  tLegal:(s,n)=>`${s}/100: ${n} labour-law breach${n>1?'es':''}. Fix those first.`,
+  tCouv:(s,n)=>`${s}/100: no breaches, but ${n} coverage problem${n>1?'s':''}.`,
+  tOpti:s=>`${s}/100: legally clean. What's left is optimisation: budget, wasted hours, requests.`,
   tCopied:"Score copied.", tCopyFail:"Copying isn't available in this browser.",
-  shareTxt:(lvl,score,cost,budget)=>`PlanningMaster — ${lvl}: ${score}/100, payroll €${cost} against a €${budget} budget. Try it: https://${SITE}`,
+  shareTxt:(lvl,score,cost,budget)=>`PlanningMaster, ${lvl}: ${score}/100, payroll €${cost} against a €${budget} budget. Try it: https://${SITE}`,
   footL:"Teaching simulator · fictional team and figures", footR:"Source on GitHub",
   modes:[
-    {k:"Learning",t:"Levels",d:"Five hand-written weeks, each with its own trap. Every level has a 100/100 solution — find it.",f:"5 levels · stars"},
+    {k:"Learning",t:"Levels",d:"Five hand-written weeks, each with its own trap. Every level has a 100/100 solution, find it.",f:"5 levels · stars"},
     {k:"Campaign",t:"The season",d:"Ten weeks in sequence. Overtime accumulates, fatigue builds, morale drops. What you do in week 3 is paid for in week 7.",f:"10 weeks · state carries over"},
     {k:"Endless",t:"Random",d:"Infinite generated weeks, adjustable difficulty. Each has a seed: share it to challenge someone on exactly the same week.",f:"unlimited · shareable seed"},
-    {k:"Compare",t:"Leaderboards",d:"Who holds the budget best, on the levels, on a given seed, or across a full season. Every score is re-verified server-side.",f:"accounts · verified scores"}],
+]
+,
   lvTitle:"Levels", lvSub:"Score at least 60 on a level to unlock the next.",
   lvLocked:"Locked", lvBest:"Best", lvNever:"Never played",
   snTitle:"The season", snSub:"March to July. Every validated week changes the state of your team.",
@@ -902,7 +960,7 @@ en:{
   dFatigue:n=>`${n} ends the week burnt out`,
   dArret:n=>`${n} is on sick leave next week`,
   dMoral:n=>`${n}'s morale has bottomed out`,
-  dQuit:n=>`${n} resigns — replaced by agency cover, more expensive and not a lead`,
+  dQuit:n=>`${n} resigns, replaced by agency cover, more expensive and not a lead`,
   dHS:(n,h)=>`${n} has banked ${h} of overtime`,
   dHSwarn:n=>`${n} is over the overtime ceiling: plan some short weeks`,
   dGoodRest:"Everyone got their two days off",
@@ -924,6 +982,9 @@ en:{
   authMail:"A confirmation email has been sent.",
   authDone:p=>`Welcome, ${p}.`,
   bdTitle:"Leaderboards", bdSub:"Scores recomputed server-side from your roster.",
+  bandK:"Measure up", bandT:"Leaderboards",
+  bandD:"Who holds the budget best, on the levels, on a given seed, or across a full season.",
+  bandC:["5 levels","Daily challenge","Season","Verified scores"],
   bdH3:"Best scores", bdEmpty:"No score here yet.",
   bdSeason:"Season", bdSeed:"Current seed",
   bdMe:"you",
@@ -934,7 +995,7 @@ en:{
   sentLegal:"Fix the labour-law breaches before saving.",
   snSubmit:"Submit my season",
   ctaTuto:"Start the tutorial", ctaResume:n=>`Continue: ${n}`,
-  ctaSeason:w=>`Resume the season — week ${w}`, ctaModes:"All modes",
+  ctaSeason:w=>`Resume the season, week ${w}`, ctaModes:"All modes",
   pbStars:"Stars", pbBest:"Best score", pbRank:"Levels cleared",
   pbGuest:"You are playing without an account: progress stays in this browser.",
   pbGuestGo:"Sign in",
@@ -945,6 +1006,15 @@ en:{
   tuStep:(n,tot)=>`Step ${n} / ${tot}`, tuNext:"Next", tuSkip:"Skip",
   tuDone:"Tutorial complete", tuGoLevel:"On to level 1",
   tuFin:"That's it: you can read a roster, cover a service and spot a breach.",
+  shLegend:"Day off · Prep · Lunch · Dinner · Split",
+  shCopied:"Roster copied, ready to paste.",
+  rpTtl:(p,sc)=>`${p}'s roster · ${sc}/100`,
+  rpSub:"Read only. Compare it with yours.",
+  rpQuit:"Close",
+  rpNone:"That roster is not available.",
+  histTtl:"My progress", histEmpty:"No attempt recorded yet.",
+  histGuest:"Sign in to track your progress.",
+  histAttempts:n=>`${n} attempt${n>1?'s':''}`,
   snNotDone:"Finish all ten weeks first.",
 }};
 let lang = "fr";
@@ -1002,8 +1072,8 @@ function randomLabels(S){
   return {
     titre:d,
     brief: lang==='en'
-      ? `Generated week, difficulty "${d}". ${S.openDays} days open, ${S.equipe.length} staff. A 100/100 solution exists — the seed guarantees it.`
-      : `Semaine générée, difficulté « ${d} ». ${S.openDays} jours ouverts, ${S.equipe.length} salariés. Une solution à 100/100 existe — la graine le garantit.`
+      ? `Generated week, difficulty "${d}". ${S.openDays} days open, ${S.equipe.length} staff. A 100/100 solution exists, the seed guarantees it.`
+      : `Semaine générée, difficulté « ${d} ». ${S.openDays} jours ouverts, ${S.equipe.length} salariés. Une solution à 100/100 existe, la graine le garantit.`
   };
 }
 
@@ -1102,7 +1172,7 @@ function renderHome(){
       <div class="pb"><span class="pk">${t('pbStars')}</span>
         <span class="starline">${Array.from({length:max},(_,k)=>
           `<i class="${k<st?'on':''}">★</i>`).join('')}</span></div>
-      <div class="pb"><span class="pk">${t('pbBest')}</span><span class="pv">${best||'—'}</span></div>
+      <div class="pb"><span class="pk">${t('pbBest')}</span><span class="pv">${best||'·'}</span></div>
       <div class="pb"><span class="pk">${t('pbRank')}</span><span class="pv">${done}<span style="font-size:13px;color:var(--muted)">/${LEVELS.length}</span></span></div>`;
   } else {
     pb.innerHTML=`
@@ -1150,15 +1220,22 @@ function renderHome(){
 
   // cartes de mode
   const w=$('#modes'); w.innerHTML='';
-  const keys=['levels','season','random','board'];
+  const keys=['levels','season','random'];
   t('modes').forEach((m,i)=>{
     const btn=document.createElement('button');
     btn.className='mode'; btn.type='button';
     btn.innerHTML=`<span class="mk">${m.k}</span><span class="mt">${m.t}</span>
       <span class="md">${m.d}</span><span class="mf">${m.f}</span>`;
-    btn.onclick=()=>{if(keys[i]!=='board')mode=keys[i];show(keys[i]);};
+    btn.onclick=()=>{mode=keys[i];show(keys[i]);};
     w.appendChild(btn);
   });
+
+  const band=$('#h-board');
+  band.innerHTML=`<span><span class="bk">${t('bandK')}</span><span class="bt">${t('bandT')}</span></span>
+    <span class="bd">${t('bandD')}</span>
+    <span class="bchips">${t('bandC').map(c=>`<span class="bchip">${c}</span>`).join('')}</span>
+    <span class="barrow">&rsaquo;</span>`;
+  band.onclick=()=>show('board');
 }
 
 function renderLevels(){
@@ -1215,7 +1292,7 @@ function renderSeason(){
     $('#sn-play').textContent=t('snSubmit');
   }else{
     const S=seasonScenario(season);
-    $('#sn-wtitle').textContent=`${X(S.n)} — ${X(S.titre)}`;
+    $('#sn-wtitle').textContent=`${X(S.n)} · ${X(S.titre)}`;
     $('#sn-wtext').textContent=X(S.brief);
     const hTot=S.equipe.reduce((s,x)=>s+x.contrat,0);
     $('#sn-wstats').innerHTML=
@@ -1233,7 +1310,7 @@ function renderSeason(){
   $('#sn-kpis').innerHTML=`
     <div class="kpi"><div class="kl">${t('kWeek')}</div><div class="kv">${Math.min(season.week+1,10)}<span style="font-size:14px;color:var(--muted)">/10</span></div></div>
     <div class="kpi"><div class="kl">${t('kTreso')}</div><div class="kv ${season.tresorerie>=0?'g':'b'}">${cur(season.tresorerie)}</div></div>
-    <div class="kpi"><div class="kl">${t('kScore')}</div><div class="kv">${avg||'—'}</div></div>
+    <div class="kpi"><div class="kl">${t('kScore')}</div><div class="kv">${avg||'·'}</div></div>
     <div class="kpi"><div class="kl">${t('kHS')}</div><div class="kv">${fmtH(hsTot)}</div></div>`;
 
   const ul=$('#sn-roster'); ul.innerHTML='';
@@ -1294,6 +1371,7 @@ function renderRandom(){
 
 /* ---------- écran de jeu ---------- */
 function startScenario(S,from){
+  replayInfo=null;
   scen=S; mode=from;
   plan=applyLocks(S,emptyPlan(S));
   if(from==='season'&&season&&season.plan) plan=season.plan;
@@ -1303,7 +1381,8 @@ function renderPlay(){
   const S=scen, ev=evaluate(S,plan);
   $('#btnClear').textContent=t('btnClear');
   $('#btnDraft').textContent=t('btnDraft');
-  $('#btnDraft').hidden=!S.draft;
+  $('#btnDraft').hidden=!S.draft||!!replayInfo;
+  document.querySelector('.toolbar').style.display=replayInfo?'none':'';
   $('#btnCheck').textContent=t('btnCheck');
   $('#btnShare').textContent=t('btnShare');
   $('#hint').innerHTML=t('hint');
@@ -1318,7 +1397,7 @@ function renderPlay(){
   $('#ulHouse').innerHTML=t('ulHouse').map(x=>`<li>${x}</li>`).join('');
   $('#disclaim').textContent=t('disclaim');
   const lab = S.diff ? randomLabels(S) : {titre:X(S.titre), brief:X(S.brief)};
-  $('#briefTitle').textContent=`${X(S.n)} — ${lab.titre}`;
+  $('#briefTitle').textContent=`${X(S.n)} · ${lab.titre}`;
   $('#briefText').textContent=lab.brief;
   const hTot=S.equipe.reduce((s,x)=>s+x.contrat,0);
   $('#briefStats').innerHTML=
@@ -1367,13 +1446,14 @@ function renderGrid(S,p,ev){
       if(j.ferme)cls.push('closedday');
       if(ev.flags.has(em.id+'-'+d))cls.push('flagged');
       const label=lock?(motif?t('motifs')[motif]:t('motifs').ferme):t('shifts')[code];
-      const sub=lock?'':(s.h?fmtH(s.h):'—');
+      const sub=lock?'':(s.h?fmtH(s.h):'·');
       const c=add(cls.join(' '),
         lock
           ? `<span class="code"><span class="lbl">${label}</span></span>`
           : `<span class="code">${code}<span class="lbl"> · ${label}</span></span><span class="hrs">${sub}</span>`);
-      c.title=lock?label:`${t('shifts')[code]} — ${s.label}`;
-      if(!lock){
+      c.title=lock?label:`${t('shifts')[code]}${s.label?' · '+s.label:''}`;
+      if(replayInfo) c.classList.add('ro');
+      if(!lock && !replayInfo){
         c.tabIndex=0;
         c.addEventListener('pointerdown',e2=>{e2.preventDefault();painting=true;setCell(em.id,d,brush);});
         c.addEventListener('pointerenter',()=>{if(painting)setCell(em.id,d,brush);});
@@ -1392,7 +1472,7 @@ function renderGrid(S,p,ev){
     add('covrow covlabel',t('needFor')(t('services')[sv]));
     S.jours.forEach((j,d)=>{
       const nc=j.besoin[sv].cuisine, ns=j.besoin[sv].salle;
-      if(nc+ns===0){add('covrow covcell none','<span class="ln">—</span>');return;}
+      if(nc+ns===0){add('covrow covcell none','<span class="ln">·</span>');return;}
       const cnt=pole=>S.equipe.filter(em=>em.pole===pole&&SHIFTS[p[em.id][d]].couvre.includes(sv)).length;
       const line=(pole,got,need)=>{
         if(need===0)return '';
@@ -1442,6 +1522,7 @@ function renderPanel(S,ev){
   }
 }
 function setCell(empId,d,code){
+  if(replayInfo) return;          // grille d'un autre joueur : on ne touche pas
   const em=scen.equipe.find(x=>x.id===empId);
   if(!em||isLocked(scen,em,d)||plan[empId][d]===code)return;
   plan[empId][d]=code;
@@ -1524,21 +1605,33 @@ $('#btnCheck').onclick=()=>{
   if(me && !legal) setTimeout(()=>submitCurrent(ev),1200);
   pushProgress();
 };
+/* Bloc de partage : une ligne par salarié, une case par jour.
+   Du texte, pas une image : ça se colle partout et ça garde la
+   lisibilité des couleurs du jeu. */
+const SQ={R:'\u2B1C',P:'\uD83D\uDFE8',M:'\uD83D\uDFE7',S:'\uD83D\uDFE6',C:'\uD83D\uDFEA'};
+function shareBlock(S,p,ev){
+  const lignes=S.equipe.map(em=>
+    S.jours.map((j,d)=> j.ferme ? '\u2B1B' : (SQ[p[em.id][d]]||'\u2B1C')).join('')
+  ).join('\n');
+  const lab = scen.diff ? randomLabels(scen).titre : X(S.titre);
+  const ent = `PlanningMaster · ${X(S.n)} · ${ev.score}/100`;
+  return `${ent}\n${lab}\n\n${lignes}\n\n${t('shLegend')}\nhttps://${SITE}`;
+}
+
 $('#btnShare').onclick=async()=>{
   const ev=evaluate(scen,plan);
-  const lb=scen.diff?randomLabels(scen).titre:X(scen.titre);
-  const txt=t('shareTxt')(`${X(scen.n)} « ${lb} »`,ev.score,nf(ev.total),nf(scen.budget));
+  const txt=shareBlock(scen,plan,ev);
   try{
     if(navigator.share&&/Android|iPhone|iPad/i.test(navigator.userAgent)){
       await navigator.share({title:'PlanningMaster',text:txt}); return;
     }
-    await navigator.clipboard.writeText(txt); toast(t('tCopied'));
+    await navigator.clipboard.writeText(txt); toast(t('shCopied'));
   }catch(_){
     try{
       const ta=document.createElement('textarea');
       ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
       document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); ta.remove(); toast(t('tCopied'));
+      document.execCommand('copy'); ta.remove(); toast(t('shCopied'));
     }catch(__){toast(t('tCopyFail'));}
   }
 };
@@ -1584,14 +1677,14 @@ function toggleLang(){
 
 /* ---------- tutoriel guidé ---------- */
 const TU_STEPS=[
- {txt:{fr:"Dans la palette, choisissez <b>Coupure</b> — elle couvre le midi et le soir d'un coup. Puis cliquez sur la case de <b>Marc</b>, au <b>mardi</b>.",
-       en:"In the palette, pick <b>Split</b> — it covers lunch and dinner in one go. Then click <b>Marc</b>'s cell on <b>Tuesday</b>."},
+ {txt:{fr:"Dans la palette, choisissez <b>Coupure</b> : elle couvre le midi et le soir d'un coup. Puis cliquez sur la case de <b>Marc</b>, au <b>mardi</b>.",
+       en:"In the palette, pick <b>Split</b>: it covers lunch and dinner in one go. Then click <b>Marc</b>'s cell on <b>Tuesday</b>."},
   check:(p)=>p.c1[1]==='C'},
  {txt:{fr:"Regardez la ligne <b>Besoin midi</b> sous la grille : mardi affiche <b>CUI 1/1</b> mais <b>SAL 0/1</b>. La cuisine est couverte, pas la salle. Placez la coupure de <b>Claire</b> au mardi.",
        en:"Look at the <b>lunch needs</b> row under the grid: Tuesday shows <b>KIT 1/1</b> but <b>FOH 0/1</b>. The kitchen is covered, the floor isn't. Place <b>Claire</b>'s split on Tuesday."},
   check:(p)=>p.s1[1]==='C'},
- {txt:{fr:"Mardi est complet. Faites de même pour <b>mercredi, jeudi et vendredi</b> — vous pouvez rester appuyé et glisser sur plusieurs cases.",
-       en:"Tuesday is covered. Do the same for <b>Wednesday, Thursday and Friday</b> — you can hold and drag across cells."},
+ {txt:{fr:"Mardi est complet. Faites de même pour <b>mercredi, jeudi et vendredi</b>. Vous pouvez rester appuyé et glisser sur plusieurs cases.",
+       en:"Tuesday is covered. Do the same for <b>Wednesday, Thursday and Friday</b>. You can hold and drag across cells."},
   check:(p)=>[2,3,4].every(d=>p.c1[d]==='C'&&p.s1[d]==='C')},
  {txt:{fr:"Colonne <b>Total</b> à droite : <b>39 h sur 39 h</b>, exactement le contrat. Ni heure supplémentaire, ni heure payée dans le vide. Le score est à 100.",
        en:"<b>Total</b> column on the right: <b>39h of 39h</b>, exactly the contract. No overtime, no paid idle hours. The score is 100."},
@@ -1600,7 +1693,7 @@ const TU_STEPS=[
        en:"Now let's trigger a breach. Put <b>Dinner</b> on Marc's Wednesday, then <b>Prep</b> on his Thursday."},
   check:(p,ev)=>ev.issues.some(i=>i.code==='REST')},
  {txt:{fr:"Les deux cases passent en rouge : le soir finit à 23:45, la prépa reprend à 08:00, soit <b>8 h 15 de repos</b> au lieu des 11 h légales. Remettez deux <b>coupures</b> pour revenir à 100.",
-       en:"Both cells turn red: dinner ends at 23:45, prep starts at 08:00 — <b>8h15 of rest</b> instead of the legal 11. Put two <b>splits</b> back to return to 100."},
+       en:"Both cells turn red: dinner ends at 23:45, prep starts at 08:00, giving <b>8h15 of rest</b> instead of the legal 11. Put two <b>splits</b> back to return to 100."},
   check:(p,ev)=>ev.score===100},
 ];
 let tuStep=0;
@@ -1611,6 +1704,15 @@ function startTutorial(){
 }
 function renderTutobar(ev){
   const bar=$('#tutobar');
+  if(replayInfo){
+    bar.hidden=false; bar.className='tutobar replay';
+    bar.innerHTML=`<span class="tk">${t('rpTtl')(replayInfo.pseudo,replayInfo.score)}</span>
+      <span class="tt">${t('rpSub')}</span>
+      <button class="tbtn go" id="rp-quit" type="button">${t('rpQuit')}</button>`;
+    $('#rp-quit').onclick=()=>{ replayInfo=null; show('board'); };
+    return;
+  }
+  bar.className='tutobar';
   if(mode!=='tuto'){ bar.hidden=true; return; }
   bar.hidden=false;
   const fini = tuStep>=TU_STEPS.length;
@@ -1646,6 +1748,7 @@ function renderTutobar(ev){
 
 /* ---------- compte, classements, enregistrement ---------- */
 let me = null;            // { id, email, pseudo } ou null
+let replayInfo = null;    // grille consultée dans le classement, lecture seule
 let boardRef = 'l1';      // onglet de classement courant
 
 function refreshAccount(){
@@ -1802,6 +1905,7 @@ async function renderBoard(){
     b.onclick=()=>{ boardRef=x.ref; renderBoard(); };
     tw.appendChild(b);
   });
+  renderHistory();          // indépendant du classement, ne doit pas dépendre de ses sorties
   const ul=$('#bd-list');
   ul.innerHTML=`<li><span class="dot" style="background:var(--muted)"></span><span class="txt">…</span></li>`;
   const kind = boardRef==='season' ? 'season' : (boardRef.includes(':') ? 'seed' : 'level');
@@ -1823,6 +1927,66 @@ async function renderBoard(){
         <b>${i+1}. ${r.pseudo}${mine?' <span style="color:var(--muted);font-weight:400">('+t('bdMe')+')</span>':''}</b>
         <span class="who">${extra}</span></span>
       <span class="pts" style="color:var(--ink);font-weight:600">${r.score}</span>`;
+    if(kind!=='season'){                    // une saison, c'est dix grilles : pas rejouable ici
+      li.style.cursor='pointer';
+      li.onclick=()=>openReplay(kind,boardRef,r.pseudo,r.score);
+    }
+    ul.appendChild(li);
+  });
+}
+
+/* Ouvre la grille d'un joueur en lecture seule. Les grilles sont
+   stockées en base, c'est le meilleur outil d'apprentissage du jeu :
+   voir comment le premier s'y est pris. */
+async function openReplay(kind,ref,pseudo,score){
+  let row=null;
+  try{ row=await cloud.gridOf(kind,ref,pseudo); }catch(_){}
+  if(!row||!row.grid){ toast(t('rpNone')); return; }
+  let S=null;
+  if(kind==='level') S=LEVELS.find(L=>L.id===ref);
+  else {
+    const m=/^([A-Z0-9]{1,12}):([1-5])$/.exec(ref);
+    if(m) S=generateWeek(m[1],Number(m[2]));
+  }
+  if(!S){ toast(t('rpNone')); return; }
+  scen=S; mode=(kind==='level'?'levels':'random');
+  plan=applyLocks(S,Object.assign(emptyPlan(S),row.grid));
+  replayInfo={pseudo,score:row.score!=null?row.score:score};
+  show('play');
+}
+
+/* Historique personnel : une barre par tentative, la plus récente en haut. */
+async function renderHistory(){
+  $('#bd-histttl').textContent=t('histTtl');
+  const ul=$('#bd-hist');
+  if(!me){
+    ul.innerHTML=`<li><span class="hd2"></span><span class="hl">${t('histGuest')}</span><span class="hs"></span></li>`;
+    return;
+  }
+  ul.innerHTML=`<li><span class="hd2"></span><span class="hl">…</span><span class="hs"></span></li>`;
+  let rows=[];
+  try{ rows=await cloud.history(40); }catch(_){}
+  if(!rows.length){
+    ul.innerHTML=`<li><span class="hd2"></span><span class="hl">${t('histEmpty')}</span><span class="hs"></span></li>`;
+    return;
+  }
+  const nom=r=>{
+    if(r.mode==='season') return t('bdSeason');
+    if(r.mode==='level'){ const L=LEVELS.find(l=>l.id===r.ref); return L?X(L.n):r.ref; }
+    return r.ref.replace(':',' · ');
+  };
+  ul.innerHTML='';
+  rows.forEach(r=>{
+    const li=document.createElement('li');
+    const d=new Date(r.created_at).toLocaleDateString(lang==='en'?'en-GB':'fr-FR',
+      {day:'2-digit',month:'2-digit'});
+    const col=r.score>=90?'var(--ok)':r.score>=70?'var(--warn)':'var(--bad)';
+    li.innerHTML=`<span class="hd2">${d}</span>
+      <span style="display:grid;gap:3px;min-width:0">
+        <span class="hl">${nom(r)}</span>
+        <span class="hbar"><i style="width:${r.score}%;background:${col}"></i></span>
+      </span>
+      <span class="hs">${r.score}</span>`;
     ul.appendChild(li);
   });
 }

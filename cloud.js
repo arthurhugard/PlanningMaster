@@ -1,5 +1,5 @@
 /* =====================================================================
-   PlanningMaster — accès Supabase
+   PlanningMaster, accès Supabase
    Comptes, scores vérifiés, classements, progression.
 
    Pas de SDK : l'API REST et l'API Auth de Supabase s'appellent très bien
@@ -167,6 +167,44 @@ export async function myScores() {
     `/rest/v1/scores?user_id=eq.${session.user.id}&select=mode,ref,score,payroll,treasury`,
   );
   return r.ok ? r.json() : [];
+}
+
+/* Grille d'un joueur sur une épreuve donnée. La table scores est en
+   lecture publique : c'est ce qui permet de rejouer le planning du
+   premier du classement. */
+export async function gridOf(mode, ref, pseudo) {
+  const q = `/rest/v1/scores?mode=eq.${encodeURIComponent(mode)}` +
+            `&ref=eq.${encodeURIComponent(ref)}` +
+            `&select=grid,score,payroll,treasury,profiles!inner(pseudo)` +
+            `&profiles.pseudo=eq.${encodeURIComponent(pseudo)}&limit=1`;
+  const r = await fetch(`${URL_BASE}${q}`, { headers: { apikey: ANON } });
+  if (!r.ok) throw new Error("grid_failed");
+  const rows = await r.json();
+  return rows[0] || null;
+}
+
+/* Historique personnel : une ligne par tentative, du plus récent au
+   plus ancien. Table en ajout seul, lisible par son seul propriétaire. */
+export async function history(limit = 200) {
+  if (!session) return [];
+  const r = await authed(
+    `/rest/v1/attempts?user_id=eq.${session.user.id}` +
+    `&select=mode,ref,score,payroll,treasury,created_at` +
+    `&order=created_at.desc&limit=${limit}`,
+  );
+  return r.ok ? r.json() : [];
+}
+
+/* Combien de personnes ont tenté une épreuve. Agrégat seul, aucune
+   ligne nominative ne sort. */
+export async function playersOn(mode, ref) {
+  const r = await fetch(`${URL_BASE}/rest/v1/rpc/players_on`, {
+    method: "POST",
+    headers: { apikey: ANON, "Content-Type": "application/json" },
+    body: JSON.stringify({ p_mode: mode, p_ref: ref }),
+  });
+  if (!r.ok) return 0;
+  return Number(await r.json()) || 0;
 }
 
 /* ---------------------------- progression ---------------------------- */
