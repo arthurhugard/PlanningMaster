@@ -27,6 +27,17 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
+<!-- Application installable : Chrome et Edge lisent le manifeste, iOS lit
+     les balises apple-. La couleur de thème suit le mode clair ou sombre,
+     sinon la barre d'état du téléphone jure avec la page. -->
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#E3E8E1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1110" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PlanningMaster">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -123,6 +134,11 @@ h1,h2,h3{text-wrap:balance}
 .hero h1 em{font-style:italic;font-weight:600;color:var(--accent)}
 .hero p{margin:14px 0 0;color:var(--ink-2);max-width:56ch;font-size:16px}
 .herogrid{display:grid;gap:30px}
+.heronav{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end;
+  align-items:center;margin-bottom:20px}
+.heronav .btn{padding:0 18px;min-height:46px;font-weight:600}
+.heronav .btn .i{width:18px;height:18px}
+.hero h1+p{margin-top:16px}
 .heroart{display:none}
 @media(min-width:980px){
   .herogrid{grid-template-columns:minmax(0,1fr) minmax(300px,400px);align-items:center;gap:44px}
@@ -154,7 +170,8 @@ h1,h2,h3{text-wrap:balance}
 .mode .mt{font-family:"Fraunces",Georgia,serif;font-size:23px;font-weight:600;line-height:1.1}
 .mode .md{color:var(--ink-2);font-size:13px;flex:1}
 .mode .mf{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);
-  border-top:1px solid var(--line);padding-top:8px}
+  border-top:1px solid var(--line);padding-top:9px;margin-top:auto}
+.mode .mt{margin-bottom:2px}
 
 /* ---------- accueil : mise en scène ---------- */
 .hero .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;align-items:center}
@@ -179,6 +196,7 @@ h1,h2,h3{text-wrap:balance}
 
 .homecols{display:grid;gap:14px;grid-template-columns:1fr;margin-bottom:22px}
 @media(min-width:820px){.homecols{grid-template-columns:1.25fr 1fr}}
+.homecols:has(> [hidden]){grid-template-columns:1fr!important}
 .homecols>*{min-width:0}
 .daily{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--midi);
   border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);
@@ -228,6 +246,19 @@ h1,h2,h3{text-wrap:balance}
 /* L'état au repos est VISIBLE : l'animation ne fait que retarder l'entrée.
    Avec `backwards`, si elle ne se déclenche pas, le contenu s'affiche
    normalement au lieu de rester bloqué à opacity:0. */
+/* Bandeau de mise à jour : discret, en bas, jamais par-dessus la grille. */
+.majbar{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:60;
+  display:flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);
+  background:var(--ink);color:var(--surface);border-radius:999px;padding:8px 8px 8px 20px;
+  box-shadow:0 10px 30px -12px rgba(0,0,0,.6);font-size:14px}
+.majbar .btn{background:var(--surface);color:var(--ink);border-color:var(--surface);
+  min-height:36px;font-size:13.5px;font-weight:600}
+.majbar .btn.ico{min-width:36px;font-size:19px;background:none;color:var(--surface);
+  border-color:rgba(255,255,255,.35)}
+.steps{margin:12px 0 0;padding-left:22px;display:grid;gap:9px;color:var(--ink-2);font-size:14.5px}
+.steps li{padding-left:2px}
+.steps b{color:var(--ink)}
+
 .anim-in{animation:riseIn .5s ease backwards}
 @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
@@ -753,6 +784,8 @@ footer.foot a{color:var(--ink-2)}
 <symbol id="i-alea" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="3.4" width="17.2" height="17.2" rx="3"/><circle cx="8.4" cy="8.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.6" cy="15.6" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none"/></symbol>
 <symbol id="i-trophee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.2h10v4.3a5 5 0 0 1-10 0z"/><path d="M7 5.8H4.4v1.4A3.2 3.2 0 0 0 7.6 10.4M17 5.8h2.6v1.4a3.2 3.2 0 0 1-3.2 3.2"/><path d="M12 13.5v3.4M8.6 20.3h6.8l-.7-3.4H9.3z"/></symbol>
 <symbol id="i-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-install" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.4v11.4"/><path d="m7.8 10.6 4.2 4.2 4.2-4.2"/><path d="M4.4 15.6v2.6a2.4 2.4 0 0 0 2.4 2.4h10.4a2.4 2.4 0 0 0 2.4-2.4v-2.6"/></symbol>
+<symbol id="i-compte" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2a7.2 7.2 0 0 1 14.4 0"/></symbol>
 <symbol id="i-aide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.8-.9 1.4v.5"/><circle cx="12" cy="16.8" r="1" fill="currentColor" stroke="none"/></symbol>
 <symbol id="i-annuler" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5h10.5a5 5 0 0 1 0 10H9"/><path d="M7.5 6.5 3.5 10.5l4 4"/></symbol>
 <symbol id="i-retablir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10.5H9.5a5 5 0 0 0 0 10H15"/><path d="m16.5 6.5 4 4-4 4"/></symbol>
@@ -776,14 +809,14 @@ footer.foot a{color:var(--ink-2)}
 <!-- ===== écran : accueil ===== -->
 <section id="scr-home">
   <div class="hero anim-in" style="animation-delay:0s">
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;justify-content:flex-end">
-      <button class="pill" id="accountbtn2" type="button">Compte</button>
+    <div class="heronav">
+      <button class="btn" id="btnInstall" type="button" hidden></button>
       <button class="pill" id="langbtn2" type="button">EN</button>
       <button class="pill" id="themebtn2" type="button">Thème</button>
+      <button class="btn" id="accountbtn2" type="button">Compte</button>
     </div>
     <div class="herogrid">
       <div class="heromain">
-        <p class="brandline" id="h-brand"></p>
         <h1>Planning<em>Master</em></h1>
         <p id="h-tag"></p>
         <div class="cta">
@@ -804,7 +837,7 @@ footer.foot a{color:var(--ink-2)}
 
   <div class="homecols">
     <div class="daily anim-in" id="h-daily" style="animation-delay:.16s"></div>
-    <div class="mini-board anim-in" style="animation-delay:.24s">
+    <div class="mini-board anim-in" id="h-topbox" style="animation-delay:.24s" hidden>
       <h3 id="h-topttl"></h3>
       <ol id="h-top"></ol>
     </div>
@@ -986,8 +1019,23 @@ const T = {
 fr:{
   html:"fr", other:"EN", theme:"Thème", menu:"← Menu",
   artCap:"Une semaine · 5 salariés · 7 jours",
+  /* installation */
+  instBtn:"Installer",
+  instOk:"Installé. Le jeu s'ouvre maintenant comme une application.",
+  instTtl:"Installer PlanningMaster",
+  instIntro:"Une fois installé, le jeu s'ouvre depuis votre écran d'accueil, en plein écran, et fonctionne sans connexion. Seuls les classements ont besoin d'internet.",
+  instIOS:["Touchez le bouton <b>Partager</b> en bas de Safari, le carré avec la flèche vers le haut.",
+           "Faites défiler et choisissez <b>Sur l'écran d'accueil</b>.",
+           "Touchez <b>Ajouter</b> en haut à droite."],
+  instAutre:["Ouvrez le menu de votre navigateur, les trois points en haut à droite.",
+             "Choisissez <b>Installer PlanningMaster</b>, ou <b>Ajouter à l'écran d'accueil</b>.",
+             "Confirmez. Une icône apparaît avec vos autres applications."],
+  instNote:"Sur iPhone, l'installation ne fonctionne que depuis Safari, pas depuis Chrome.",
+  majTxt:"Nouvelle version disponible.",
+  majGo:"Recharger",
   brand:"Simulateur de planning · Restauration · Convention HCR",
-  tag:"Vous êtes responsable d'exploitation d'un restaurant à Bayeux. Sept jours, une équipe, un budget. Placez les services sans casser le droit du travail, ni la marge.",
+  tag:"Un restaurant à Lyon. Sept jours, une équipe, un budget.",
+  tagHi:p=>`Bonjour ${p}. Sept jours, une équipe, un budget.`,
   days:["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"],
   daysShort:["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"],
   shifts:{R:"Repos",P:"Prépa",M:"Midi",S:"Soir",C:"Coupure"},
@@ -1068,9 +1116,9 @@ fr:{
   footL:"Simulateur pédagogique · données et équipe fictives", footR:"Code ouvert sur GitHub",
   /* modes */
   modes:[
-    {k:"Apprentissage",t:"Les niveaux",d:"Cinq semaines écrites à la main, chacune avec son piège. Chaque niveau a une solution à 100/100, à vous de la trouver.",f:"5 niveaux · étoiles"},
-    {k:"Campagne",t:"La saison",d:"Dix semaines qui s'enchaînent. Les heures supplémentaires s'accumulent, la fatigue monte, le moral baisse. Vos choix de la semaine 3 se paient semaine 7.",f:"10 semaines · état reporté"},
-    {k:"Sans fin",t:"Aléatoire",d:"Des semaines générées à l'infini, difficulté réglable. Chaque semaine a une graine : partagez-la pour défier quelqu'un sur exactement la même.",f:"illimité · graine partageable"},
+    {k:"Apprentissage",t:"Les niveaux",d:"",f:"5 niveaux · étoiles"},
+    {k:"Campagne",t:"La saison",d:"",f:"10 semaines · état reporté"},
+    {k:"Sans fin",t:"Aléatoire",d:"",f:"illimité · graine partageable"},
 ]
 ,
   /* niveaux */
@@ -1131,7 +1179,7 @@ fr:{
   ctaTuto:"Commencer le tutoriel", ctaResume:n=>`Continuer : ${n}`,
   ctaSeason:w=>`Reprendre la saison, semaine ${w}`, ctaModes:"Tous les modes",
   pbStars:"Étoiles", pbBest:"Meilleur score", pbRank:"Niveaux terminés",
-  pbGuest:"Vous jouez sans compte : la progression reste sur ce navigateur.",
+  pbGuest:"Progression gardée sur ce navigateur seulement.",
   pbGuestGo:"Se connecter",
   dTtl:"Défi du jour", dSub:"La même semaine pour tout le monde, jusqu'à minuit.",
   dGo:"Jouer le défi", dAgain:"Rejouer", dDoneS:s=>`Déjà joué aujourd'hui : ${s}/100`,
@@ -1177,8 +1225,23 @@ fr:{
 en:{
   html:"en", other:"FR", theme:"Theme", menu:"← Menu",
   artCap:"A week · 5 staff · 7 days",
+  /* install */
+  instBtn:"Install",
+  instOk:"Installed. The game now opens like an app.",
+  instTtl:"Install PlanningMaster",
+  instIntro:"Once installed, the game opens from your home screen, full width, and works without a connection. Only the leaderboards need the internet.",
+  instIOS:["Tap the <b>Share</b> button at the bottom of Safari, the square with the up arrow.",
+           "Scroll down and choose <b>Add to Home Screen</b>.",
+           "Tap <b>Add</b> in the top right."],
+  instAutre:["Open your browser menu, the three dots in the top right.",
+             "Choose <b>Install PlanningMaster</b>, or <b>Add to Home screen</b>.",
+             "Confirm. An icon appears with your other apps."],
+  instNote:"On iPhone, installing only works from Safari, not from Chrome.",
+  majTxt:"A new version is available.",
+  majGo:"Reload",
   brand:"Shift-planning simulator · Restaurants · French labour rules",
-  tag:"You run a restaurant in Bayeux. Seven days, one team, one budget. Build the roster without breaking the law, or the margin.",
+  tag:"A restaurant in Lyon. Seven days, one team, one budget.",
+  tagHi:p=>`Hello ${p}. Seven days, one team, one budget.`,
   days:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
   daysShort:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
   shifts:{R:"Day off",P:"Prep",M:"Lunch",S:"Dinner",C:"Split"},
@@ -1258,9 +1321,9 @@ en:{
   shareTxt:(lvl,score,cost,budget)=>`PlanningMaster, ${lvl}: ${score}/100, payroll €${cost} against a €${budget} budget. Try it: https://${SITE}`,
   footL:"Teaching simulator · fictional team and figures", footR:"Source on GitHub",
   modes:[
-    {k:"Learning",t:"Levels",d:"Five hand-written weeks, each with its own trap. Every level has a 100/100 solution, find it.",f:"5 levels · stars"},
-    {k:"Campaign",t:"The season",d:"Ten weeks in sequence. Overtime accumulates, fatigue builds, morale drops. What you do in week 3 is paid for in week 7.",f:"10 weeks · state carries over"},
-    {k:"Endless",t:"Random",d:"Infinite generated weeks, adjustable difficulty. Each has a seed: share it to challenge someone on exactly the same week.",f:"unlimited · shareable seed"},
+    {k:"Learning",t:"Levels",d:"",f:"5 levels · stars"},
+    {k:"Campaign",t:"The season",d:"",f:"10 weeks · state carries over"},
+    {k:"Endless",t:"Random",d:"",f:"unlimited · shareable seed"},
 ]
 ,
   lvTitle:"Levels", lvSub:"Score at least 60 on a level to unlock the next.",
@@ -1316,7 +1379,7 @@ en:{
   ctaTuto:"Start the tutorial", ctaResume:n=>`Continue: ${n}`,
   ctaSeason:w=>`Resume the season, week ${w}`, ctaModes:"All modes",
   pbStars:"Stars", pbBest:"Best score", pbRank:"Levels cleared",
-  pbGuest:"You are playing without an account: progress stays in this browser.",
+  pbGuest:"Progress kept in this browser only.",
   pbGuestGo:"Sign in",
   dTtl:"Daily challenge", dSub:"The same week for everyone, until midnight.",
   dGo:"Play the challenge", dAgain:"Play again", dDoneS:s=>`Played today: ${s}/100`,
@@ -1502,8 +1565,8 @@ function renderArt(){
 
 function renderHome(){
   renderArt();
-  $('#h-brand').textContent=t('brand');
-  $('#h-tag').textContent=t('tag');
+  majBoutonInstall();
+  $('#h-tag').textContent = me ? t('tagHi')(me.pseudo||me.email) : t('tag');
   $('#h-footL').textContent=t('footL');
   $('#h-footR').innerHTML=`<a href="${REPO_URL}" rel="noopener">${t('footR')}</a>`;
 
@@ -1527,7 +1590,6 @@ function renderHome(){
   const pb=$('#h-player');
   if(me){
     pb.innerHTML=`
-      <span class="who">${me.pseudo||me.email}</span>
       <div class="pb"><span class="pk">${t('pbStars')}</span>
         <span class="starline">${Array.from({length:max},(_,k)=>
           `<i class="${k<st?'on':''}">★</i>`).join('')}<span class="starcount">${st}/${max}</span></span></div>
@@ -1539,8 +1601,8 @@ function renderHome(){
         <span class="starline">${Array.from({length:max},(_,k)=>
           `<i class="${k<st?'on':''}">★</i>`).join('')}<span class="starcount">${st}/${max}</span></span></div>
       <span class="spacer"></span>
-      <span style="color:var(--ink-2);font-size:13px">${t('pbGuest')}</span>
-      <button class="btn" id="pb-in" type="button">${t('pbGuestGo')}</button>`;
+      <span style="color:var(--muted);font-size:13px">${t('pbGuest')}</span>
+      <button class="btn primary" id="pb-in" type="button">${ico('compte')}${t('pbGuestGo')}</button>`;
     const b=$('#pb-in'); if(b) b.onclick=openAuth;
   }
 
@@ -1553,29 +1615,27 @@ function renderHome(){
   $('#h-daily').innerHTML=`
     <span class="dk">${ico('defi')}${t('dTtl')}</span>
     <h3>${jour.charAt(0).toUpperCase()+jour.slice(1)}</h3>
-    <p>${t('dSub')}</p>
     <div class="dmeta"><span>${t('dSeed')(seed)}</span><span>${t('dDiff')}</span>
       ${fait!==null?`<span style="color:var(--ok)">${t('dDoneS')(fait)}</span>`:''}</div>
     <button class="btn primary dgo" id="h-dgo" type="button">${fait!==null?t('dAgain'):t('dGo')}</button>`;
   $('#h-dgo').onclick=()=>{ startScenario(dailyScenario(),'daily'); };
 
-  // top du jour
+  // Top du jour : un panneau vide n'apprend rien. Il reste masqué et la
+  // carte du défi prend toute la largeur tant qu'aucun score n'est tombé.
   $('#h-topttl').textContent=t('topTtl');
-  const ol=$('#h-top');
-  ol.innerHTML=`<li class="empty" style="padding:9px 14px">…</li>`;
+  const ol=$('#h-top'), boite=$('#h-topbox');
+  boite.hidden=true;
   cloud.leaderboard('seed',`${seed}:${DAILY_DIFF}`,3).then(rows=>{
+    if(!rows.length) return;
     ol.innerHTML='';
-    if(!rows.length){
-      ol.innerHTML=`<li><span class="empty">${t('topEmpty')}</span></li>`;
-      return;
-    }
     rows.forEach((r,i)=>{
       const li=document.createElement('li');
       li.innerHTML=`<span class="rk">${i+1}</span>
         <span class="nm2">${r.pseudo}</span><span class="sc">${r.score}</span>`;
       ol.appendChild(li);
     });
-  }).catch(()=>{ ol.innerHTML=`<li><span class="empty">${t('topEmpty')}</span></li>`; });
+    boite.hidden=false;
+  }).catch(()=>{});
 
   // cartes de mode
   const w=$('#modes'); w.innerHTML='';
@@ -1585,15 +1645,14 @@ function renderHome(){
     const btn=document.createElement('button');
     btn.className='mode'; btn.type='button';
     btn.innerHTML=`<span class="mk">${ico(MODE_ICON[i])}${m.k}</span><span class="mt">${m.t}</span>
-      <span class="md">${m.d}</span><span class="mf">${m.f}</span>`;
+      ${m.d?`<span class="md">${m.d}</span>`:''}<span class="mf">${m.f}</span>`;
     btn.onclick=()=>{mode=keys[i];show(keys[i]);};
     w.appendChild(btn);
   });
 
   const band=$('#h-board');
   band.innerHTML=`<span><span class="bk">${ico('trophee')}${t('bandK')}</span><span class="bt">${t('bandT')}</span></span>
-    <span class="bd">${t('bandD')}</span>
-    <span class="bchips">${t('bandC').map(c=>`<span class="bchip">${c}</span>`).join('')}</span>
+    <span class="grow"></span>
     <span class="barrow">&rsaquo;</span>`;
   band.onclick=()=>show('board');
 }
@@ -2573,7 +2632,7 @@ let boardRef = 'l1';      // onglet de classement courant
 function refreshAccount(){
   const label = me ? (me.pseudo || me.email) : t('signIn');
   ['#accountbtn','#accountbtn2'].forEach(sel=>{
-    const el=$(sel); if(el) el.textContent=label;
+    const el=$(sel); if(el) el.innerHTML = ico('compte') + label;
   });
 }
 
@@ -2810,7 +2869,106 @@ async function renderHistory(){
   });
 }
 
+/* =====================================================================
+   Installation et mises à jour
+
+   Le jeu est entièrement client : une fois les fichiers en cache, il
+   tourne sans réseau. Reste à le proposer honnêtement.
+
+   Chrome et Edge préviennent avec beforeinstallprompt : on garde
+   l'événement et on ouvre le bouton quand il arrive. Safari ne le fait
+   pas, donc sur iPhone on explique le geste plutôt que de laisser un
+   bouton qui ne ferait rien.
+   ===================================================================== */
+let promptInstall = null;
+const enAppli = () =>
+  matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const surIOS = () =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+function majBoutonInstall(){
+  const b = $('#btnInstall');
+  if(!b) return;
+  // Le bouton reste visible partout sauf une fois l'application installée.
+  // Sans invite native (Safari, Firefox), il ouvre le mode d'emploi : mieux
+  // vaut expliquer le geste que de cacher la possibilité.
+  b.hidden = enAppli();
+  if(!b.hidden) b.innerHTML = ico('install') + t('instBtn');
+}
+
+async function lancerInstall(){
+  if(promptInstall){
+    promptInstall.prompt();
+    const res = await promptInstall.userChoice.catch(()=>({outcome:'dismissed'}));
+    promptInstall = null;
+    majBoutonInstall();
+    if(res && res.outcome === 'accepted') toast(t('instOk'));
+    return;
+  }
+  ouvrirInstallAide();
+}
+
+function ouvrirInstallAide(){
+  const ovl = document.createElement('div');
+  ovl.className = 'ovl';
+  const etapes = surIOS() ? t('instIOS') : t('instAutre');
+  ovl.innerHTML = `
+    <div class="sheet" role="dialog" aria-modal="true">
+      <header><div class="ek">PlanningMaster</div><h2>${t('instTtl')}</h2></header>
+      <div class="body">
+        <p style="margin:0;color:var(--ink-2)">${t('instIntro')}</p>
+        <ol class="steps">${etapes.map(x=>`<li>${x}</li>`).join('')}</ol>
+        <p class="disclaim">${t('instNote')}</p>
+      </div>
+      <footer><button class="btn primary" id="in-x" type="button">${t('dbClose')}</button></footer>
+    </div>`;
+  ovl.querySelector('#in-x').onclick = () => ovl.remove();
+  mountOvl(ovl);
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  promptInstall = e;
+  majBoutonInstall();
+});
+window.addEventListener('appinstalled', () => {
+  promptInstall = null;
+  majBoutonInstall();
+  toast(t('instOk'));
+});
+
+/* Une version fraîche attend : on le dit, on ne recharge pas dans le dos
+   d'un joueur qui est peut-être au milieu d'une semaine. */
+function bandeauMaj(sw){
+  if($('#majbar')) return;
+  const d = document.createElement('div');
+  d.id = 'majbar'; d.className = 'majbar';
+  d.innerHTML = `<span>${t('majTxt')}</span>
+    <button class="btn" type="button" id="maj-go">${t('majGo')}</button>
+    <button class="btn ico" type="button" id="maj-x" aria-label="${t('dbClose')}">&times;</button>`;
+  document.body.appendChild(d);
+  $('#maj-go').onclick = () => { if(sw) sw.postMessage('skip-waiting'); location.reload(); };
+  $('#maj-x').onclick = () => d.remove();
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      if(reg.waiting) bandeauMaj(reg.waiting);
+      reg.addEventListener('updatefound', () => {
+        const neuf = reg.installing;
+        if(!neuf) return;
+        neuf.addEventListener('statechange', () => {
+          if(neuf.state === 'installed' && navigator.serviceWorker.controller) bandeauMaj(neuf);
+        });
+      });
+    }).catch(()=>{});
+  });
+}
+
 ['#accountbtn','#accountbtn2'].forEach(sel=>{ const el=$(sel); if(el) el.onclick=openAuth; });
+{ const b=$('#btnInstall'); if(b) b.onclick=lancerInstall; }
 
 /* ---------- démarrage ---------- */
 window.__pm={show,startScenario,setCell,LEVELS,generateWeek,newSeason,
@@ -2824,6 +2982,13 @@ window.__pm={show,startScenario,setCell,LEVELS,generateWeek,newSeason,
   cloud.init().then(u=>{ me=u; refreshAccount(); if(me) pullProgress().then(()=>show(screen)); })
              .catch(()=>{});
   const u=new URLSearchParams(location.search);
+  // Raccourcis de l'icône installée (appui long sur l'icône) : ils ouvrent
+  // directement le mode voulu au lieu de la page d'accueil.
+  const go=u.get('go');
+  if(go==='daily'){ show('home'); refreshAccount();
+    startScenario(dailyScenario(),'daily'); return; }
+  if(go==='levels'||go==='season'||go==='random'){
+    mode=go; show(go); refreshAccount(); return; }
   const s=u.get('seed');
   if(s){
     rnd.seed=s.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)||rnd.seed;

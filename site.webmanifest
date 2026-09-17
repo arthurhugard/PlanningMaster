@@ -1,0 +1,41 @@
+{
+  "name": "PlanningMaster",
+  "short_name": "PlanningMaster",
+  "description": "Simulateur de planning d'équipe en restauration : repos, couverture des services et masse salariale.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "lang": "fr",
+  "dir": "ltr",
+  "background_color": "#E3E8E1",
+  "theme_color": "#E3E8E1",
+  "categories": ["education", "games", "productivity"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Défi du jour",
+      "short_name": "Défi",
+      "url": "/?go=daily",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Les niveaux",
+      "short_name": "Niveaux",
+      "url": "/?go=levels",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "La saison",
+      "short_name": "Saison",
+      "url": "/?go=season",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}
