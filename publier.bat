@@ -23,6 +23,9 @@ exit /b 0
 
 :haschanges
 del "%TEMP%\pm_new.txt" >nul 2>&1
+rem  le moteur est partage avec l'Edge Function : on resynchronise
+if not exist "supabase\functions\_shared" mkdir "supabase\functions\_shared"
+copy /Y game-core.js "supabase\functions\_shared\game-core.js" >nul
 echo.
 echo   Fichiers modifies :
 git --no-pager status --short

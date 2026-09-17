@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Planning Coup de Feu</title>
+<title>PlanningMaster</title>
 <meta name="description" content="Simulateur de planning d'équipe en restauration : niveaux, saison complète et semaines générées à l'infini, sous contraintes de repos, de couverture et de budget.">
 <meta name="author" content="Arthur Hugard">
 <meta name="color-scheme" content="light dark">
 
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Planning Coup de Feu">
-<meta property="og:title" content="Planning Coup de Feu">
+<meta property="og:site_name" content="PlanningMaster">
+<meta property="og:title" content="PlanningMaster">
 <meta property="og:description" content="Trois modes, une équipe, un budget. 11 h de repos, effectifs par service, masse salariale : saurez-vous tenir une saison entière ?">
 <meta property="og:url" content="https://jeu.arthurhugard.com/">
 <meta property="og:image" content="https://jeu.arthurhugard.com/og.png">
@@ -19,7 +19,7 @@
 <meta property="og:locale" content="fr_FR">
 <meta property="og:locale:alternate" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Planning Coup de Feu">
+<meta name="twitter:title" content="PlanningMaster">
 <meta name="twitter:description" content="Trois modes, une équipe, un budget. Saurez-vous tenir une saison entière ?">
 <meta name="twitter:image" content="https://jeu.arthurhugard.com/og.png">
 
@@ -185,8 +185,9 @@ h1,h2,h3{text-wrap:balance}
 .field{display:grid;gap:6px}
 .field label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;
   text-transform:uppercase;color:var(--muted)}
-.field input[type=text]{font:inherit;font-family:"IBM Plex Mono",monospace;padding:9px 11px;
-  border:1px solid var(--line-strong);border-radius:5px;background:var(--surface);color:var(--ink)}
+.field input[type=text],.field input[type=password],.field input[type=email]{
+  font:inherit;font-family:"IBM Plex Mono",monospace;padding:9px 11px;
+  border:1px solid var(--line-strong);border-radius:5px;background:var(--surface);color:var(--ink);width:100%}
 .field input[type=range]{accent-color:var(--accent)}
 .diffrow{display:flex;gap:6px;flex-wrap:wrap}
 .diffrow button{font:inherit;font-size:13px;cursor:pointer;padding:7px 13px;border-radius:5px;
@@ -415,8 +416,9 @@ footer.foot a{color:var(--ink-2)}
 <!-- ===== barre haute (masquée sur l'accueil) ===== -->
 <div class="topbar" id="topbar" hidden>
   <button class="pill" id="btnHome" type="button">← Menu</button>
-  <p class="topttl">Planning <em>Coup de Feu</em></p>
+  <p class="topttl">Planning<em>Master</em></p>
   <span class="grow"></span>
+  <button class="pill" id="accountbtn" type="button">Compte</button>
   <button class="pill" id="langbtn" type="button">EN</button>
   <button class="pill" id="themebtn" type="button">Thème</button>
 </div>
@@ -425,9 +427,10 @@ footer.foot a{color:var(--ink-2)}
 <section id="scr-home">
   <div class="hero">
     <p class="brandline" id="h-brand"></p>
-    <h1>Planning <em>Coup de Feu</em></h1>
+    <h1>Planning<em>Master</em></h1>
     <p id="h-tag"></p>
-    <div style="display:flex;gap:8px;margin-top:16px">
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+      <button class="pill" id="accountbtn2" type="button">Compte</button>
       <button class="pill" id="langbtn2" type="button">EN</button>
       <button class="pill" id="themebtn2" type="button">Thème</button>
     </div>
@@ -499,6 +502,16 @@ footer.foot a{color:var(--ink-2)}
   </div>
 </section>
 
+<!-- ===== écran : classements ===== -->
+<section id="scr-board" hidden>
+  <div class="pagehead"><h2 id="bd-title"></h2><span class="sub" id="bd-sub"></span></div>
+  <div class="diffrow" id="bd-tabs" style="margin-bottom:16px"></div>
+  <div class="panel">
+    <h3 id="bd-h3"></h3>
+    <ul class="issues" id="bd-list"></ul>
+  </div>
+</section>
+
 <!-- ===== écran : jeu ===== -->
 <section id="scr-play" hidden>
   <div class="brief">
@@ -558,10 +571,18 @@ footer.foot a{color:var(--ink-2)}
 
 </div>
 
-<script>
+<script type="module">
 "use strict";
+import {
+  SHIFTS, ORDER, KEYMAP, coutSalarie, evaluate, LEVELS,
+  SEASON_WEEKS, newSeason, seasonScenario, applySeasonWeek,
+  randomSeed, generateWeek,
+} from './game-core.js';
+import * as cloud from './cloud.js';
+
+// Bascule sur planningmaster.arthurhugard.com une fois le CNAME actif.
 const SITE = "jeu.arthurhugard.com";
-const REPO_URL = "https://github.com/arthurhugard/planning-coup-de-feu";
+const REPO_URL = "https://github.com/arthurhugard/planningmaster";
 
 /* ======================= i18n ======================= */
 const T = {
@@ -628,13 +649,14 @@ fr:{
   tCouv:(s,n)=>`${s}/100 — pas d'infraction, mais ${n} problème${n>1?'s':''} de couverture.`,
   tOpti:s=>`${s}/100 — légalement propre. Reste l'optimisation : budget, heures perdues, souhaits.`,
   tCopied:"Score copié.", tCopyFail:"Copie impossible sur ce navigateur.",
-  shareTxt:(lvl,score,cost,budget)=>`Planning Coup de Feu — ${lvl} : ${score}/100, masse salariale ${cost} € sur un budget de ${budget} €. À vous d'essayer : https://${SITE}`,
+  shareTxt:(lvl,score,cost,budget)=>`PlanningMaster — ${lvl} : ${score}/100, masse salariale ${cost} € sur un budget de ${budget} €. À vous d'essayer : https://${SITE}`,
   footL:"Simulateur pédagogique · données et équipe fictives", footR:"Code ouvert sur GitHub",
   /* modes */
   modes:[
     {k:"Apprentissage",t:"Les niveaux",d:"Cinq semaines écrites à la main, chacune avec son piège. Chaque niveau a une solution à 100/100 — à vous de la trouver.",f:"5 niveaux · étoiles"},
     {k:"Campagne",t:"La saison",d:"Dix semaines qui s'enchaînent. Les heures supplémentaires s'accumulent, la fatigue monte, le moral baisse. Vos choix de la semaine 3 se paient semaine 7.",f:"10 semaines · état reporté"},
-    {k:"Sans fin",t:"Aléatoire",d:"Des semaines générées à l'infini, difficulté réglable. Chaque semaine a une graine : partagez-la pour défier quelqu'un sur exactement la même.",f:"illimité · graine partageable"}],
+    {k:"Sans fin",t:"Aléatoire",d:"Des semaines générées à l'infini, difficulté réglable. Chaque semaine a une graine : partagez-la pour défier quelqu'un sur exactement la même.",f:"illimité · graine partageable"},
+    {k:"Comparaison",t:"Classements",d:"Qui tient le mieux le budget, sur les niveaux, sur une graine donnée ou sur la saison complète. Les scores sont revérifiés par le serveur.",f:"comptes · scores vérifiés"}],
   /* niveaux */
   lvTitle:"Les niveaux", lvSub:"Terminez un niveau à 60 minimum pour débloquer le suivant.",
   lvLocked:"Verrouillé", lvBest:"Meilleur", lvNever:"Jamais jouée",
@@ -664,6 +686,29 @@ fr:{
   rdPlay:"Jouer cette semaine", rdRoll:"Nouvelle graine", rdPrevTtl:"Aperçu",
   diffs:["Tranquille","Normale","Tendue","Rude","Infernale"],
   rdOpen:"Jours ouverts", rdStaff:"Salariés", rdSlots:"Postes à couvrir",
+  /* compte et classements */
+  account:"Compte", signIn:"Se connecter", signOut:"Se déconnecter",
+  authTtlIn:"Se connecter", authTtlUp:"Créer un compte",
+  fEmail:"E-mail", fPass:"Mot de passe", fPseudo:"Pseudo affiché",
+  goUp:"Pas encore de compte ? En créer un", goIn:"J'ai déjà un compte",
+  authGo:"Valider", authCancel:"Fermer",
+  hello:p=>`Connecté : ${p}`,
+  needAuth:"Connectez-vous pour enregistrer vos scores.",
+  authBad:"E-mail ou mot de passe incorrect.",
+  authShort:"Mot de passe : 6 caractères minimum.",
+  authMail:"Un e-mail de confirmation vous a été envoyé.",
+  authDone:p=>`Bienvenue, ${p}.`,
+  bdTitle:"Classements", bdSub:"Scores recalculés côté serveur à partir de votre grille.",
+  bdH3:"Meilleurs scores", bdEmpty:"Personne n'a encore de score ici.",
+  bdSeason:"Saison", bdSeed:"Graine en cours",
+  bdMe:"vous",
+  sent:(s,b)=>`Score enregistré : ${s}/100.`,
+  sentBetter:s=>`Nouveau record : ${s}/100.`,
+  sentWorse:b=>`Pas battu : votre record reste ${b}/100.`,
+  sentFail:"Enregistrement impossible. Réessayez.",
+  sentLegal:"Corrigez les infractions avant d'enregistrer.",
+  snSubmit:"Enregistrer ma saison",
+  snNotDone:"Terminez les dix semaines d'abord.",
 },
 en:{
   html:"en", other:"FR", theme:"Theme", menu:"← Menu",
@@ -728,12 +773,13 @@ en:{
   tCouv:(s,n)=>`${s}/100 — no breaches, but ${n} coverage problem${n>1?'s':''}.`,
   tOpti:s=>`${s}/100 — legally clean. What's left is optimisation: budget, wasted hours, requests.`,
   tCopied:"Score copied.", tCopyFail:"Copying isn't available in this browser.",
-  shareTxt:(lvl,score,cost,budget)=>`Planning Coup de Feu — ${lvl}: ${score}/100, payroll €${cost} against a €${budget} budget. Try it: https://${SITE}`,
+  shareTxt:(lvl,score,cost,budget)=>`PlanningMaster — ${lvl}: ${score}/100, payroll €${cost} against a €${budget} budget. Try it: https://${SITE}`,
   footL:"Teaching simulator · fictional team and figures", footR:"Source on GitHub",
   modes:[
     {k:"Learning",t:"Levels",d:"Five hand-written weeks, each with its own trap. Every level has a 100/100 solution — find it.",f:"5 levels · stars"},
     {k:"Campaign",t:"The season",d:"Ten weeks in sequence. Overtime accumulates, fatigue builds, morale drops. What you do in week 3 is paid for in week 7.",f:"10 weeks · state carries over"},
-    {k:"Endless",t:"Random",d:"Infinite generated weeks, adjustable difficulty. Each has a seed: share it to challenge someone on exactly the same week.",f:"unlimited · shareable seed"}],
+    {k:"Endless",t:"Random",d:"Infinite generated weeks, adjustable difficulty. Each has a seed: share it to challenge someone on exactly the same week.",f:"unlimited · shareable seed"},
+    {k:"Compare",t:"Leaderboards",d:"Who holds the budget best, on the levels, on a given seed, or across a full season. Every score is re-verified server-side.",f:"accounts · verified scores"}],
   lvTitle:"Levels", lvSub:"Score at least 60 on a level to unlock the next.",
   lvLocked:"Locked", lvBest:"Best", lvNever:"Never played",
   snTitle:"The season", snSub:"March to July. Every validated week changes the state of your team.",
@@ -760,29 +806,38 @@ en:{
   rdPlay:"Play this week", rdRoll:"New seed", rdPrevTtl:"Preview",
   diffs:["Easy","Normal","Tight","Hard","Brutal"],
   rdOpen:"Days open", rdStaff:"Staff", rdSlots:"Posts to cover",
+  account:"Account", signIn:"Sign in", signOut:"Sign out",
+  authTtlIn:"Sign in", authTtlUp:"Create an account",
+  fEmail:"Email", fPass:"Password", fPseudo:"Display name",
+  goUp:"No account yet? Create one", goIn:"I already have an account",
+  authGo:"Continue", authCancel:"Close",
+  hello:p=>`Signed in: ${p}`,
+  needAuth:"Sign in to save your scores.",
+  authBad:"Wrong email or password.",
+  authShort:"Password: 6 characters minimum.",
+  authMail:"A confirmation email has been sent.",
+  authDone:p=>`Welcome, ${p}.`,
+  bdTitle:"Leaderboards", bdSub:"Scores recomputed server-side from your roster.",
+  bdH3:"Best scores", bdEmpty:"No score here yet.",
+  bdSeason:"Season", bdSeed:"Current seed",
+  bdMe:"you",
+  sent:(s,b)=>`Score saved: ${s}/100.`,
+  sentBetter:s=>`New personal best: ${s}/100.`,
+  sentWorse:b=>`Not beaten: your best is still ${b}/100.`,
+  sentFail:"Could not save. Try again.",
+  sentLegal:"Fix the labour-law breaches before saving.",
+  snSubmit:"Submit my season",
+  snNotDone:"Finish all ten weeks first.",
 }};
 let lang = "fr";
 const t = k => T[lang][k];
 const X = o => (o && typeof o==='object' && o.fr!==undefined) ? o[lang] : o;
 
 /* ======================= moteur ======================= */
-const SHIFTS = {
-  R:{code:'R',h:0,   deb:null,fin:null, couvre:[],              col:'--repos',label:'—'},
-  P:{code:'P',h:7,   deb:8,   fin:15,   couvre:['midi'],        col:'--prep', label:'08:00–15:00'},
-  M:{code:'M',h:4,   deb:11,  fin:15,   couvre:['midi'],        col:'--midi', label:'11:00–15:00'},
-  S:{code:'S',h:5.75,deb:18,  fin:23.75,couvre:['soir'],        col:'--soir', label:'18:00–23:45'},
-  C:{code:'C',h:9.75,deb:11,  fin:23.75,couvre:['midi','soir'], col:'--coup', label:'11:00–15:00 + 18:00–23:45'},
-};
-const ORDER=['R','P','M','S','C'], KEYMAP={'0':'R','1':'P','2':'M','3':'S','4':'C'};
+// Le moteur vit dans game-core.js : même code pour la page et pour
+// l'Edge Function qui revalide les scores. Voir supabase/functions/.
 
-function coutSalarie(em,h){
-  const p=Math.max(h,em.contrat), tx=em.taux;
-  let c=Math.min(p,35)*tx;
-  if(p>35)c+=(Math.min(p,39)-35)*tx*1.10;
-  if(p>39)c+=(Math.min(p,43)-39)*tx*1.20;
-  if(p>43)c+=(p-43)*tx*1.50;
-  return c;
-}
+/* --- formatage : dépend de la langue, donc ici et pas dans le moteur --- */
 function fmtH(h){
   const hh=Math.floor(h+1e-9), mm=Math.round((h-hh)*60);
   if(lang==='en') return mm?`${hh}h${String(mm).padStart(2,'0')}`:`${hh}h`;
@@ -791,477 +846,47 @@ function fmtH(h){
 const nf = n => Math.round(n).toLocaleString(lang==='en'?'en-GB':'fr-FR');
 const cur = v => lang==='en' ? `€${nf(v)}` : `${nf(v)} €`;
 
-function evaluate(S,p){
-  const issues=[],flags=new Set(),hours={},cost={};
-  let total=0;
-  const D=t('days'),Ds=t('daysShort'),SV=t('services');
-  S.equipe.forEach(em=>{
-    const row=p[em.id];
-    let h=0,repos=0;
-    row.forEach(c=>{h+=SHIFTS[c].h; if(c==='R')repos++;});
-    hours[em.id]=h; cost[em.id]=coutSalarie(em,h); total+=cost[em.id];
-    for(let d=0;d<6;d++){
-      const a=SHIFTS[row[d]],n=SHIFTS[row[d+1]];
-      if(a.fin===null||n.deb===null)continue;
-      const rep=(n.deb+24)-a.fin;
-      if(rep<11){
-        issues.push({cat:'legal',pts:20,txt:t('iRest')(fmtH(rep),Ds[d],Ds[d+1]),who:t('iRestWho')(em.nom)});
-        flags.add(em.id+'-'+d); flags.add(em.id+'-'+(d+1));
-      }
-    }
-    if(repos<2){
-      issues.push({cat:'legal',pts:20,txt:t('iOff'),who:t('iOffWho')(em.nom,repos)});
-      row.forEach((c,d)=>{if(c!=='R')flags.add(em.id+'-'+d);});
-    }
-    if(S.reposConsecutifs&&repos>=2){
-      let ok=false;
-      for(let d=0;d<6;d++) if(row[d]==='R'&&row[d+1]==='R') ok=true;
-      if(!ok) issues.push({cat:'conf',pts:5,txt:t('iConsec'),who:t('iConsecWho')(em.nom)});
-    }
-    if(h>48){
-      issues.push({cat:'legal',pts:20,txt:t('i48')(fmtH(h)),who:t('i48Who')(em.nom)});
-      row.forEach((c,d)=>{if(c!=='R')flags.add(em.id+'-'+d);});
-    }
-    const dispo=S.jours.filter((j,d)=>!j.ferme&&!(em.indispo&&em.indispo[d]!==undefined)).length;
-    if(h<em.contrat-0.01&&dispo>0){
-      const perdu=em.contrat-h;
-      issues.push({cat:'eco',pts:Math.min(10,Math.round(perdu)),
-        txt:t('iPaid')(fmtH(perdu)),who:t('iPaidWho')(em.nom,em.contrat,fmtH(h))});
-    }
-  });
-  let postesOK=0,postesTot=0;
-  S.jours.forEach((j,d)=>{
-    ['midi','soir'].forEach(sv=>{
-      ['cuisine','salle'].forEach(pole=>{
-        const need=j.besoin[sv][pole];
-        if(need<=0)return;
-        postesTot+=need;
-        const pres=S.equipe.filter(em=>em.pole===pole&&SHIFTS[p[em.id][d]].couvre.includes(sv));
-        postesOK+=Math.min(pres.length,need);
-        if(pres.length<need){
-          const m=need-pres.length;
-          issues.push({cat:'couv',pts:12*m,txt:t('iCover')(D[d],SV[sv],m,pole),
-            who:t('iCoverWho')(pres.length,need,pole)});
-        }
-        if(pres.length>0&&!pres.some(em=>em.resp))
-          issues.push({cat:'couv',pts:8,txt:t('iResp')(D[d],SV[sv],pole),who:t('iRespWho')(pole)});
-      });
-    });
-  });
-  (S.prefs||[]).forEach(pr=>{
-    if(p[pr.emp]&&p[pr.emp][pr.jour]!==pr.veut)
-      issues.push({cat:'conf',pts:3,txt:t('iWish'),who:X(pr.txt)});
-  });
-  const over=total-S.budget;
-  if(over>0){
-    const pct=over/S.budget*100;
-    issues.push({cat:'eco',pts:Math.min(25,Math.round(pct*1.5)),
-      txt:t('iBudget')(nf(over)),who:t('iBudgetWho')(nf(total),nf(S.budget))});
+/* --- traduction des codes renvoyés par le moteur --- */
+function fmtIssue(i){
+  const a=i.a, D=t('days'), Ds=t('daysShort'), SV=t('services');
+  switch(i.code){
+    case 'REST':   return [t('iRest')(fmtH(a.h),Ds[a.d1],Ds[a.d2]), t('iRestWho')(a.nom)];
+    case 'OFF':    return [t('iOff'), t('iOffWho')(a.nom,a.repos)];
+    case 'CONSEC': return [t('iConsec'), t('iConsecWho')(a.nom)];
+    case 'MAX48':  return [t('i48')(fmtH(a.h)), t('i48Who')(a.nom)];
+    case 'PAID':   return [t('iPaid')(fmtH(a.perdu)), t('iPaidWho')(a.nom,a.contrat,fmtH(a.h))];
+    case 'COVER':  return [t('iCover')(D[a.jour],SV[a.sv],a.manque,a.pole),
+                           t('iCoverWho')(a.present,a.need,a.pole)];
+    case 'LEAD':   return [t('iResp')(D[a.jour],SV[a.sv],a.pole), t('iRespWho')(a.pole)];
+    case 'WISH':   return [t('iWish'), X(a.txt)];
+    case 'BUDGET': return [t('iBudget')(nf(a.over)), t('iBudgetWho')(nf(a.total),nf(a.budget))];
+    default:       return [i.code, ''];
   }
-  const score=Math.max(0,100-issues.reduce((s,i)=>s+i.pts,0));
-  return {issues,flags,hours,cost,total,score,postesOK,postesTot};
 }
-
-/* ======================= données ======================= */
-const b=(cm,cs,sm,ss)=>({midi:{cuisine:cm,salle:cs},soir:{cuisine:sm,salle:ss}});
-function e(id,nom,pole,role,contrat,taux,resp,opts){
-  return Object.assign({id,nom,pole,role,contrat,taux,resp:!!resp},opts||{});
-}
-const wish=(fr,en)=>({fr,en});
-
-const LEVELS=[
-{ id:'l1', n:{fr:'Niveau 1',en:'Level 1'},
-  titre:{fr:'Novembre, semaine calme',en:'November, a quiet week'},
-  sous:{fr:'6 salariés · fermé le lundi',en:'6 staff · closed Mondays'},
-  brief:{fr:"Basse saison à Bayeux. Fermé le lundi et le dimanche soir. L'équipe est au complet et les besoins sont modestes : le vrai enjeu, c'est de coller aux contrats sans payer d'heures dans le vide. Léa a cours le mardi et le mercredi.",
-    en:"Low season in Bayeux. Closed Mondays and Sunday evenings. The team is complete and demand is modest: the real challenge is matching the contracts without paying for hours nobody works. Léa has classes on Tuesday and Wednesday."},
-  ca:12500,budget:4100,reposConsecutifs:false,
-  jours:[{ferme:true,besoin:b(0,0,0,0),note:'ferme'},{besoin:b(1,1,2,2)},{besoin:b(1,1,2,2)},
-    {besoin:b(2,1,2,2)},{besoin:b(2,2,3,3)},{besoin:b(2,2,3,3)},{besoin:b(2,2,0,0),note:'soirFerme'}],
-  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
-    e('c2','Inès Diallo','cuisine','second',35,19,true),
-    e('c3','Tom Berger','cuisine','commis',35,15,false),
-    e('s1','Claire Aubert','salle','mh',39,21,true),
-    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
-    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{1:'cours',2:'cours'}})],
-  prefs:[{emp:'s2',jour:6,veut:'R',txt:wish("Yanis a demandé son dimanche","Yanis asked for Sunday off")}],
-  draft:{c1:['R','C','S','P','C','C','R'],c2:['R','R','C','C','C','S','R'],
-    c3:['R','S','R','C','S','C','M'],s1:['R','C','S','R','C','C','M'],
-    s2:['R','S','C','C','S','S','R'],s3:['R','R','R','S','C','C','M']} },
-
-{ id:'l2', n:{fr:'Niveau 2',en:'Level 2'},
-  titre:{fr:'Le pont du 8 mai',en:'The May bank holiday'},
-  sous:{fr:'8 salariés · ouvert 7 jours',en:'8 staff · open all week'},
-  brief:{fr:"Premier coup de chaud de l'année : ouvert tous les jours, le 8 mai tombe un jeudi et les tables du soir sont pleines. Inès a posé ses congés vendredi et samedi — les deux services où vous auriez le plus besoin d'elle. Hugo est en contrat d'extra 20 h.",
-    en:"The first rush of the year: open every day, the holiday falls on Thursday and every dinner table is booked. Inès has taken leave on Friday and Saturday — the two services where you need her most. Hugo is on a 20-hour casual contract."},
-  ca:16500,budget:4950,reposConsecutifs:false,
-  jours:[{besoin:b(1,1,2,2)},{besoin:b(1,1,2,2)},{besoin:b(2,2,2,2)},{besoin:b(2,2,3,3),note:'ferie'},
-    {besoin:b(2,2,3,2)},{besoin:b(2,2,3,3)},{besoin:b(2,2,0,0),note:'soirFerme'}],
-  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
-    e('c2','Inès Diallo','cuisine','second',35,19,true,{indispo:{4:'conge',5:'conge'}}),
-    e('c3','Tom Berger','cuisine','commis',35,15,false),
-    e('c4','Hugo Pellerin','cuisine','extra',20,16,false),
-    e('s1','Claire Aubert','salle','mh',39,21,true),
-    e('s4','Nora Benali','salle','rang',30,17,true),
-    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
-    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{1:'cours'}})],
-  prefs:[{emp:'s2',jour:6,veut:'R',txt:wish("Yanis a demandé son dimanche","Yanis asked for Sunday off")},
-    {emp:'c3',jour:5,veut:'R',txt:wish("Tom ne peut pas fermer le samedi","Tom cannot close on Saturday")}] },
-
-{ id:'l3', n:{fr:'Niveau 3',en:'Level 3'},
-  titre:{fr:'Plein été, semaine du 6 juin',en:'High summer, D-Day week'},
-  sous:{fr:'10 salariés · budget sous tension',en:'10 staff · budget under pressure'},
-  brief:{fr:"Les commémorations remplissent Bayeux, la salle tourne midi et soir sept jours sur sept. Tom est en arrêt jusqu'à mercredi inclus. Le budget est calé sur 31 % du chiffre d'affaires. Règle maison ce mois-ci : deux jours de repos consécutifs pour tout le monde.",
-    en:"The commemorations fill Bayeux and the dining room turns over at lunch and dinner, seven days a week. Tom is on sick leave through Wednesday. Payroll is capped at 31% of revenue. House rule this month: two consecutive days off for everyone."},
-  ca:21000,budget:6600,reposConsecutifs:true,
-  jours:[{besoin:b(2,2,2,2)},{besoin:b(2,2,2,2)},{besoin:b(2,2,3,3)},{besoin:b(2,2,3,3)},
-    {besoin:b(3,3,3,3)},{besoin:b(3,3,4,4)},{besoin:b(3,3,2,2)}],
-  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
-    e('c2','Inès Diallo','cuisine','second',35,19,true),
-    e('c3','Tom Berger','cuisine','commis',35,15,false,{indispo:{0:'arret',1:'arret',2:'arret'}}),
-    e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
-    e('c5','Sami Ouaddah','cuisine','plongeur',24,15,false),
-    e('s1','Claire Aubert','salle','mh',39,21,true),
-    e('s4','Nora Benali','salle','rang',30,17,true),
-    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
-    e('s5','Emma Caron','salle','rang',35,16.5,true),
-    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{3:'cours'}})],
-  prefs:[{emp:'s2',jour:6,veut:'R',txt:wish("Yanis a demandé son dimanche","Yanis asked for Sunday off")},
-    {emp:'c5',jour:0,veut:'R',txt:wish("Sami a un rendez-vous lundi","Sami has an appointment on Monday")},
-    {emp:'s5',jour:2,veut:'R',txt:wish("Emma a demandé son mercredi","Emma asked for Wednesday off")}] },
-
-{ id:'l4', n:{fr:'Niveau 4',en:'Level 4'},
-  titre:{fr:'Réouverture après travaux',en:'Reopening after the works'},
-  sous:{fr:'8 salariés · 5 jours, tout en soirée',en:'8 staff · 5 days, dinner-heavy'},
-  brief:{fr:"La salle a été refaite, vous rouvrez le mercredi. Deux jours de fermeture en début de semaine, puis cinq services du soir pleins à craquer : tout le monde veut voir la nouvelle déco. Aucun salarié en congé, mais des besoins du soir que la brigade ne peut couvrir qu'en coupures bien placées.",
-    en:"The dining room has been redone and you reopen on Wednesday. Two closed days, then five packed dinner services: everyone wants to see the new look. Nobody is on leave, but the dinner headcount can only be met with well-placed splits."},
-  ca:17000,budget:5400,reposConsecutifs:false,
-  jours:[{ferme:true,besoin:b(0,0,0,0),note:'ferme'},{ferme:true,besoin:b(0,0,0,0),note:'ferme'},
-    {besoin:b(2,2,3,3)},{besoin:b(2,2,3,3)},{besoin:b(3,3,4,4)},{besoin:b(3,3,4,4)},{besoin:b(3,3,2,2)}],
-  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
-    e('c2','Inès Diallo','cuisine','second',35,19,true),
-    e('c3','Tom Berger','cuisine','commis',35,15,false),
-    e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
-    e('s1','Claire Aubert','salle','mh',39,21,true),
-    e('s4','Nora Benali','salle','rang',35,17,true),
-    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
-    e('s5','Emma Caron','salle','rang',35,16.5,true)],
-  prefs:[{emp:'c3',jour:6,veut:'R',txt:wish("Tom voudrait son dimanche","Tom would like Sunday off")}] },
-
-{ id:'l5', n:{fr:'Niveau 5',en:'Level 5'},
-  titre:{fr:'La semaine de Noël',en:'Christmas week'},
-  sous:{fr:'10 salariés · tout le monde veut partir',en:'10 staff · everyone wants time off'},
-  brief:{fr:"Six jours d'ouverture, fermé le 25. Les réservations du soir sont complètes depuis novembre et la moitié de l'équipe a de la famille à voir. Quatre souhaits sur la table, un budget calé à 28 % du CA, et deux jours de repos consécutifs exigés par la direction. Bon courage.",
-    en:"Six days open, closed on the 25th. Dinner has been fully booked since November and half the team has family to see. Four requests on the table, payroll capped at 28% of revenue, and management wants two consecutive days off for everyone. Good luck."},
-  ca:23000,budget:6550,reposConsecutifs:true,
-  jours:[{besoin:b(2,2,3,3)},{besoin:b(2,2,3,3)},{ferme:true,besoin:b(0,0,0,0),note:'noel'},
-    {besoin:b(3,3,4,4)},{besoin:b(3,3,4,4)},{besoin:b(3,3,4,4)},{besoin:b(2,2,3,3)}],
-  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
-    e('c2','Inès Diallo','cuisine','second',35,19,true),
-    e('c3','Tom Berger','cuisine','commis',35,15,false),
-    e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
-    e('c5','Sami Ouaddah','cuisine','plongeur',35,15,false),
-    e('s1','Claire Aubert','salle','mh',39,21,true),
-    e('s4','Nora Benali','salle','rang',35,17,true),
-    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
-    e('s5','Emma Caron','salle','rang',35,16.5,true),
-    e('s3','Léa Marchand','salle','serveuse',35,15.5,false)],
-  prefs:[{emp:'s3',jour:0,veut:'R',txt:wish("Léa part en famille le lundi","Léa travels to family on Monday")},
-    {emp:'c5',jour:6,veut:'R',txt:wish("Sami a demandé son dimanche","Sami asked for Sunday off")},
-    {emp:'s5',jour:1,veut:'R',txt:wish("Emma voudrait le 24 au soir","Emma would like Christmas Eve off")},
-    {emp:'c3',jour:3,veut:'R',txt:wish("Tom a un train le jeudi","Tom has a train on Thursday")}] },
-];
-
-/* ---------- saison ---------- */
-const SEASON_TEAM=[
-  e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
-  e('c2','Inès Diallo','cuisine','second',35,19,true),
-  e('c3','Tom Berger','cuisine','commis',35,15,false),
-  e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
-  e('c5','Sami Ouaddah','cuisine','plongeur',30,15,false),
-  e('s1','Claire Aubert','salle','mh',39,21,true),
-  e('s4','Nora Benali','salle','rang',35,17,true),
-  e('s2','Yanis Roux','salle','rangM',35,16.5,true),
-  e('s5','Emma Caron','salle','rang',35,16.5,true),
-  e('s3','Léa Marchand','salle','serveuse',30,15.5,false),
-];
-const SEASON_WEEKS=[
- {nom:{fr:"Mars — reprise",en:"March — back open"},ca:13000,mult:.62,
-  txt:{fr:"On rouvre après la coupure d'hiver. Peu de monde en semaine, un peu de passage le week-end. Semaine idéale pour caler les contrats sans creuser la trésorerie.",
-       en:"Reopening after the winter break. Quiet midweek, a little weekend trade. A good week to settle into the contracts without burning cash."},
-  ferme:[0], staff:['c1','c2','c3','s1','s4','s2']},
- {nom:{fr:"Mars — premiers cars",en:"March — first coaches"},ca:14500,mult:.68,
-  txt:{fr:"Les premiers autocars de touristes s'arrêtent à Bayeux. Les midis se remplissent, les soirs restent calmes.",
-       en:"The first tourist coaches stop in Bayeux. Lunches fill up, evenings stay quiet."},
-  ferme:[0], staff:['c1','c2','c3','s1','s4','s2']},
- {nom:{fr:"Avril — vacances de Pâques",en:"April — Easter holidays"},ca:17000,mult:.80,
-  txt:{fr:"Vacances scolaires : familles au déjeuner, couples le soir. Vous ouvrez sept jours sur sept à partir de maintenant.",
-       en:"School holidays: families at lunch, couples at dinner. You are open seven days a week from now on."},
-  ferme:[], staff:['c1','c2','c3','c4','s1','s4','s2','s5']},
- {nom:{fr:"Avril — creux",en:"April — the dip"},ca:14000,mult:.66,
-  txt:{fr:"Fin des vacances, la fréquentation retombe d'un coup. Profitez-en pour faire souffler ceux qui ont tiré.",
-       en:"Holidays over, footfall drops sharply. Use it to rest whoever has been pushing hardest."},
-  ferme:[0], staff:['c1','c2','c3','s1','s4','s2']},
- {nom:{fr:"Mai — le pont",en:"May — bank holiday"},ca:19000,mult:.88,
-  txt:{fr:"Long week-end férié, la ville est pleine. Trois services du soir à quatre en cuisine.",
-       en:"A long weekend and the town is full. Three dinner services need four in the kitchen."},
-  ferme:[], staff:['c1','c2','c3','c4','s1','s4','s2','s5']},
- {nom:{fr:"Mai — mariages",en:"May — wedding season"},ca:18000,mult:.84,
-  txt:{fr:"Deux mariages en ville : les samedis sont saturés, le reste de la semaine respire.",
-       en:"Two weddings in town: Saturdays are packed, the rest of the week breathes."},
-  ferme:[], staff:['c1','c2','c3','c4','s1','s4','s2','s5']},
- {nom:{fr:"Juin — le 6",en:"June — the 6th"},ca:22000,mult:1.0,
-  txt:{fr:"Commémorations du Débarquement. La semaine la plus dense de la saison, midi et soir, tous les jours.",
-       en:"D-Day commemorations. The busiest week of the season, lunch and dinner, every day."},
-  ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
- {nom:{fr:"Juin — après la vague",en:"June — after the wave"},ca:18500,mult:.86,
-  txt:{fr:"La ville se vide un peu. L'équipe, elle, sort de la semaine la plus dure de l'année.",
-       en:"The town empties a little. The team, on the other hand, is coming off the hardest week of the year."},
-  ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
- {nom:{fr:"Juillet — plein été",en:"July — high summer"},ca:21000,mult:.96,
-  txt:{fr:"Saison pleine et stable. C'est le moment où les compteurs d'heures explosent si vous n'avez rien anticipé.",
-       en:"Full, steady season. This is when the overtime banks blow up if you haven't planned ahead."},
-  ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
- {nom:{fr:"Juillet — le 14",en:"July — Bastille Day"},ca:23000,mult:1.05,
-  txt:{fr:"Dernière semaine de la campagne, et la plus chargée. Terminez sans casser personne.",
-       en:"Final week of the campaign, and the heaviest. Finish without breaking anyone."},
-  ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
-];
-const SEASON_EVENTS={
-  2:{emp:'c2',motif:'conge',jours:[4,5]},
-  5:{emp:'s5',motif:'conge',jours:[1,2]},
-  7:{emp:'c4',motif:'conge',jours:[0,1,2]},
-};
-const SEASON_WISHES={
-  1:[{emp:'s2',jour:6,txt:wish("Yanis a demandé son dimanche","Yanis asked for Sunday off")}],
-  3:[{emp:'c3',jour:0,txt:wish("Tom a un rendez-vous lundi","Tom has an appointment on Monday")}],
-  4:[{emp:'s5',jour:2,txt:wish("Emma a demandé son mercredi","Emma asked for Wednesday off")}],
-  6:[{emp:'c3',jour:3,txt:wish("Tom voudrait son jeudi","Tom would like Thursday off")},
-     {emp:'s2',jour:6,txt:wish("Yanis redemande son dimanche","Yanis asks again for Sunday off")}],
-  8:[{emp:'s3',jour:5,txt:wish("Léa a un examen samedi","Léa has an exam on Saturday")}],
-  9:[{emp:'s1',jour:0,txt:wish("Claire pose son lundi","Claire is taking Monday off")}],
-};
-const MARGE_BRUTE=0.34;  // part du CA restant pour la masse salariale (après matières et charges fixes)
-
-// Les besoins de la semaine sont dérivés de l'effectif réellement présent :
-// le volume horaire demandé colle aux contrats, donc chaque semaine reste jouable.
-function deriveNeeds(equipe,W){
-  const open=[];
-  for(let d=0;d<7;d++) if(!W.ferme.includes(d)) open.push(d);
-  const dimSoirFerme = W.mult<0.80 && open.includes(6);
-  const needs={};
-  ['cuisine','salle'].forEach(pole=>{
-    const contracts=equipe.filter(x=>x.pole===pole).reduce((s,x)=>s+x.contrat,0);
-    const target=contracts;
-    const w={}; let tot=0;
-    open.forEach(d=>{ const v=(d>=4?1.35:1)*(d===6?0.85:1); w[d]=v; tot+=v; });
-    needs[pole]={};
-    open.forEach(d=>{
-      const dayH=target*w[d]/tot;
-      if(d===6&&dimSoirFerme){ needs[pole][d]={m:Math.max(1,Math.round(dayH/4)),s:0}; return; }
-      const m=Math.max(1,Math.round(dayH*0.30/4));
-      const s=Math.max(1,Math.round((dayH-4*m)/5.75));
-      needs[pole][d]={m,s};
-    });
-    // rattrapage : les arrondis journaliers font perdre des heures, or un volume
-    // inférieur aux contrats se paie en heures payées non travaillées.
-    const vol=()=>open.reduce((a,d)=>a+needs[pole][d].m*4+needs[pole][d].s*5.75,0);
-    const order=open.slice().sort((a,c)=>w[c]-w[a]);
-    let guard=0;
-    while(target-vol()>=2 && guard++<40){
-      const d=order.find(x=>!(x===6&&dimSoirFerme))||order[0];
-      if(target-vol()>=5.75 && !(d===6&&dimSoirFerme)) needs[pole][d].s++;
-      else needs[pole][d].m++;
-      order.push(order.shift());
-    }
-    guard=0;
-    while(vol()-target>=5 && guard++<40){
-      const d=order.find(x=>needs[pole][x].s>1)||order.find(x=>needs[pole][x].m>1);
-      if(d===undefined) break;
-      if(needs[pole][d].s>1) needs[pole][d].s--; else needs[pole][d].m--;
-      order.push(order.shift());
-    }
-  });
-  const jours=[];
-  for(let d=0;d<7;d++){
-    if(W.ferme.includes(d)){jours.push({ferme:true,besoin:b(0,0,0,0),note:'ferme'});continue;}
-    const c=needs.cuisine[d], s=needs.salle[d];
-    jours.push({besoin:b(c.m,s.m,c.s,s.s), note:(d===6&&c.s===0)?'soirFerme':null});
+function fmtDelta(d){
+  const a=d.a||{};
+  switch(d.code){
+    case 'TRESO':     return t('dTreso')(nf(a.gain));
+    case 'ARRET':     return t('dArret')(a.nom);
+    case 'FATIGUE':   return t('dFatigue')(a.nom);
+    case 'QUIT':      return t('dQuit')(a.nom);
+    case 'MORAL':     return t('dMoral')(a.nom);
+    case 'HS_WARN':   return t('dHSwarn')(a.nom);
+    case 'HS':        return t('dHS')(a.nom,fmtH(a.h));
+    case 'GOOD_REST': return t('dGoodRest');
+    case 'WISHES':    return t('dWishes');
+    default:          return d.code;
   }
-  return jours;
 }
-
-function seasonScenario(st){
-  const w=st.week, W=SEASON_WEEKS[w];
-  const equipe=st.roster.filter(r=>!r.parti&&(W.staff.includes(r.id)||r.id[0]==='x')).map(r=>{
-    const src=Object.assign({},r);
-    src.indispo={};
-    if(r.arret) for(let d=0;d<7;d++) src.indispo[d]='arret';
-    return src;
-  });
-  const ev=SEASON_EVENTS[w];
-  if(ev){
-    const em=equipe.find(x=>x.id===ev.emp);
-    if(em&&!em.arret) ev.jours.forEach(d=>{em.indispo[d]=ev.motif;});
-  }
-  const jours=deriveNeeds(equipe,W);
-  const prefs=(SEASON_WISHES[w]||[]).filter(p=>equipe.some(x=>x.id===p.emp&&!x.arret))
-    .map(p=>({emp:p.emp,jour:p.jour,veut:'R',txt:p.txt}));
-  let hours=0;
-  jours.forEach(j=>{hours+=(j.besoin.midi.cuisine+j.besoin.midi.salle)*4
-    +(j.besoin.soir.cuisine+j.besoin.soir.salle)*5.75;});
-  const contracts=equipe.reduce((s,x)=>s+x.contrat,0);
-  let cost=0;
-  const extra=Math.max(0,hours-contracts);
-  equipe.forEach(x=>{cost+=coutSalarie(x,x.contrat+extra*(x.contrat/contracts));});
-  return {id:'sn'+w, equipe, jours, prefs, reposConsecutifs:w>=6,
-    budget:Math.round(cost*1.05/10)*10, ca:W.ca,
-    n:{fr:`Semaine ${w+1} / 10`,en:`Week ${w+1} / 10`},
-    titre:X(W.nom), brief:X(W.txt)};
-}
-
-function applySeasonWeek(st,S,ev){
-  const deltas=[];
-  const payroll=ev.total;
-  const gain=Math.round(S.ca*MARGE_BRUTE-payroll);
-  st.tresorerie+=gain;
-  deltas.push({tag:gain>=0?'good':'bad',txt:t('dTreso')(nf(gain))});
-  st.scores.push(ev.score);
-  let allRest=true, allWishes=true;
-  (S.prefs||[]).forEach(pr=>{ if(st.plan[pr.emp]&&st.plan[pr.emp][pr.jour]!=='R') allWishes=false; });
-  st.roster.forEach(r=>{
-    if(r.parti) return;
-    if(r.arret){ r.arret=false; r.fatigue=Math.max(0,r.fatigue-45); return; }
-    const row=st.plan[r.id]; if(!row) return;
-    let h=0,repos=0,coupures=0,fermetures=0;
-    row.forEach(c=>{ h+=SHIFTS[c].h; if(c==='R')repos++; if(c==='C')coupures++;
-      if(c==='S'||c==='C')fermetures++; });
-    if(repos<2) allRest=false;
-    r.fatigue=Math.max(0,Math.min(100, r.fatigue + (7-repos)*4 + coupures*5 + fermetures*2 - repos*11));
-    r.compteurHS+=Math.max(0,h-35);
-    let dm=0;
-    if(h>44) dm-=10;
-    if(coupures>4) dm-=6;
-    let conse=false;
-    for(let d=0;d<6;d++) if(row[d]==='R'&&row[d+1]==='R') conse=true;
-    if(conse) dm+=5;
-    (S.prefs||[]).forEach(pr=>{ if(pr.emp===r.id) dm += (row[pr.jour]==='R'? 8 : -12); });
-    if(repos>=2) dm+=3;
-    r.moral=Math.max(0,Math.min(100,r.moral+dm));
-    if(r.fatigue>=85){
-      r.arret=true;
-      deltas.push({tag:'bad',txt:t('dArret')(r.nom)});
-    } else if(r.fatigue>=70){
-      deltas.push({tag:'warn',txt:t('dFatigue')(r.nom)});
-    }
-    if(r.moral<=18){
-      r.parti=true;
-      deltas.push({tag:'bad',txt:t('dQuit')(r.nom)});
-      st.roster.push(Object.assign(e('x'+st.roster.length,
-        lang==='en'?'Agency cover':'Extra intérim', r.pole,'interim',35,Math.round(r.taux*1.4),false),
-        {fatigue:20,moral:60,compteurHS:0,arret:false,parti:false}));
-    } else if(r.moral<=30){
-      deltas.push({tag:'warn',txt:t('dMoral')(r.nom)});
-    }
-    if(r.compteurHS>=40) deltas.push({tag:'warn',txt:t('dHSwarn')(r.nom)});
-    else if(r.compteurHS>=22) deltas.push({tag:'info',txt:t('dHS')(r.nom,fmtH(r.compteurHS))});
-  });
-  if(allRest) deltas.push({tag:'good',txt:t('dGoodRest')});
-  if(allWishes&&(S.prefs||[]).length) deltas.push({tag:'good',txt:t('dWishes')});
-  st.log.push({week:st.week,score:ev.score,gain});
-  st.week++;
-  st.plan=null;
-  return deltas;
-}
-function newSeason(){
-  return {week:0,tresorerie:0,scores:[],log:[],plan:null,
-    roster:SEASON_TEAM.map(x=>Object.assign({},x,{fatigue:12,moral:72,compteurHS:0,arret:false,parti:false}))};
-}
-
-/* ---------- générateur ---------- */
-function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
-  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-function seedToInt(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-function randomSeed(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';
-  for(let i=0;i<5;i++)s+=A[Math.floor(Math.random()*A.length)];return s;}
-
-// Les responsables sont tirés séparément : un commis ou un serveur ne peut pas
-// encadrer un service, donc le rôle doit suivre la fonction, pas l'ordre de tirage.
-const RND_NAMES={
-  cuisine:{
-    leads:[['Marc','chef'],['Inès','second'],['Nadia','second'],['Karim','chef']],
-    others:[['Tom','commis'],['Hugo','cuisinier'],['Sami','plongeur'],['Lucas','cuisinier'],
-            ['Rachid','commis'],['Iris','cuisinier'],['Bilal','plongeur'],['Jonas','commis']]},
-  salle:{
-    leads:[['Claire','mh'],['Nora','rang'],['Yanis','rangM'],['Emma','rang'],
-            ['Victor','rangM'],['Leonora','rang']],
-    others:[['Léa','serveuse'],['Paul','serveur'],['Zoé','serveuse'],['Théo','serveur'],
-            ['Mina','serveuse'],['Adam','serveur'],['Jade','serveuse']]}};
-
-function generateWeek(seedStr,diff){
-  const rnd=mulberry32(seedToInt(seedStr+'|'+diff));
-  const pick=(a)=>a[Math.floor(rnd()*a.length)];
-  const openDays=[5,6,6,7,7][diff-1];
-  const closed=[];
-  while(closed.length<7-openDays){const d=Math.floor(rnd()*7);if(!closed.includes(d))closed.push(d);}
-  const intensity=[0.62,0.78,0.92,1.06,1.2][diff-1];
-  const jours=[];
-  for(let d=0;d<7;d++){
-    if(closed.includes(d)){jours.push({ferme:true,besoin:b(0,0,0,0),note:'ferme'});continue;}
-    const we=(d>=4)?1.28:1;
-    const m=Math.max(1,Math.round(intensity*we*2.1+rnd()*0.6));
-    const s=Math.max(1,Math.round(intensity*we*2.9+rnd()*0.6));
-    jours.push({besoin:b(m,m,s,s)});
-  }
-  const scen={jours,equipe:[],prefs:[],reposConsecutifs:diff>=4};
-  ['cuisine','salle'].forEach(pole=>{
-    let lunch=0,dinner=0,maxC=0;
-    jours.forEach(j=>{const l=j.besoin.midi[pole],dd=j.besoin.soir[pole];
-      lunch+=l;dinner+=dd;maxC+=Math.min(l,dd);});
-    const hours=lunch*4+dinner*5.75;
-    const personDays=lunch+dinner-maxC;
-    const openCount=7-closed.length;
-    const perPerson=Math.max(1,Math.min(openCount, openCount-Math.max(0,2-closed.length)));
-    // l'effectif doit suffire à la fois en jours disponibles et en volume horaire :
-    // sans le second critère, une petite brigade se retrouve à 48 h par tête.
-    const slack=[1.10,1.05,1.0,0.97,0.94][diff-1];
-    const size=Math.max(3,Math.ceil(personDays/perPerson),Math.ceil(hours*slack/39));
-    let budgetH=hours*slack;
-    const leads=RND_NAMES[pole].leads.slice(), others=RND_NAMES[pole].others.slice();
-    const nLeads=Math.min(leads.length, size>=6?3:2);
-    const take=(arr)=>arr.length?arr.splice(Math.floor(rnd()*arr.length),1)[0]:null;
-    for(let i=0;i<size;i++){
-      const isResp=i<nLeads;
-      const entry=(isResp?take(leads):take(others))||take(others)||take(leads)
-        ||[(lang==='en'?'Casual':'Extra')+' '+(i+1),isResp?'rang':'extra'];
-      const [nom,role]=entry;
-      // un peu de dispersion : une brigade réelle mélange temps pleins et partiels
-      const part=budgetH/(size-i)*(0.82+rnd()*0.38);
-      let contrat=Math.max(20,Math.min(39,Math.round(part)));
-      budgetH-=contrat;
-      const taux=pole==='cuisine'
-        ? (role==='chef'?24:role==='second'?19:15+Math.round(rnd()*2))
-        : (role==='mh'?21:role==='rang'||role==='rangM'?17:15.5);
-      scen.equipe.push(e(pole[0]+i,nom,pole,role,contrat,taux,isResp));
-    }
-  });
-  let hours=0;
-  jours.forEach(j=>{hours+=(j.besoin.midi.cuisine+j.besoin.midi.salle)*4
-    +(j.besoin.soir.cuisine+j.besoin.soir.salle)*5.75;});
-  const contracts=scen.equipe.reduce((s,x)=>s+x.contrat,0);
-  const extra=Math.max(0,hours-contracts);
-  let cost=0;
-  scen.equipe.forEach(x=>{cost+=coutSalarie(x,x.contrat+extra*(x.contrat/contracts));});
-  const marge=[1.14,1.10,1.07,1.04,1.02][diff-1];
-  scen.budget=Math.round(cost*marge/10)*10;
-  scen.ca=Math.round(scen.budget/([0.30,0.31,0.32,0.33,0.34][diff-1])/100)*100;
-  scen.id='rnd-'+seedStr+'-'+diff;
-  scen.n={fr:`Graine ${seedStr}`,en:`Seed ${seedStr}`};
-  scen.titre=t('diffs')[diff-1];
-  scen.brief=lang==='en'
-    ? `Generated week, difficulty "${t('diffs')[diff-1]}". ${7-closed.length} days open, ${scen.equipe.length} staff. A 100/100 solution exists — the seed guarantees it.`
-    : `Semaine générée, difficulté « ${t('diffs')[diff-1]} ». ${7-closed.length} jours ouverts, ${scen.equipe.length} salariés. Une solution à 100/100 existe — la graine le garantit.`;
-  return scen;
+// Titre et brief d'une semaine générée : construits ici, pas dans le moteur.
+function randomLabels(S){
+  const d=t('diffs')[S.diff-1];
+  return {
+    titre:d,
+    brief: lang==='en'
+      ? `Generated week, difficulty "${d}". ${S.openDays} days open, ${S.equipe.length} staff. A 100/100 solution exists — the seed guarantees it.`
+      : `Semaine générée, difficulté « ${d} ». ${S.openDays} jours ouverts, ${S.equipe.length} salariés. Une solution à 100/100 existe — la graine le garantit.`
+  };
 }
 
 /* ======================= état ======================= */
@@ -1293,7 +918,7 @@ const stars = s => s>=100?3 : s>=80?2 : s>=60?1 : 0;
 
 /* ======================= rendu ======================= */
 const $=s=>document.querySelector(s);
-const SCREENS=['home','levels','season','random','play'];
+const SCREENS=['home','levels','season','random','board','play'];
 function show(name){
   screen=name;
   SCREENS.forEach(s=>{ $('#scr-'+s).hidden = (s!==name); });
@@ -1305,6 +930,7 @@ function show(name){
   if(name==='levels') renderLevels();
   if(name==='season') renderSeason();
   if(name==='random') renderRandom();
+  if(name==='board')  renderBoard();
   if(name==='play')   renderPlay();
 }
 
@@ -1313,6 +939,7 @@ function renderChrome(){
   ['#langbtn','#langbtn2'].forEach(s=>{const el=$(s);if(el)el.textContent=t('other');});
   ['#themebtn','#themebtn2'].forEach(s=>{const el=$(s);if(el)el.textContent=t('theme');});
   $('#btnHome').textContent=t('menu');
+  refreshAccount();
 }
 
 function renderHome(){
@@ -1321,13 +948,13 @@ function renderHome(){
   $('#h-footL').textContent=t('footL');
   $('#h-footR').innerHTML=`<a href="${REPO_URL}" rel="noopener">${t('footR')}</a>`;
   const w=$('#modes'); w.innerHTML='';
-  const keys=['levels','season','random'];
+  const keys=['levels','season','random','board'];
   t('modes').forEach((m,i)=>{
     const btn=document.createElement('button');
     btn.className='mode'; btn.type='button';
     btn.innerHTML=`<span class="mk">${m.k}</span><span class="mt">${m.t}</span>
       <span class="md">${m.d}</span><span class="mf">${m.f}</span>`;
-    btn.onclick=()=>{mode=keys[i];show(keys[i]);};
+    btn.onclick=()=>{if(keys[i]!=='board')mode=keys[i];show(keys[i]);};
     w.appendChild(btn);
   });
 }
@@ -1381,11 +1008,13 @@ function renderSeason(){
     $('#sn-wtitle').textContent=t('snDone');
     $('#sn-wtext').textContent=t('snDoneSub');
     $('#sn-wstats').innerHTML='';
-    $('#sn-play').hidden=true;
+    $('#sn-play').hidden=false;
+    $('#sn-play').dataset.act='submit';
+    $('#sn-play').textContent=t('snSubmit');
   }else{
     const S=seasonScenario(season);
-    $('#sn-wtitle').textContent=`${X(S.n)} — ${S.titre}`;
-    $('#sn-wtext').textContent=S.brief;
+    $('#sn-wtitle').textContent=`${X(S.n)} — ${X(S.titre)}`;
+    $('#sn-wtext').textContent=X(S.brief);
     const hTot=S.equipe.reduce((s,x)=>s+x.contrat,0);
     $('#sn-wstats').innerHTML=
       `<span>${t('statTeam')} <b>${S.equipe.filter(x=>!x.indispo||Object.keys(x.indispo).length<7).length}</b></span>
@@ -1393,6 +1022,7 @@ function renderSeason(){
        <span>${t('statCA')} <b>${cur(S.ca)}</b></span>
        <span>${t('statBudget')} <b>${cur(S.budget)}</b></span>`;
     $('#sn-play').hidden=false;
+    $('#sn-play').dataset.act='play';
     $('#sn-play').textContent=t('snPlay')(season.week+1);
   }
 
@@ -1485,8 +1115,9 @@ function renderPlay(){
   $('#ulLegal').innerHTML=t('ulLegal').map(x=>`<li>${x}</li>`).join('');
   $('#ulHouse').innerHTML=t('ulHouse').map(x=>`<li>${x}</li>`).join('');
   $('#disclaim').textContent=t('disclaim');
-  $('#briefTitle').textContent=`${X(S.n)} — ${X(S.titre)}`;
-  $('#briefText').textContent=X(S.brief);
+  const lab = S.diff ? randomLabels(S) : {titre:X(S.titre), brief:X(S.brief)};
+  $('#briefTitle').textContent=`${X(S.n)} — ${lab.titre}`;
+  $('#briefText').textContent=lab.brief;
   const hTot=S.equipe.reduce((s,x)=>s+x.contrat,0);
   $('#briefStats').innerHTML=
     `<span>${t('statTeam')} <b>${S.equipe.length}</b></span>
@@ -1598,7 +1229,8 @@ function renderPanel(S,ev){
   sorted.slice(0,14).forEach(i=>{
     const li=document.createElement('li');
     li.className=i.cat;
-    li.innerHTML=`<span class="dot"></span><span class="txt"><b>${i.txt}</b><span class="who">${i.who||''}</span></span><span class="pts">−${i.pts}</span>`;
+    const [ttl,who]=fmtIssue(i);
+    li.innerHTML=`<span class="dot"></span><span class="txt"><b>${ttl}</b><span class="who">${who}</span></span><span class="pts">−${i.pts}</span>`;
     ul.appendChild(li);
   });
   if(sorted.length>14){
@@ -1630,7 +1262,7 @@ function openDebrief(ev,deltas,weekNo){
           <div class="kpi"><div class="kl">${t('kTreso')}</div><div class="kv ${season.tresorerie>=0?'g':'b'}" style="font-size:19px">${cur(season.tresorerie)}</div></div>
         </div>
         <ul class="deltas">${deltas.map(d=>`<li><span class="tag ${d.tag}">${
-          d.tag==='good'?'+':d.tag==='bad'?'!':d.tag==='warn'?'~':'i'}</span><span>${d.txt}</span></li>`).join('')}</ul>
+          d.tag==='good'?'+':d.tag==='bad'?'!':d.tag==='warn'?'~':'i'}</span><span>${fmtDelta(d)}</span></li>`).join('')}</ul>
       </div>
       <footer><button class="btn primary" id="db-ok">${t('dbNext')}</button></footer>
     </div>`;
@@ -1672,7 +1304,7 @@ $('#btnCheck').onclick=()=>{
     if(legal){toast(t('tLegal')(ev.score,legal));return;}
     const weekNo=season.week+1;
     const deltas=applySeasonWeek(season,scen,ev);
-    save();
+    save(); pushProgress();
     openDebrief(ev,deltas,weekNo);
     return;
   }
@@ -1680,13 +1312,16 @@ $('#btnCheck').onclick=()=>{
   else if(legal)toast(t('tLegal')(ev.score,legal));
   else if(couv)toast(t('tCouv')(ev.score,couv));
   else toast(t('tOpti')(ev.score));
+  if(me && !legal) setTimeout(()=>submitCurrent(ev),1200);
+  pushProgress();
 };
 $('#btnShare').onclick=async()=>{
   const ev=evaluate(scen,plan);
-  const txt=t('shareTxt')(`${X(scen.n)} « ${X(scen.titre)} »`,ev.score,nf(ev.total),nf(scen.budget));
+  const lb=scen.diff?randomLabels(scen).titre:X(scen.titre);
+  const txt=t('shareTxt')(`${X(scen.n)} « ${lb} »`,ev.score,nf(ev.total),nf(scen.budget));
   try{
     if(navigator.share&&/Android|iPhone|iPad/i.test(navigator.userAgent)){
-      await navigator.share({title:'Planning Coup de Feu',text:txt}); return;
+      await navigator.share({title:'PlanningMaster',text:txt}); return;
     }
     await navigator.clipboard.writeText(txt); toast(t('tCopied'));
   }catch(_){
@@ -1699,6 +1334,7 @@ $('#btnShare').onclick=async()=>{
   }
 };
 $('#sn-play').onclick=()=>{
+  if($('#sn-play').dataset.act==='submit'){ submitSeason(); return; }
   const S=seasonScenario(season);
   scen=S; mode='season';
   plan=season.plan||applyLocks(S,emptyPlan(S));
@@ -1737,12 +1373,202 @@ function toggleLang(){
 ['#themebtn','#themebtn2'].forEach(s=>{$(s).onclick=toggleTheme;});
 ['#langbtn','#langbtn2'].forEach(s=>{$(s).onclick=toggleLang;});
 
+/* ---------- compte, classements, enregistrement ---------- */
+let me = null;            // { id, email, pseudo } ou null
+let boardRef = 'l1';      // onglet de classement courant
+
+function refreshAccount(){
+  const label = me ? (me.pseudo || me.email) : t('signIn');
+  ['#accountbtn','#accountbtn2'].forEach(sel=>{
+    const el=$(sel); if(el) el.textContent=label;
+  });
+}
+
+function openAuth(){
+  if(me){ openAccount(); return; }
+  let up = false;                       // false = connexion, true = inscription
+  const ovl=document.createElement('div');
+  ovl.className='ovl';
+  const draw=()=>{
+    ovl.innerHTML=`
+      <div class="sheet" role="dialog" aria-modal="true" style="max-width:420px">
+        <header><div class="ek">PlanningMaster</div>
+          <h2>${up?t('authTtlUp'):t('authTtlIn')}</h2></header>
+        <div class="body">
+          <div class="field"><label for="au-mail">${t('fEmail')}</label>
+            <input type="text" id="au-mail" autocomplete="email" inputmode="email"></div>
+          <div class="field"><label for="au-pass">${t('fPass')}</label>
+            <input type="password" id="au-pass" autocomplete="${up?'new-password':'current-password'}"></div>
+          ${up?`<div class="field"><label for="au-pseudo">${t('fPseudo')}</label>
+            <input type="text" id="au-pseudo" maxlength="24" autocomplete="nickname"></div>`:''}
+          <p id="au-err" class="disclaim" style="color:var(--bad);border:0;padding:0" hidden></p>
+          <button class="btn" id="au-swap" type="button"
+            style="background:none;border:0;padding:0;color:var(--ink-2);text-align:left;text-decoration:underline">
+            ${up?t('goIn'):t('goUp')}</button>
+        </div>
+        <footer>
+          <button class="btn" id="au-cancel" type="button">${t('authCancel')}</button>
+          <button class="btn primary" id="au-go" type="button">${t('authGo')}</button>
+        </footer>
+      </div>`;
+    ovl.querySelector('#au-cancel').onclick=()=>ovl.remove();
+    ovl.querySelector('#au-swap').onclick=()=>{ up=!up; draw(); };
+    ovl.querySelector('#au-go').onclick=go;
+    ovl.querySelectorAll('input').forEach(i=>{
+      i.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+    });
+  };
+  const fail=(msg)=>{
+    const p=ovl.querySelector('#au-err');
+    p.textContent=msg; p.hidden=false;
+  };
+  async function go(){
+    const mail=(ovl.querySelector('#au-mail').value||'').trim();
+    const pass=ovl.querySelector('#au-pass').value||'';
+    const pseudo=up?(ovl.querySelector('#au-pseudo').value||'').trim():'';
+    if(!mail || !pass) return fail(t('authBad'));
+    if(up && pass.length<6) return fail(t('authShort'));
+    const btn=ovl.querySelector('#au-go'); btn.disabled=true;
+    try{
+      if(up){
+        const r=await cloud.signUp(mail,pass,pseudo||mail.split('@')[0]);
+        if(!r.confirmed){ ovl.remove(); toast(t('authMail')); return; }
+      } else {
+        await cloud.signIn(mail,pass);
+      }
+      me=cloud.currentUser();
+      await pullProgress();
+      ovl.remove(); refreshAccount(); renderAll();
+      toast(t('authDone')(me.pseudo||me.email));
+    }catch(err){
+      btn.disabled=false;
+      fail(String(err.message||err).includes('6') ? t('authShort') : t('authBad'));
+    }
+  }
+  draw();
+  document.body.appendChild(ovl);
+  setTimeout(()=>{ const el=ovl.querySelector('#au-mail'); if(el) el.focus(); },30);
+}
+
+function openAccount(){
+  const ovl=document.createElement('div');
+  ovl.className='ovl';
+  ovl.innerHTML=`
+    <div class="sheet" role="dialog" aria-modal="true" style="max-width:420px">
+      <header><div class="ek">${t('account')}</div><h2>${me.pseudo||me.email}</h2></header>
+      <div class="body"><p class="disclaim" style="border:0;padding:0">${me.email}</p></div>
+      <footer>
+        <button class="btn" id="ac-close" type="button">${t('authCancel')}</button>
+        <button class="btn primary" id="ac-out" type="button">${t('signOut')}</button>
+      </footer>
+    </div>`;
+  ovl.querySelector('#ac-close').onclick=()=>ovl.remove();
+  ovl.querySelector('#ac-out').onclick=async()=>{
+    await cloud.signOut(); me=null; ovl.remove(); refreshAccount(); renderAll();
+  };
+  document.body.appendChild(ovl);
+}
+
+/* --- progression : le nuage fait autorité au moment de la connexion --- */
+async function pullProgress(){
+  try{
+    const d=await cloud.loadProgress();
+    if(d && typeof d==='object'){
+      if(d.progress) progress=Object.assign({},progress,d.progress);
+      if(d.season) season=d.season;
+      save();
+    } else {
+      await cloud.saveProgress({progress,season});
+    }
+  }catch(_){}
+}
+async function pushProgress(){
+  if(!me) return;
+  try{ await cloud.saveProgress({progress,season}); }catch(_){}
+}
+
+/* --- envoi d'une grille pour vérification --- */
+async function submitCurrent(ev){
+  if(!me){ toast(t('needAuth')); return; }
+  if(ev.issues.some(i=>i.cat==='legal')){ toast(t('sentLegal')); return; }
+  let payload=null;
+  if(mode==='levels') payload={mode:'level', ref:scen.id, grid:plan};
+  else if(mode==='random') payload={mode:'seed', ref:`${scen.seed}:${scen.diff}`, grid:plan};
+  else return;
+  try{
+    const r=await cloud.submitScore(payload);
+    toast(r.improved ? t('sentBetter')(r.score) : t('sentWorse')(r.best));
+  }catch(_){ toast(t('sentFail')); }
+}
+
+async function submitSeason(){
+  if(!me){ toast(t('needAuth')); return; }
+  if(!season || season.week<SEASON_WEEKS.length){ toast(t('snNotDone')); return; }
+  try{
+    const r=await cloud.submitScore({mode:'season', ref:'season', grids:season.grids});
+    toast(r.improved ? t('sentBetter')(r.score) : t('sentWorse')(r.best));
+  }catch(_){ toast(t('sentFail')); }
+}
+
+/* --- écran classements --- */
+function boardTabs(){
+  const tabs=LEVELS.map(L=>({ref:L.id, lab:X(L.n)}));
+  tabs.push({ref:'season', lab:t('bdSeason')});
+  if(rnd && rnd.seed) tabs.push({ref:`${rnd.seed}:${rnd.diff}`, lab:`${t('bdSeed')} ${rnd.seed}`});
+  return tabs;
+}
+async function renderBoard(){
+  $('#bd-title').textContent=t('bdTitle');
+  $('#bd-sub').textContent=t('bdSub');
+  $('#bd-h3').textContent=t('bdH3');
+  const tabs=boardTabs();
+  if(!tabs.some(x=>x.ref===boardRef)) boardRef=tabs[0].ref;
+  const tw=$('#bd-tabs'); tw.innerHTML='';
+  tabs.forEach(x=>{
+    const b=document.createElement('button');
+    b.type='button'; b.textContent=x.lab;
+    b.setAttribute('aria-pressed',String(x.ref===boardRef));
+    b.onclick=()=>{ boardRef=x.ref; renderBoard(); };
+    tw.appendChild(b);
+  });
+  const ul=$('#bd-list');
+  ul.innerHTML=`<li><span class="dot" style="background:var(--muted)"></span><span class="txt">…</span></li>`;
+  const kind = boardRef==='season' ? 'season' : (boardRef.includes(':') ? 'seed' : 'level');
+  let rows=[];
+  try{ rows=await cloud.leaderboard(kind, boardRef, 25); }catch(_){ rows=[]; }
+  ul.innerHTML='';
+  if(!rows.length){
+    ul.innerHTML=`<li><span class="dot" style="background:var(--muted)"></span><span class="txt">${t('bdEmpty')}</span></li>`;
+    return;
+  }
+  rows.forEach((r,i)=>{
+    const li=document.createElement('li');
+    li.className = r.score>=90?'clean' : r.score>=70?'couv' : 'legal';
+    const mine = me && r.pseudo===me.pseudo;
+    const extra = kind==='season'
+      ? `${t('kTreso')} ${cur(r.treasury||0)}`
+      : `${t('lblCost')} ${cur(r.payroll||0)}`;
+    li.innerHTML=`<span class="dot"></span><span class="txt">
+        <b>${i+1}. ${r.pseudo}${mine?' <span style="color:var(--muted);font-weight:400">('+t('bdMe')+')</span>':''}</b>
+        <span class="who">${extra}</span></span>
+      <span class="pts" style="color:var(--ink);font-weight:600">${r.score}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+['#accountbtn','#accountbtn2'].forEach(sel=>{ const el=$(sel); if(el) el.onclick=openAuth; });
+
 /* ---------- démarrage ---------- */
+window.__pm={show,startScenario,LEVELS,generateWeek,newSeason,
+  get season(){return season;}, set season(v){season=v;}};
+
 (function start(){
   let had=false;
   try{had=!!localStorage.getItem('cdf_v3');}catch(_){}
   load();
   if(!had&&/^en/i.test(navigator.language||''))lang='en';
+  cloud.init().then(u=>{ me=u; refreshAccount(); if(me) pullProgress().then(()=>renderAll()); })
+             .catch(()=>{});
   const u=new URLSearchParams(location.search);
   const s=u.get('seed');
   if(s){
@@ -1751,6 +1577,7 @@ function toggleLang(){
     rnd.diff=(d>=1&&d<=5)?d:2;
     show('random');
   } else show('home');
+  refreshAccount();
 })();
 </script>
 </body>
