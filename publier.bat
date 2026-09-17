@@ -2,70 +2,77 @@
 setlocal
 cd /d "%~dp0"
 
-rem ---------------------------------------------------------------
-rem  PlanningMaster - publication
-rem  Double-clic, ou "publier" dans le terminal.
-rem  Ajoute tout, commit, pousse. Vercel redeploie tout seul.
-rem ---------------------------------------------------------------
+rem  PlanningMaster - publication.
 
-where git >nul 2>nul
-if errorlevel 1 (
-  echo.
-  echo   Git n'est pas installe ou pas dans le PATH.
-  echo   Installe-le avec : winget install --id Git.Git -e
-  echo   puis rouvre ce terminal.
-  echo.
-  pause
-  exit /b 1
-)
+where git >nul 2>&1
+if errorlevel 1 goto nogit
+if not exist ".git" goto noinit
 
-if not exist ".git" (
-  echo.
-  echo   Ce dossier n'est pas encore un depot git.
-  echo   Lance d'abord installer.bat une seule fois.
-  echo.
-  pause
-  exit /b 1
-)
+git diff --quiet
+if errorlevel 1 goto haschanges
+git diff --cached --quiet
+if errorlevel 1 goto haschanges
+git ls-files --others --exclude-standard >"%TEMP%\pm_new.txt"
+for %%A in ("%TEMP%\pm_new.txt") do if %%~zA GTR 0 goto haschanges
+del "%TEMP%\pm_new.txt" >nul 2>&1
+echo.
+echo   Rien n'a change depuis le dernier envoi.
+echo.
+pause
+exit /b 0
 
-git diff --quiet && git diff --cached --quiet
-if not errorlevel 1 (
-  echo.
-  echo   Rien n'a change depuis le dernier envoi.
-  echo.
-  pause
-  exit /b 0
-)
-
+:haschanges
+del "%TEMP%\pm_new.txt" >nul 2>&1
 echo.
 echo   Fichiers modifies :
 git --no-pager status --short
 echo.
 
 set "MSG=%*"
-if "%MSG%"=="" set /p "MSG=  Message (Entree pour 'Mise a jour') : "
+if not "%MSG%"=="" goto gotmsg
+set /p "MSG=  Message (Entree pour 'Mise a jour') : "
 if "%MSG%"=="" set "MSG=Mise a jour"
+:gotmsg
 
 git add -A
 git commit -m "%MSG%"
-if errorlevel 1 (
-  echo.
-  echo   Le commit a echoue.
-  pause
-  exit /b 1
-)
+if errorlevel 1 goto commitfail
 
 git push
-if errorlevel 1 (
-  echo.
-  echo   Le push a echoue. Si c'est la premiere fois, une fenetre
-  echo   de connexion GitHub a pu s'ouvrir : valide-la et relance.
-  echo.
-  pause
-  exit /b 1
-)
+if errorlevel 1 goto pushfail
 
 echo.
 echo   Envoye. Vercel redeploie dans la minute.
 echo.
 pause
+exit /b 0
+
+:commitfail
+echo.
+echo   Le commit a echoue.
+echo.
+pause
+exit /b 1
+
+:pushfail
+echo.
+echo   Le push a echoue. Si une fenetre de connexion GitHub s'ouvre,
+echo   valide-la puis relance.
+echo.
+pause
+exit /b 1
+
+:noinit
+echo.
+echo   Ce dossier n'est pas encore relie. Lance installer.bat.
+echo.
+pause
+exit /b 1
+
+:nogit
+echo.
+echo   Git n'est pas installe. Colle :
+echo       winget install --id Git.Git -e
+echo.
+pause
+exit /b 1
