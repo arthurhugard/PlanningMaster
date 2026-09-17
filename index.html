@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Planning Coup de Feu</title>
-<meta name="description" content="Simulateur de planning d'équipe en restauration : construisez la semaine sous contraintes de repos, de couverture et de budget.">
+<meta name="description" content="Simulateur de planning d'équipe en restauration : niveaux, saison complète et semaines générées à l'infini, sous contraintes de repos, de couverture et de budget.">
 <meta name="author" content="Arthur Hugard">
 <meta name="color-scheme" content="light dark">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Planning Coup de Feu">
 <meta property="og:title" content="Planning Coup de Feu">
-<meta property="og:description" content="Trois semaines à planifier dans un restaurant. 11 h de repos, effectifs par service, masse salariale : saurez-vous tenir les trois à la fois ?">
+<meta property="og:description" content="Trois modes, une équipe, un budget. 11 h de repos, effectifs par service, masse salariale : saurez-vous tenir une saison entière ?">
 <meta property="og:url" content="https://jeu.arthurhugard.com/">
 <meta property="og:image" content="https://jeu.arthurhugard.com/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:locale:alternate" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Planning Coup de Feu">
-<meta name="twitter:description" content="Trois semaines à planifier dans un restaurant. 11 h de repos, effectifs par service, masse salariale : saurez-vous tenir les trois à la fois ?">
+<meta name="twitter:description" content="Trois modes, une équipe, un budget. Saurez-vous tenir une saison entière ?">
 <meta name="twitter:image" content="https://jeu.arthurhugard.com/og.png">
 
 <link rel="canonical" href="https://jeu.arthurhugard.com/">
@@ -86,54 +86,123 @@
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{
-  margin:0; background:var(--bg); color:var(--ink);
+body{margin:0;background:var(--bg);color:var(--ink);
   font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
-}
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 img{max-width:100%}
 [hidden]{display:none!important}
 .wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:24px 56px}
+h1,h2,h3{text-wrap:balance}
 
-header.masthead{
-  display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
-  gap:16px;padding-bottom:16px;border-bottom:2px solid var(--ink);
-}
+/* ---------- barre haute ---------- */
+.topbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  padding-bottom:14px;border-bottom:2px solid var(--ink)}
 .brandline{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--muted);margin:0 0 4px}
-h1{font-family:"Fraunces","Iowan Old Style",Georgia,serif;font-optical-sizing:auto;
-  font-weight:800;font-size:clamp(30px,5.2vw,44px);line-height:.98;margin:0;
-  letter-spacing:-.02em;text-wrap:balance}
-h1 em{font-style:italic;font-weight:600;color:var(--accent)}
-.tagline{margin:6px 0 0;color:var(--ink-2);max-width:52ch}
-.hdbtns{display:flex;gap:8px;align-items:center}
-.themebtn{font:inherit;font-size:12px;background:var(--surface);color:var(--ink-2);
+  text-transform:uppercase;color:var(--muted);margin:0}
+.topttl{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:20px;letter-spacing:-.01em;margin:0}
+.topttl em{font-style:italic;font-weight:600;color:var(--accent)}
+.grow{flex:1 1 auto;min-width:4px}
+.pill{font:inherit;font-size:12px;background:var(--surface);color:var(--ink-2);
   border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer}
-.themebtn:hover{border-color:var(--line-strong);color:var(--ink)}
-.themebtn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.pill:hover{border-color:var(--line-strong);color:var(--ink)}
 
-.levels{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
-.lvl{flex:1 1 200px;text-align:left;font:inherit;cursor:pointer;background:var(--surface);
-  border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;
-  display:grid;gap:2px;transition:border-color .15s}
-.lvl:hover{border-color:var(--line-strong)}
-.lvl .n{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+/* ---------- accueil ---------- */
+.hero{padding-block:34px 26px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.hero .brandline{margin-bottom:10px}
+.hero h1{font-family:"Fraunces",Georgia,serif;font-weight:800;
+  font-size:clamp(36px,7vw,62px);line-height:.95;letter-spacing:-.025em;margin:0}
+.hero h1 em{font-style:italic;font-weight:600;color:var(--accent)}
+.hero p{margin:14px 0 0;color:var(--ink-2);max-width:56ch;font-size:16px}
+.modes{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:760px){.modes{grid-template-columns:repeat(3,1fr)}}
+.mode{text-align:left;font:inherit;cursor:pointer;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+  display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);
+  transition:border-color .15s,transform .15s}
+.mode:hover{border-color:var(--ink);transform:translateY(-2px)}
+.mode .mk{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent)}
+.mode .mt{font-family:"Fraunces",Georgia,serif;font-size:23px;font-weight:600;line-height:1.1}
+.mode .md{color:var(--ink-2);font-size:13px;flex:1}
+.mode .mf{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);
+  border-top:1px solid var(--line);padding-top:8px}
+
+/* ---------- sélection de niveaux ---------- */
+.pagehead{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:18px}
+.pagehead h2{font-family:"Fraunces",Georgia,serif;font-size:27px;font-weight:600;margin:0}
+.pagehead .sub{color:var(--muted);font-size:13px}
+.lvlgrid{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:680px){.lvlgrid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.lvlgrid{grid-template-columns:repeat(3,1fr)}}
+.lcard{text-align:left;font:inherit;cursor:pointer;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);padding:14px;
+  display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow)}
+.lcard:hover{border-color:var(--line-strong)}
+.lcard .lrow{display:flex;align-items:center;gap:8px}
+.lcard .ln{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--muted)}
-.lvl .t{font-weight:600}
-.lvl .d{font-size:12px;color:var(--muted)}
-.lvl[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
-.lvl[aria-pressed="true"] .n{color:var(--accent)}
+.lcard .lt{font-weight:600;font-size:15px}
+.lcard .ld{font-size:12.5px;color:var(--muted)}
+.lcard .lb{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-2);
+  border-top:1px solid var(--line);padding-top:7px;margin-top:2px;
+  display:flex;justify-content:space-between;gap:8px}
+.stars{margin-left:auto;display:flex;gap:2px;font-size:13px;letter-spacing:1px}
+.stars i{font-style:normal;color:var(--line-strong)}
+.stars i.on{color:var(--midi)}
+.lcard.locked{opacity:.55;cursor:not-allowed}
+.lcard.locked:hover{border-color:var(--line)}
 
-.brief{margin-top:20px;background:var(--surface);border:1px solid var(--line);
-  border-left:3px solid var(--accent);border-radius:var(--radius);padding:14px 16px;
-  display:grid;gap:10px;box-shadow:var(--shadow)}
+/* ---------- saison ---------- */
+.seasongrid{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:900px){.seasongrid{grid-template-columns:1fr 330px;align-items:start}}
+.seasongrid>*{min-width:0}
+.weeks{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.wk{width:40px;height:40px;border-radius:5px;border:1px solid var(--line);
+  background:var(--surface);display:flex;align-items:center;justify-content:center;
+  font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);position:relative}
+.wk.done{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.wk.done.mid{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
+.wk.done.low{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+.wk.now{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);color:var(--ink);font-weight:600}
+.roster{list-style:none;margin:0;padding:0}
+.roster li{display:grid;grid-template-columns:1fr 66px 66px;gap:8px;align-items:center;
+  padding:9px 14px;border-bottom:1px solid var(--line)}
+.roster li:last-child{border-bottom:none}
+.roster .rn{font-size:13px;font-weight:600;line-height:1.2}
+.roster .rr{font-size:11px;color:var(--muted)}
+.roster .gauge{display:grid;gap:3px}
+.roster .gauge span{font-family:"IBM Plex Mono",monospace;font-size:9px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.gbar{height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+.gbar i{display:block;height:100%;border-radius:3px}
+.roster li.out{opacity:.5}
+.roster li.out .rn::after{content:" · arrêt";color:var(--bad);font-weight:400;font-size:11px}
+
+/* ---------- aléatoire ---------- */
+.randbox{display:grid;gap:16px;max-width:620px}
+.field{display:grid;gap:6px}
+.field label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted)}
+.field input[type=text]{font:inherit;font-family:"IBM Plex Mono",monospace;padding:9px 11px;
+  border:1px solid var(--line-strong);border-radius:5px;background:var(--surface);color:var(--ink)}
+.field input[type=range]{accent-color:var(--accent)}
+.diffrow{display:flex;gap:6px;flex-wrap:wrap}
+.diffrow button{font:inherit;font-size:13px;cursor:pointer;padding:7px 13px;border-radius:5px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-2)}
+.diffrow button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+
+/* ---------- brief ---------- */
+.brief{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:var(--radius);padding:14px 16px;display:grid;gap:10px;box-shadow:var(--shadow)}
 .brief h2{font-family:"Fraunces",Georgia,serif;font-size:19px;margin:0;font-weight:600}
 .brief p{margin:0;color:var(--ink-2);max-width:72ch}
-.briefstats{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:"IBM Plex Mono",monospace;font-size:12px}
+.briefstats{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:"IBM Plex Mono",monospace;
+  font-size:12px;font-variant-numeric:tabular-nums}
 .briefstats b{font-weight:600;color:var(--ink)}
 .briefstats span{color:var(--muted)}
 
-.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin-top:20px;padding:10px;
+/* ---------- barre d'outils ---------- */
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin-top:16px;padding:10px;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;box-shadow:var(--shadow)}
 .palette{display:flex;flex-wrap:wrap;gap:6px}
@@ -146,13 +215,14 @@ h1 em{font-style:italic;font-weight:600;color:var(--accent)}
 .chip:hover{border-color:var(--line-strong)}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .chip[aria-pressed="true"] .hh,.chip[aria-pressed="true"] .key{color:var(--surface);opacity:.75;border-color:currentColor}
-.spacer{flex:1 1 auto;min-width:8px}
 .btn{font:inherit;cursor:pointer;border-radius:5px;padding:6px 14px;
   border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink)}
 .btn:hover{background:var(--line)}
 .btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:600}
 .btn.primary:hover{opacity:.88}
+.btn.big{padding:10px 20px;font-size:15px}
 
+/* ---------- grille ---------- */
 .gridwrap{margin-top:14px;overflow-x:auto;background:var(--surface);
   border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 .grid{display:grid;grid-template-columns:186px repeat(7,minmax(94px,1fr)) 104px;min-width:920px}
@@ -172,7 +242,6 @@ h1 em{font-style:italic;font-weight:600;color:var(--accent)}
   text-transform:uppercase;border:1px solid var(--line-strong);border-radius:3px;padding:0 3px;margin-right:4px}
 .namecell.cuisine{box-shadow:inset 3px 0 0 var(--midi)}
 .namecell.salle{box-shadow:inset 3px 0 0 var(--soir)}
-
 .cell{cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:center;
   gap:1px;user-select:none;-webkit-user-select:none;transition:box-shadow .1s}
 .cell .code{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;letter-spacing:.04em}
@@ -191,7 +260,6 @@ h1 em{font-style:italic;font-weight:600;color:var(--accent)}
 .cell.flagged{box-shadow:inset 0 0 0 2px var(--bad)}
 .cell.flagged::after{content:"";position:absolute;top:3px;right:3px;width:6px;height:6px;
   border-radius:50%;background:var(--bad)}
-
 .totcell{display:flex;flex-direction:column;justify-content:center;gap:1px;
   font-family:"IBM Plex Mono",monospace;background:var(--surface-2);font-variant-numeric:tabular-nums}
 .totcell .big{font-size:14px;font-weight:600}
@@ -199,7 +267,6 @@ h1 em{font-style:italic;font-weight:600;color:var(--accent)}
 .totcell.over .big{color:var(--warn)}
 .totcell.way .big{color:var(--bad)}
 .totcell.under .big{color:var(--soir)}
-
 .covrow{background:var(--surface-2)}
 .covlabel{position:sticky;left:0;z-index:4;background:var(--surface-2);
   font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;
@@ -213,6 +280,7 @@ h1 em{font-style:italic;font-weight:600;color:var(--accent)}
 .covcell .plus b{color:var(--warn)}
 .covcell.none{color:var(--muted)}
 
+/* ---------- panneaux ---------- */
 .cols{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
 .cols>*{min-width:0}
 @media(min-width:980px){.cols{grid-template-columns:minmax(0,1fr) 340px;align-items:start}}
@@ -236,8 +304,6 @@ h1 em{font-style:italic;font-weight:600;color:var(--accent)}
 .meter .mtop span{color:var(--muted)}
 .bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .bar i{display:block;height:100%;border-radius:3px;transition:width .3s ease}
-.sharebtn{width:100%;justify-content:center;display:flex}
-
 .issues{list-style:none;margin:0;padding:0}
 .issues li{display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line);align-items:flex-start}
 .issues li:last-child{border-bottom:none}
@@ -252,7 +318,6 @@ h1 em{font-style:italic;font-weight:600;color:var(--accent)}
 .issues li.conf .dot{background:var(--coup)} .issues li.conf .pts{color:var(--coup)}
 .issues li.clean{color:var(--ok)}
 .issues li.clean .dot{background:var(--ok)}
-
 .rules{padding:0 14px 14px}
 .rules summary{cursor:pointer;padding:11px 0;font-size:12.5px;font-weight:600;color:var(--ink-2)}
 .rules summary:hover{color:var(--ink)}
@@ -261,16 +326,43 @@ h1 em{font-style:italic;font-weight:600;color:var(--accent)}
   border:1px solid var(--line);border-radius:3px;padding:0 4px}
 .disclaim{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:9px;margin:0}
 
+/* ---------- débrief ---------- */
+.ovl{position:fixed;inset:0;z-index:70;background:rgba(10,14,12,.62);
+  display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.sheet{background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.5);max-width:620px;width:100%;
+  max-height:calc(100vh - 32px);overflow-y:auto}
+.sheet header{padding:20px 22px 14px;border-bottom:1px solid var(--line)}
+.sheet header .ek{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.sheet header h2{font-family:"Fraunces",Georgia,serif;font-size:27px;font-weight:600;margin:0}
+.sheet .body{padding:16px 22px 20px;display:grid;gap:14px}
+.deltas{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.deltas li{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45}
+.deltas .tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;padding:2px 6px;border-radius:3px;flex:none;margin-top:1px}
+.deltas .tag.good{background:var(--ok-soft);color:var(--ok)}
+.deltas .tag.bad{background:var(--bad-soft);color:var(--bad)}
+.deltas .tag.warn{background:var(--warn-soft);color:var(--warn)}
+.deltas .tag.info{background:var(--surface-2);color:var(--ink-2)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.kpi{border:1px solid var(--line);border-radius:5px;padding:10px 12px;background:var(--surface-2)}
+.kpi .kl{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted)}
+.kpi .kv{font-family:"Fraunces",Georgia,serif;font-size:24px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .kv.g{color:var(--ok)} .kpi .kv.b{color:var(--bad)}
+.sheet footer{padding:0 22px 20px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
 .toast{position:fixed;left:50%;transform:translateX(-50%);
   bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);
-  padding:10px 18px;border-radius:999px;font-size:13px;z-index:60;box-shadow:var(--shadow);
+  padding:10px 18px;border-radius:999px;font-size:13px;z-index:80;box-shadow:var(--shadow);
   max-width:min(90vw,520px);text-align:center}
 .hint{font-size:12px;color:var(--muted);margin:10px 2px 0}
 kbd{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--line-strong);
   border-bottom-width:2px;border-radius:3px;padding:0 4px;background:var(--surface-2);color:var(--ink-2)}
 footer.foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);
-  display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between;
-  font-size:12px;color:var(--muted)}
+  display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between;font-size:12px;color:var(--muted)}
 footer.foot a{color:var(--ink-2)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -278,122 +370,180 @@ footer.foot a{color:var(--ink-2)}
 <body>
 <div class="wrap">
 
-<header class="masthead">
-  <div>
-    <p class="brandline" id="brandline"></p>
+<!-- ===== barre haute (masquée sur l'accueil) ===== -->
+<div class="topbar" id="topbar" hidden>
+  <button class="pill" id="btnHome" type="button">← Menu</button>
+  <p class="topttl">Planning <em>Coup de Feu</em></p>
+  <span class="grow"></span>
+  <button class="pill" id="langbtn" type="button">EN</button>
+  <button class="pill" id="themebtn" type="button">Thème</button>
+</div>
+
+<!-- ===== écran : accueil ===== -->
+<section id="scr-home">
+  <div class="hero">
+    <p class="brandline" id="h-brand"></p>
     <h1>Planning <em>Coup de Feu</em></h1>
-    <p class="tagline" id="tagline"></p>
+    <p id="h-tag"></p>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="pill" id="langbtn2" type="button">EN</button>
+      <button class="pill" id="themebtn2" type="button">Thème</button>
+    </div>
   </div>
-  <div class="hdbtns">
-    <button class="themebtn" id="langbtn" type="button">EN</button>
-    <button class="themebtn" id="themebtn" type="button">Thème</button>
-  </div>
-</header>
-
-<div class="levels" id="levels"></div>
-
-<section class="brief">
-  <h2 id="briefTitle"></h2>
-  <p id="briefText"></p>
-  <div class="briefstats" id="briefStats"></div>
+  <div class="modes" id="modes"></div>
+  <footer class="foot"><span id="h-footL"></span><span id="h-footR"></span></footer>
 </section>
 
-<div class="toolbar">
-  <div class="palette" id="palette"></div>
-  <div class="spacer"></div>
-  <button class="btn" id="btnClear" type="button"></button>
-  <button class="btn" id="btnDraft" type="button"></button>
-  <button class="btn primary" id="btnCheck" type="button"></button>
-</div>
+<!-- ===== écran : niveaux ===== -->
+<section id="scr-levels" hidden>
+  <div class="pagehead"><h2 id="lv-title"></h2><span class="sub" id="lv-sub"></span></div>
+  <div class="lvlgrid" id="lvlgrid"></div>
+</section>
 
-<div class="cols">
-  <div>
-    <div class="gridwrap"><div class="grid" id="grid"></div></div>
-    <p class="hint" id="hint"></p>
+<!-- ===== écran : saison ===== -->
+<section id="scr-season" hidden>
+  <div class="pagehead"><h2 id="sn-title"></h2><span class="sub" id="sn-sub"></span></div>
+  <div class="weeks" id="sn-weeks"></div>
+  <div class="seasongrid">
+    <div style="display:grid;gap:16px">
+      <div class="brief">
+        <h2 id="sn-wtitle"></h2>
+        <p id="sn-wtext"></p>
+        <div class="briefstats" id="sn-wstats"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn primary big" id="sn-play" type="button"></button>
+        <button class="btn" id="sn-reset" type="button"></button>
+      </div>
+      <div class="panel">
+        <h3 id="sn-logttl"></h3>
+        <ul class="issues" id="sn-log"></ul>
+      </div>
+    </div>
+    <div style="display:grid;gap:16px">
+      <div class="panel">
+        <h3 id="sn-kpittl"></h3>
+        <div class="scorebox"><div class="kpis" id="sn-kpis"></div></div>
+      </div>
+      <div class="panel">
+        <h3 id="sn-teamttl"></h3>
+        <ul class="roster" id="sn-roster"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== écran : aléatoire ===== -->
+<section id="scr-random" hidden>
+  <div class="pagehead"><h2 id="rd-title"></h2><span class="sub" id="rd-sub"></span></div>
+  <div class="randbox">
+    <div class="field">
+      <label id="rd-difflbl"></label>
+      <div class="diffrow" id="rd-diff"></div>
+    </div>
+    <div class="field">
+      <label for="rd-seed" id="rd-seedlbl"></label>
+      <input type="text" id="rd-seed" maxlength="12" autocomplete="off" spellcheck="false">
+      <span class="sub" style="color:var(--muted);font-size:12px" id="rd-seedhelp"></span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn primary big" id="rd-play" type="button"></button>
+      <button class="btn" id="rd-roll" type="button"></button>
+    </div>
+    <div class="panel">
+      <h3 id="rd-prevttl"></h3>
+      <div class="scorebox"><div class="briefstats" id="rd-preview"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== écran : jeu ===== -->
+<section id="scr-play" hidden>
+  <div class="brief">
+    <h2 id="briefTitle"></h2>
+    <p id="briefText"></p>
+    <div class="briefstats" id="briefStats"></div>
   </div>
 
-  <aside style="display:grid;gap:16px">
-    <div class="panel">
-      <h3 id="h3board"></h3>
-      <div class="scorebox">
-        <div class="scoreline">
-          <span class="scorenum" id="score">—</span>
-          <span class="scoreof">/ 100</span>
-          <span class="rank" id="rank"></span>
+  <div class="toolbar">
+    <div class="palette" id="palette"></div>
+    <span class="grow"></span>
+    <button class="btn" id="btnClear" type="button"></button>
+    <button class="btn" id="btnDraft" type="button" hidden></button>
+    <button class="btn primary" id="btnCheck" type="button"></button>
+  </div>
+
+  <div class="cols">
+    <div>
+      <div class="gridwrap"><div class="grid" id="grid"></div></div>
+      <p class="hint" id="hint"></p>
+    </div>
+    <aside style="display:grid;gap:16px">
+      <div class="panel">
+        <h3 id="h3board"></h3>
+        <div class="scorebox">
+          <div class="scoreline">
+            <span class="scorenum" id="score">—</span>
+            <span class="scoreof">/ 100</span>
+            <span class="rank" id="rank"></span>
+          </div>
+          <div class="meter">
+            <div class="mtop"><span id="lblCost"></span><b id="costTxt">—</b></div>
+            <div class="bar"><i id="costBar" style="width:0%;background:var(--ok)"></i></div>
+          </div>
+          <div class="meter">
+            <div class="mtop"><span id="lblCov"></span><b id="covTxt">—</b></div>
+            <div class="bar"><i id="covBar" style="width:0%;background:var(--ok)"></i></div>
+          </div>
+          <button class="btn" id="btnShare" type="button" style="justify-content:center"></button>
         </div>
-        <div class="meter">
-          <div class="mtop"><span id="lblCost"></span><b id="costTxt">—</b></div>
-          <div class="bar"><i id="costBar" style="width:0%;background:var(--ok)"></i></div>
-        </div>
-        <div class="meter">
-          <div class="mtop"><span id="lblCov"></span><b id="covTxt">—</b></div>
-          <div class="bar"><i id="covBar" style="width:0%;background:var(--ok)"></i></div>
-        </div>
-        <button class="btn sharebtn" id="btnShare" type="button"></button>
       </div>
-    </div>
-
-    <div class="panel">
-      <h3 id="h3live"></h3>
-      <ul class="issues" id="issues"></ul>
-    </div>
-
-    <div class="panel">
-      <h3 id="h3rules"></h3>
-      <div class="rules">
-        <details>
-          <summary id="sumLegal"></summary>
-          <ul id="ulLegal"></ul>
-        </details>
-        <details>
-          <summary id="sumHouse"></summary>
-          <ul id="ulHouse"></ul>
-        </details>
-        <p class="disclaim" id="disclaim"></p>
+      <div class="panel">
+        <h3 id="h3live"></h3>
+        <ul class="issues" id="issues"></ul>
       </div>
-    </div>
-  </aside>
-</div>
+      <div class="panel">
+        <h3 id="h3rules"></h3>
+        <div class="rules">
+          <details><summary id="sumLegal"></summary><ul id="ulLegal"></ul></details>
+          <details><summary id="sumHouse"></summary><ul id="ulHouse"></ul></details>
+          <p class="disclaim" id="disclaim"></p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
 
-<footer class="foot">
-  <span id="footL"></span>
-  <span id="footR"></span>
-</footer>
 </div>
 
 <script>
 "use strict";
 const SITE = "jeu.arthurhugard.com";
-const REPO_URL = ""; // renseigné après création du dépôt GitHub
+const REPO_URL = "https://github.com/arthurhugard/planning-coup-de-feu";
 
-/* ===================== i18n ===================== */
+/* ======================= i18n ======================= */
 const T = {
 fr:{
-  html:"fr", other:"EN",
-  brandline:"Simulateur de planning · Restauration · Convention HCR",
-  tagline:"Vous êtes responsable d'exploitation. Sept jours, une équipe, un budget. Placez les services sans casser le droit du travail — ni la marge.",
-  theme:"Thème",
+  html:"fr", other:"EN", theme:"Thème", menu:"← Menu",
+  brand:"Simulateur de planning · Restauration · Convention HCR",
+  tag:"Vous êtes responsable d'exploitation d'un restaurant à Bayeux. Sept jours, une équipe, un budget. Placez les services sans casser le droit du travail — ni la marge.",
   days:["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"],
   daysShort:["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"],
   shifts:{R:"Repos",P:"Prépa",M:"Midi",S:"Soir",C:"Coupure"},
   services:{midi:"midi",soir:"soir"},
-  poles:{cuisine:"cuisine",salle:"salle"},
   poleShort:{cuisine:"CUI",salle:"SAL"},
-  roles:{
-    chef:"Chef de cuisine", second:"Seconde de cuisine", commis:"Commis",
-    cuisinier:"Cuisinier", plongeur:"Plongeur-commis", extra:"Extra",
-    mh:"Maître d'hôtel", rang:"Cheffe de rang", rangM:"Chef de rang",
-    serveur:"Serveur", serveuse:"Serveuse"
-  },
-  motifs:{cours:"Cours", conge:"Congé", arret:"Arrêt", ferme:"Fermé"},
-  notes:{ferme:"Fermé", soirFerme:"Soir fermé", ferie:"8 mai"},
-  resp:"resp.",
-  team:"Équipe", total:"Total", contract:"contrat",
-  midiCount:(a)=>`${a} midi`, soirCount:(a)=>`${a} soir`,
-  needFor:(sv)=>`Besoin ${sv}`,
+  roles:{chef:"Chef de cuisine",second:"Seconde de cuisine",commis:"Commis",
+    cuisinier:"Cuisinier",plongeur:"Plongeur-commis",extra:"Extra",interim:"Extra intérim",
+    mh:"Maître d'hôtel",rang:"Cheffe de rang",rangM:"Chef de rang",
+    serveur:"Serveur",serveuse:"Serveuse"},
+  motifs:{cours:"Cours",conge:"Congé",arret:"Arrêt",ferme:"Fermé",epuise:"Épuisé"},
+  notes:{ferme:"Fermé",soirFerme:"Soir fermé",ferie:"Férié",noel:"Noël"},
+  resp:"resp.", team:"Équipe", total:"Total", contract:"contrat",
+  midiCount:a=>`${a} midi`, soirCount:a=>`${a} soir`,
+  needFor:sv=>`Besoin ${sv}`,
   statTeam:"Équipe", statHours:"Heures contractuelles", statCA:"CA prévisionnel", statBudget:"Budget masse salariale",
   btnClear:"Vider", btnDraft:"Brouillon du chef", btnCheck:"Valider la semaine", btnShare:"Partager mon score",
-  hint:'Choisissez un service puis cliquez (ou glissez) sur les cases. Raccourcis : <kbd>0</kbd> repos · <kbd>1</kbd> prépa · <kbd>2</kbd> midi · <kbd>3</kbd> soir · <kbd>4</kbd> coupure. Les cases hachurées sont verrouillées (congé, arrêt, indisponibilité).',
+  hint:'Choisissez un service puis cliquez (ou glissez) sur les cases. Raccourcis : <kbd>0</kbd> repos · <kbd>1</kbd> prépa · <kbd>2</kbd> midi · <kbd>3</kbd> soir · <kbd>4</kbd> coupure. Les cases hachurées sont verrouillées.',
   h3board:"Tableau de bord", h3live:"Contrôle en direct", h3rules:"Les règles",
   lblCost:"Masse salariale", lblCov:"Postes couverts",
   rankGood:"Planning validable", rankMid:"À retoucher", rankBad:"Non conforme",
@@ -401,76 +551,99 @@ fr:{
   ulLegal:[
     "<b>11 h de repos</b> entre la fin d'un service et la reprise le lendemain. Un <code>Soir</code> ou une <code>Coupure</code> (fin 23:45) suivi d'une <code>Prépa</code> (début 08:00) ne laisse que 8 h 15.",
     "<b>2 jours de repos</b> par semaine minimum.",
-    "<b>48 h</b> maximum sur la semaine, quelle que soit la charge.",
-    "<b>Heures supplémentaires</b> au-delà de 35 h : +10 % (36-39 h), +20 % (40-43 h), +50 % (44 h et plus)."
-  ],
+    "<b>48 h</b> maximum sur la semaine.",
+    "<b>Heures supplémentaires</b> au-delà de 35 h : +10 % (36-39 h), +20 % (40-43 h), +50 % (44 h et plus)."],
   sumHouse:"Règles d'établissement",
   ulHouse:[
     "Chaque service ouvert doit avoir l'<b>effectif demandé</b> en cuisine et en salle.",
-    "Un <b>responsable</b> par pôle et par service (chef ou seconde en cuisine, maître d'hôtel ou cheffe de rang en salle).",
-    "Les <b>heures payées non travaillées</b> coûtent : un contrat 35 h utilisé 28 h, c'est 7 h perdues.",
-    "Les <b>souhaits de l'équipe</b> comptent peu au score, beaucoup dans la vraie vie."
-  ],
-  disclaim:"Modèle pédagogique inspiré de la convention collective HCR et du Code du travail, volontairement simplifié. Ne remplace ni un conseil juridique, ni votre logiciel de paie.",
-  clean:"<b>Semaine conforme.</b><span class='who'>Couverture complète, repos respectés, budget tenu. Passez au niveau suivant.</span>",
-  more:(n)=>`… et ${n} autre${n>1?'s':''} point${n>1?'s':''} à corriger`,
+    "Un <b>responsable</b> par pôle et par service.",
+    "Les <b>heures payées non travaillées</b> coûtent.",
+    "Les <b>souhaits de l'équipe</b> comptent peu au score, beaucoup dans la vraie vie."],
+  disclaim:"Modèle pédagogique inspiré de la convention collective HCR et du Code du travail, volontairement simplifié. Équipe et chiffres fictifs. Ne remplace ni un conseil juridique, ni un logiciel de paie.",
+  clean:"<b>Semaine conforme.</b><span class='who'>Couverture complète, repos respectés, budget tenu.</span>",
+  more:n=>`… et ${n} autre${n>1?'s':''} point${n>1?'s':''} à corriger`,
   iRest:(h,d1,d2)=>`Repos quotidien de ${h} entre ${d1} et ${d2}`,
-  iRestWho:(n)=>`${n} — il en faut 11 h`,
+  iRestWho:n=>`${n} — il en faut 11 h`,
   iOff:"Moins de 2 jours de repos hebdomadaires",
   iOffWho:(n,r)=>`${n} — ${r} jour${r>1?'s':''} de repos sur la semaine`,
   iConsec:"Pas de repos consécutif",
-  iConsecWho:(n)=>`${n} — la règle maison en demande deux d'affilée`,
-  i48:(h)=>`Plus de 48 h travaillées (${h})`,
-  i48Who:(n)=>`${n} — plafond absolu dépassé`,
-  iPaid:(h)=>`${h} payées et non travaillées`,
+  iConsecWho:n=>`${n} — la règle maison en demande deux d'affilée`,
+  i48:h=>`Plus de 48 h travaillées (${h})`,
+  i48Who:n=>`${n} — plafond absolu dépassé`,
+  iPaid:h=>`${h} payées et non travaillées`,
   iPaidWho:(n,c,h)=>`${n} — contrat ${c} h, planifié ${h}`,
   iCover:(d,sv,m,pole)=>`${d} ${sv} : ${m} ${pole==='cuisine'?(m>1?'cuisiniers':'cuisinier'):(m>1?'personnes':'personne')} en moins${pole==='salle'?' en salle':''}`,
   iCoverWho:(g,n,pole)=>`${g} sur ${n} en ${pole==='cuisine'?'cuisine':'salle'}`,
   iResp:(d,sv,pole)=>`${d} ${sv} : aucun responsable en ${pole==='cuisine'?'cuisine':'salle'}`,
-  iRespWho:(pole)=>`Il faut ${pole==='cuisine'?'le chef ou la seconde':"le maître d'hôtel ou la cheffe de rang"}`,
+  iRespWho:pole=>`Il faut ${pole==='cuisine'?'le chef ou la seconde':"le maître d'hôtel ou la cheffe de rang"}`,
   iWish:"Souhait non respecté",
-  iBudget:(o)=>`Budget dépassé de ${o} €`,
+  iBudget:o=>`Budget dépassé de ${o} €`,
   iBudgetWho:(t,b)=>`${t} € pour un objectif de ${b} €`,
-  tClear:"Grille vidée. À vous de construire la semaine.",
-  tNoDraft:"Pas de brouillon sur ce niveau — celui-là, vous le montez de zéro.",
-  tDraft:"Brouillon rechargé — il contient plusieurs erreurs, à vous de les trouver.",
+  tClear:"Grille vidée.", tNoDraft:"Pas de brouillon sur cette semaine.",
+  tDraft:"Brouillon rechargé — il contient plusieurs erreurs.",
   tPerfect:"Parfait : 100/100. Semaine conforme, couverte et dans le budget.",
-  tLegal:(s,n)=>`${s}/100 — ${n} infraction${n>1?'s':''} au droit du travail. Corrigez-les d'abord : ce sont les plus chères.`,
-  tCouv:(s,n)=>`${s}/100 — pas d'infraction, mais ${n} problème${n>1?'s':''} de couverture en salle ou en cuisine.`,
-  tOpti:(s)=>`${s}/100 — légalement propre. Reste l'optimisation : budget, heures perdues, souhaits.`,
-  tCopied:"Score copié — plus qu'à le coller où vous voulez.",
-  tCopyFail:"Copie impossible sur ce navigateur. Sélectionnez le texte à la main.",
-  shareTxt:(lvl,score,cost,budget)=>
-    `Planning Coup de Feu — ${lvl} : ${score}/100, masse salariale ${cost} € sur un budget de ${budget} €. À vous d'essayer : https://${SITE}`,
-  footL:"Simulateur pédagogique · données et équipe fictives",
-  footR:"Code ouvert sur GitHub"
+  tLegal:(s,n)=>`${s}/100 — ${n} infraction${n>1?'s':''} au droit du travail. Corrigez-les d'abord.`,
+  tCouv:(s,n)=>`${s}/100 — pas d'infraction, mais ${n} problème${n>1?'s':''} de couverture.`,
+  tOpti:s=>`${s}/100 — légalement propre. Reste l'optimisation : budget, heures perdues, souhaits.`,
+  tCopied:"Score copié.", tCopyFail:"Copie impossible sur ce navigateur.",
+  shareTxt:(lvl,score,cost,budget)=>`Planning Coup de Feu — ${lvl} : ${score}/100, masse salariale ${cost} € sur un budget de ${budget} €. À vous d'essayer : https://${SITE}`,
+  footL:"Simulateur pédagogique · données et équipe fictives", footR:"Code ouvert sur GitHub",
+  /* modes */
+  modes:[
+    {k:"Apprentissage",t:"Les niveaux",d:"Cinq semaines écrites à la main, chacune avec son piège. Chaque niveau a une solution à 100/100 — à vous de la trouver.",f:"5 niveaux · étoiles"},
+    {k:"Campagne",t:"La saison",d:"Dix semaines qui s'enchaînent. Les heures supplémentaires s'accumulent, la fatigue monte, le moral baisse. Vos choix de la semaine 3 se paient semaine 7.",f:"10 semaines · état reporté"},
+    {k:"Sans fin",t:"Aléatoire",d:"Des semaines générées à l'infini, difficulté réglable. Chaque semaine a une graine : partagez-la pour défier quelqu'un sur exactement la même.",f:"illimité · graine partageable"}],
+  /* niveaux */
+  lvTitle:"Les niveaux", lvSub:"Terminez un niveau à 60 minimum pour débloquer le suivant.",
+  lvLocked:"Verrouillé", lvBest:"Meilleur", lvNever:"Jamais jouée",
+  /* saison */
+  snTitle:"La saison", snSub:"De mars à juillet. Chaque semaine validée modifie l'état de l'équipe.",
+  snPlay:n=>`Planifier la semaine ${n}`, snReset:"Recommencer la saison",
+  snResetOk:"Nouvelle saison. L'équipe repart au complet.",
+  snDone:"Saison terminée", snDoneSub:"Vous avez tenu les dix semaines.",
+  snLogTtl:"Journal de la saison", snKpiTtl:"Situation", snTeamTtl:"L'équipe",
+  snEmptyLog:"Rien encore. Planifiez la première semaine.",
+  kTreso:"Trésorerie", kScore:"Score moyen", kWeek:"Semaine", kHS:"Compteur HS",
+  gFatigue:"Fatigue", gMoral:"Moral",
+  dbWeek:n=>`Semaine ${n} validée`,
+  dbNext:"Semaine suivante", dbStay:"Revoir la saison",
+  dTreso:(v)=>`Trésorerie ${v>=0?'+':''}${v} € sur la semaine`,
+  dFatigue:n=>`${n} termine la semaine épuisé`,
+  dArret:n=>`${n} est en arrêt la semaine prochaine`,
+  dMoral:n=>`Le moral de ${n} est au plus bas`,
+  dQuit:n=>`${n} démissionne — remplacé par un extra en intérim, plus cher et sans responsabilité`,
+  dHS:(n,h)=>`${n} cumule ${h} d'heures supplémentaires`,
+  dHSwarn:n=>`${n} dépasse le compteur d'heures autorisé : prévoyez des semaines courtes`,
+  dGoodRest:"Toute l'équipe a eu ses deux jours de repos",
+  dWishes:"Tous les souhaits de la semaine ont été respectés",
+  /* aléatoire */
+  rdTitle:"Semaine aléatoire", rdSub:"Une semaine générée, toujours résoluble. La graine détermine tout.",
+  rdDiffLbl:"Difficulté", rdSeedLbl:"Graine", rdSeedHelp:"Même graine, même semaine. Partagez-la pour comparer vos scores.",
+  rdPlay:"Jouer cette semaine", rdRoll:"Nouvelle graine", rdPrevTtl:"Aperçu",
+  diffs:["Tranquille","Normale","Tendue","Rude","Infernale"],
+  rdOpen:"Jours ouverts", rdStaff:"Salariés", rdSlots:"Postes à couvrir",
 },
 en:{
-  html:"en", other:"FR",
-  brandline:"Shift-planning simulator · Restaurants · French labour rules",
-  tagline:"You run the floor. Seven days, one team, one budget. Build the roster without breaking the law — or the margin.",
-  theme:"Theme",
+  html:"en", other:"FR", theme:"Theme", menu:"← Menu",
+  brand:"Shift-planning simulator · Restaurants · French labour rules",
+  tag:"You run a restaurant in Bayeux. Seven days, one team, one budget. Build the roster without breaking the law — or the margin.",
   days:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
   daysShort:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
   shifts:{R:"Day off",P:"Prep",M:"Lunch",S:"Dinner",C:"Split"},
   services:{midi:"lunch",soir:"dinner"},
-  poles:{cuisine:"the kitchen",salle:"the floor"},
   poleShort:{cuisine:"KIT",salle:"FOH"},
-  roles:{
-    chef:"Head chef", second:"Sous-chef", commis:"Commis chef",
-    cuisinier:"Line cook", plongeur:"Kitchen porter", extra:"Casual staff",
-    mh:"Head waiter", rang:"Section head", rangM:"Section head",
-    serveur:"Server", serveuse:"Server"
-  },
-  motifs:{cours:"Class", conge:"Leave", arret:"Sick leave", ferme:"Closed"},
-  notes:{ferme:"Closed", soirFerme:"No dinner", ferie:"Public holiday"},
-  resp:"lead",
-  team:"Team", total:"Total", contract:"contract",
-  midiCount:(a)=>`${a} lunch`, soirCount:(a)=>`${a} dinner`,
-  needFor:(sv)=>`${sv} needs`,
+  roles:{chef:"Head chef",second:"Sous-chef",commis:"Commis chef",
+    cuisinier:"Line cook",plongeur:"Kitchen porter",extra:"Casual staff",interim:"Agency cover",
+    mh:"Head waiter",rang:"Section head",rangM:"Section head",
+    serveur:"Server",serveuse:"Server"},
+  motifs:{cours:"Class",conge:"Leave",arret:"Sick leave",ferme:"Closed",epuise:"Burnt out"},
+  notes:{ferme:"Closed",soirFerme:"No dinner",ferie:"Holiday",noel:"Christmas"},
+  resp:"lead", team:"Team", total:"Total", contract:"contract",
+  midiCount:a=>`${a} lunch`, soirCount:a=>`${a} dinner`,
+  needFor:sv=>`${sv} needs`,
   statTeam:"Team", statHours:"Contracted hours", statCA:"Forecast revenue", statBudget:"Payroll budget",
   btnClear:"Clear", btnDraft:"Chef's draft", btnCheck:"Check the week", btnShare:"Share my score",
-  hint:'Pick a shift, then click or drag across the cells. Shortcuts: <kbd>0</kbd> day off · <kbd>1</kbd> prep · <kbd>2</kbd> lunch · <kbd>3</kbd> dinner · <kbd>4</kbd> split. Hatched cells are locked (leave, sick leave, unavailability).',
+  hint:'Pick a shift, then click or drag across the cells. Shortcuts: <kbd>0</kbd> day off · <kbd>1</kbd> prep · <kbd>2</kbd> lunch · <kbd>3</kbd> dinner · <kbd>4</kbd> split. Hatched cells are locked.',
   h3board:"Dashboard", h3live:"Live check", h3rules:"The rules",
   lblCost:"Payroll", lblCov:"Posts covered",
   rankGood:"Ready to post", rankMid:"Needs work", rankBad:"Non-compliant",
@@ -478,565 +651,1059 @@ en:{
   ulLegal:[
     "<b>11 hours of rest</b> between the end of one shift and the start of the next day. A <code>Dinner</code> or <code>Split</code> (ending 23:45) followed by <code>Prep</code> (starting 08:00) leaves only 8h15.",
     "<b>2 days off</b> per week, minimum.",
-    "<b>48 hours</b> maximum per week, however busy the service.",
-    "<b>Overtime</b> above 35h: +10% (36-39h), +20% (40-43h), +50% (44h and over)."
-  ],
+    "<b>48 hours</b> maximum per week.",
+    "<b>Overtime</b> above 35h: +10% (36-39h), +20% (40-43h), +50% (44h and over)."],
   sumHouse:"House rules",
   ulHouse:[
     "Every open service needs the <b>headcount requested</b> in the kitchen and on the floor.",
-    "One <b>lead</b> per area per service (head chef or sous-chef in the kitchen, head waiter or section head on the floor).",
-    "<b>Paid hours nobody worked</b> still cost you: a 35h contract used for 28h is 7h lost.",
-    "<b>Staff requests</b> cost little on the score, a lot in real life."
-  ],
-  disclaim:"Teaching model based on the French HCR collective agreement and Labour Code, deliberately simplified. Not legal advice, and not a payroll system.",
-  clean:"<b>Compliant week.</b><span class='who'>Every post covered, rest respected, budget held. On to the next level.</span>",
-  more:(n)=>`… and ${n} more issue${n>1?'s':''} to fix`,
+    "One <b>lead</b> per area per service.",
+    "<b>Paid hours nobody worked</b> still cost you.",
+    "<b>Staff requests</b> cost little on the score, a lot in real life."],
+  disclaim:"Teaching model based on the French HCR collective agreement and Labour Code, deliberately simplified. Fictional team and figures. Not legal advice, and not a payroll system.",
+  clean:"<b>Compliant week.</b><span class='who'>Every post covered, rest respected, budget held.</span>",
+  more:n=>`… and ${n} more issue${n>1?'s':''} to fix`,
   iRest:(h,d1,d2)=>`Only ${h} of rest between ${d1} and ${d2}`,
-  iRestWho:(n)=>`${n} — 11 hours are required`,
+  iRestWho:n=>`${n} — 11 hours are required`,
   iOff:"Fewer than 2 days off this week",
   iOffWho:(n,r)=>`${n} — ${r} day${r>1?'s':''} off across the week`,
   iConsec:"No consecutive days off",
-  iConsecWho:(n)=>`${n} — the house rule asks for two in a row`,
-  i48:(h)=>`More than 48 hours worked (${h})`,
-  i48Who:(n)=>`${n} — absolute ceiling exceeded`,
-  iPaid:(h)=>`${h} paid but not worked`,
+  iConsecWho:n=>`${n} — the house rule asks for two in a row`,
+  i48:h=>`More than 48 hours worked (${h})`,
+  i48Who:n=>`${n} — absolute ceiling exceeded`,
+  iPaid:h=>`${h} paid but not worked`,
   iPaidWho:(n,c,h)=>`${n} — ${c}h contract, ${h} rostered`,
   iCover:(d,sv,m,pole)=>`${d} ${sv}: ${m} ${pole==='cuisine'?(m>1?'cooks':'cook'):(m>1?'people':'person')} short${pole==='salle'?' on the floor':''}`,
   iCoverWho:(g,n,pole)=>`${g} of ${n} in ${pole==='cuisine'?'the kitchen':'the floor team'}`,
   iResp:(d,sv,pole)=>`${d} ${sv}: no lead ${pole==='cuisine'?'in the kitchen':'on the floor'}`,
-  iRespWho:(pole)=>`You need ${pole==='cuisine'?'the head chef or sous-chef':'the head waiter or section head'}`,
+  iRespWho:pole=>`You need ${pole==='cuisine'?'the head chef or sous-chef':'the head waiter or section head'}`,
   iWish:"Staff request ignored",
-  iBudget:(o)=>`Budget exceeded by €${o}`,
+  iBudget:o=>`Budget exceeded by €${o}`,
   iBudgetWho:(t,b)=>`€${t} against a €${b} target`,
-  tClear:"Grid cleared. Build the week from scratch.",
-  tNoDraft:"No draft on this level — you build this one yourself.",
-  tDraft:"Draft reloaded — it contains several mistakes. Find them.",
+  tClear:"Grid cleared.", tNoDraft:"No draft on this week.",
+  tDraft:"Draft reloaded — it contains several mistakes.",
   tPerfect:"Perfect: 100/100. Compliant, covered and on budget.",
-  tLegal:(s,n)=>`${s}/100 — ${n} labour-law breach${n>1?'es':''}. Fix those first: they cost the most.`,
-  tCouv:(s,n)=>`${s}/100 — no breaches, but ${n} coverage problem${n>1?'s':''} in the kitchen or on the floor.`,
-  tOpti:(s)=>`${s}/100 — legally clean. What's left is optimisation: budget, wasted hours, staff requests.`,
-  tCopied:"Score copied — paste it wherever you like.",
-  tCopyFail:"Copying isn't available in this browser. Select the text manually.",
-  shareTxt:(lvl,score,cost,budget)=>
-    `Planning Coup de Feu — ${lvl}: ${score}/100, payroll €${cost} against a €${budget} budget. Try it: https://${SITE}`,
-  footL:"Teaching simulator · fictional team and figures",
-  footR:"Source on GitHub"
+  tLegal:(s,n)=>`${s}/100 — ${n} labour-law breach${n>1?'es':''}. Fix those first.`,
+  tCouv:(s,n)=>`${s}/100 — no breaches, but ${n} coverage problem${n>1?'s':''}.`,
+  tOpti:s=>`${s}/100 — legally clean. What's left is optimisation: budget, wasted hours, requests.`,
+  tCopied:"Score copied.", tCopyFail:"Copying isn't available in this browser.",
+  shareTxt:(lvl,score,cost,budget)=>`Planning Coup de Feu — ${lvl}: ${score}/100, payroll €${cost} against a €${budget} budget. Try it: https://${SITE}`,
+  footL:"Teaching simulator · fictional team and figures", footR:"Source on GitHub",
+  modes:[
+    {k:"Learning",t:"Levels",d:"Five hand-written weeks, each with its own trap. Every level has a 100/100 solution — find it.",f:"5 levels · stars"},
+    {k:"Campaign",t:"The season",d:"Ten weeks in sequence. Overtime accumulates, fatigue builds, morale drops. What you do in week 3 is paid for in week 7.",f:"10 weeks · state carries over"},
+    {k:"Endless",t:"Random",d:"Infinite generated weeks, adjustable difficulty. Each has a seed: share it to challenge someone on exactly the same week.",f:"unlimited · shareable seed"}],
+  lvTitle:"Levels", lvSub:"Score at least 60 on a level to unlock the next.",
+  lvLocked:"Locked", lvBest:"Best", lvNever:"Never played",
+  snTitle:"The season", snSub:"March to July. Every validated week changes the state of your team.",
+  snPlay:n=>`Plan week ${n}`, snReset:"Restart the season",
+  snResetOk:"New season. Full team again.",
+  snDone:"Season complete", snDoneSub:"You made it through all ten weeks.",
+  snLogTtl:"Season log", snKpiTtl:"Standing", snTeamTtl:"The team",
+  snEmptyLog:"Nothing yet. Plan the first week.",
+  kTreso:"Cash", kScore:"Average score", kWeek:"Week", kHS:"Overtime bank",
+  gFatigue:"Fatigue", gMoral:"Morale",
+  dbWeek:n=>`Week ${n} validated`,
+  dbNext:"Next week", dbStay:"Back to the season",
+  dTreso:v=>`Cash ${v>=0?'+':''}€${v} this week`,
+  dFatigue:n=>`${n} ends the week burnt out`,
+  dArret:n=>`${n} is on sick leave next week`,
+  dMoral:n=>`${n}'s morale has bottomed out`,
+  dQuit:n=>`${n} resigns — replaced by agency cover, more expensive and not a lead`,
+  dHS:(n,h)=>`${n} has banked ${h} of overtime`,
+  dHSwarn:n=>`${n} is over the overtime ceiling: plan some short weeks`,
+  dGoodRest:"Everyone got their two days off",
+  dWishes:"Every request this week was respected",
+  rdTitle:"Random week", rdSub:"A generated week, always solvable. The seed decides everything.",
+  rdDiffLbl:"Difficulty", rdSeedLbl:"Seed", rdSeedHelp:"Same seed, same week. Share it to compare scores.",
+  rdPlay:"Play this week", rdRoll:"New seed", rdPrevTtl:"Preview",
+  diffs:["Easy","Normal","Tight","Hard","Brutal"],
+  rdOpen:"Days open", rdStaff:"Staff", rdSlots:"Posts to cover",
 }};
-
 let lang = "fr";
 const t = k => T[lang][k];
 const X = o => (o && typeof o==='object' && o.fr!==undefined) ? o[lang] : o;
 
-/* ===================== modèle ===================== */
+/* ======================= moteur ======================= */
 const SHIFTS = {
-  R:{code:'R', h:0,    deb:null, fin:null,  couvre:[],              col:'--repos', label:'—'},
-  P:{code:'P', h:7,    deb:8,    fin:15,    couvre:['midi'],        col:'--prep',  label:'08:00–15:00'},
-  M:{code:'M', h:4,    deb:11,   fin:15,    couvre:['midi'],        col:'--midi',  label:'11:00–15:00'},
-  S:{code:'S', h:5.75, deb:18,   fin:23.75, couvre:['soir'],        col:'--soir',  label:'18:00–23:45'},
-  C:{code:'C', h:9.75, deb:11,   fin:23.75, couvre:['midi','soir'], col:'--coup',  label:'11:00–15:00 + 18:00–23:45'},
+  R:{code:'R',h:0,   deb:null,fin:null, couvre:[],              col:'--repos',label:'—'},
+  P:{code:'P',h:7,   deb:8,   fin:15,   couvre:['midi'],        col:'--prep', label:'08:00–15:00'},
+  M:{code:'M',h:4,   deb:11,  fin:15,   couvre:['midi'],        col:'--midi', label:'11:00–15:00'},
+  S:{code:'S',h:5.75,deb:18,  fin:23.75,couvre:['soir'],        col:'--soir', label:'18:00–23:45'},
+  C:{code:'C',h:9.75,deb:11,  fin:23.75,couvre:['midi','soir'], col:'--coup', label:'11:00–15:00 + 18:00–23:45'},
 };
-const ORDER = ['R','P','M','S','C'];
-const KEYMAP = {'0':'R','1':'P','2':'M','3':'S','4':'C'};
+const ORDER=['R','P','M','S','C'], KEYMAP={'0':'R','1':'P','2':'M','3':'S','4':'C'};
 
-function e(id,nom,pole,role,contrat,taux,resp,opts){
-  return Object.assign({id,nom,pole,role,contrat,taux,resp:!!resp},opts||{});
-}
-function b(cm,cs,sm,ss){return {midi:{cuisine:cm,salle:cs}, soir:{cuisine:sm,salle:ss}};}
-
-const LEVELS = [
-{
-  id:'l1',
-  n:{fr:'Niveau 1',en:'Level 1'},
-  titre:{fr:'Novembre, semaine calme',en:'November, a quiet week'},
-  sous:{fr:'6 salariés · fermé le lundi',en:'6 staff · closed Mondays'},
-  brief:{
-    fr:"Basse saison à Bayeux. Le restaurant est fermé le lundi et le dimanche soir. L'équipe est au complet, les besoins sont modestes : le vrai enjeu, c'est de coller aux contrats sans payer d'heures dans le vide. Léa a cours le mardi et le mercredi.",
-    en:"Low season in Bayeux. The restaurant closes on Mondays and on Sunday evenings. The team is complete and demand is modest: the real challenge is matching the contracts without paying for hours nobody works. Léa has classes on Tuesday and Wednesday."},
-  ca:12500, budget:4100, reposConsecutifs:false,
-  jours:[
-    {ferme:true,  besoin:b(0,0,0,0), note:'ferme'},
-    {ferme:false, besoin:b(1,1,2,2)},
-    {ferme:false, besoin:b(1,1,2,2)},
-    {ferme:false, besoin:b(2,1,2,2)},
-    {ferme:false, besoin:b(2,2,3,3)},
-    {ferme:false, besoin:b(2,2,3,3)},
-    {ferme:false, besoin:b(2,2,0,0), note:'soirFerme'},
-  ],
-  equipe:[
-    e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
-    e('c2','Inès Diallo','cuisine','second',35,19,true),
-    e('c3','Tom Berger','cuisine','commis',35,15,false),
-    e('s1','Claire Aubert','salle','mh',39,21,true),
-    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
-    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{1:'cours',2:'cours'}}),
-  ],
-  prefs:[{emp:'s2',jour:6,veut:'R',txt:{fr:"Yanis a demandé son dimanche",en:"Yanis asked for Sunday off"}}],
-  draft:{
-    c1:['R','C','S','P','C','C','R'],
-    c2:['R','R','C','C','C','S','R'],
-    c3:['R','S','R','C','S','C','M'],
-    s1:['R','C','S','R','C','C','M'],
-    s2:['R','S','C','C','S','S','R'],
-    s3:['R','R','R','S','C','C','M'],
-  }
-},
-{
-  id:'l2',
-  n:{fr:'Niveau 2',en:'Level 2'},
-  titre:{fr:'Le pont du 8 mai',en:'The May bank-holiday weekend'},
-  sous:{fr:'8 salariés · ouvert 7 jours',en:'8 staff · open all week'},
-  brief:{
-    fr:"Premier vrai coup de chaud de l'année : le restaurant ouvre tous les jours, le 8 mai tombe un jeudi et les tables du soir sont pleines. Inès a posé ses congés vendredi et samedi — les deux services où vous auriez le plus besoin d'elle. Hugo est en contrat d'extra 20 h.",
-    en:"The first real rush of the year: open every day, the public holiday falls on Thursday and every dinner table is booked. Inès has taken leave on Friday and Saturday — the two services where you need her most. Hugo is on a 20-hour casual contract."},
-  ca:16500, budget:4950, reposConsecutifs:false,
-  jours:[
-    {ferme:false, besoin:b(1,1,2,2)},
-    {ferme:false, besoin:b(1,1,2,2)},
-    {ferme:false, besoin:b(2,2,2,2)},
-    {ferme:false, besoin:b(2,2,3,3), note:'ferie'},
-    {ferme:false, besoin:b(2,2,3,2)},
-    {ferme:false, besoin:b(2,2,3,3)},
-    {ferme:false, besoin:b(2,2,0,0), note:'soirFerme'},
-  ],
-  equipe:[
-    e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
-    e('c2','Inès Diallo','cuisine','second',35,19,true,{indispo:{4:'conge',5:'conge'}}),
-    e('c3','Tom Berger','cuisine','commis',35,15,false),
-    e('c4','Hugo Pellerin','cuisine','extra',20,16,false),
-    e('s1','Claire Aubert','salle','mh',39,21,true),
-    e('s4','Nora Benali','salle','rang',30,17,true),
-    e('s2','Yanis Roux','salle','serveur',35,15.5,false),
-    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{1:'cours'}}),
-  ],
-  prefs:[
-    {emp:'s2',jour:6,veut:'R',txt:{fr:"Yanis a demandé son dimanche",en:"Yanis asked for Sunday off"}},
-    {emp:'c3',jour:5,veut:'R',txt:{fr:"Tom ne peut pas fermer le samedi",en:"Tom cannot close on Saturday"}},
-  ],
-},
-{
-  id:'l3',
-  n:{fr:'Niveau 3',en:'Level 3'},
-  titre:{fr:'Plein été, semaine du 6 juin',en:'High summer, D-Day week'},
-  sous:{fr:'10 salariés · budget sous tension',en:'10 staff · budget under pressure'},
-  brief:{
-    fr:"Les commémorations remplissent Bayeux, la salle tourne midi et soir sept jours sur sept. Tom est en arrêt maladie jusqu'à mercredi inclus, l'équipe doit absorber. Le budget est calé sur 31 % du chiffre d'affaires : chaque heure supplémentaire se voit. Règle maison ce mois-ci : deux jours de repos consécutifs pour tout le monde.",
-    en:"The commemorations fill Bayeux and the dining room turns over at lunch and dinner, seven days a week. Tom is on sick leave through Wednesday and the team has to absorb it. Payroll is capped at 31% of revenue, so every overtime hour shows. House rule this month: two consecutive days off for everyone."},
-  ca:21000, budget:6600, reposConsecutifs:true,
-  jours:[
-    {ferme:false, besoin:b(2,2,2,2)},
-    {ferme:false, besoin:b(2,2,2,2)},
-    {ferme:false, besoin:b(2,2,3,3)},
-    {ferme:false, besoin:b(2,2,3,3)},
-    {ferme:false, besoin:b(3,3,3,3)},
-    {ferme:false, besoin:b(3,3,4,4)},
-    {ferme:false, besoin:b(3,3,2,2)},
-  ],
-  equipe:[
-    e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
-    e('c2','Inès Diallo','cuisine','second',35,19,true),
-    e('c3','Tom Berger','cuisine','commis',35,15,false,{indispo:{0:'arret',1:'arret',2:'arret'}}),
-    e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
-    e('c5','Sami Ouaddah','cuisine','plongeur',24,15,false),
-    e('s1','Claire Aubert','salle','mh',39,21,true),
-    e('s4','Nora Benali','salle','rang',30,17,true),
-    e('s2','Yanis Roux','salle','serveur',35,15.5,false),
-    e('s5','Emma Caron','salle','rang',35,16.5,true),
-    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{3:'cours'}}),
-  ],
-  prefs:[
-    {emp:'s2',jour:6,veut:'R',txt:{fr:"Yanis a demandé son dimanche",en:"Yanis asked for Sunday off"}},
-    {emp:'c5',jour:0,veut:'R',txt:{fr:"Sami a un rendez-vous lundi",en:"Sami has an appointment on Monday"}},
-    {emp:'s5',jour:2,veut:'R',txt:{fr:"Emma a demandé son mercredi",en:"Emma asked for Wednesday off"}},
-  ],
-}];
-
-/* ===================== état ===================== */
-let lvlIndex = 0, brush = 'C', plans = {}, painting = false;
-
-function emptyPlan(L){ const p={}; L.equipe.forEach(em=>{p[em.id]=[0,1,2,3,4,5,6].map(()=> 'R');}); return p; }
-function applyLocks(L,p){
-  L.equipe.forEach(em=>{ if(em.indispo) Object.keys(em.indispo).forEach(d=>{p[em.id][+d]='R';}); });
-  L.jours.forEach((j,d)=>{ if(j.ferme) L.equipe.forEach(em=>{p[em.id][d]='R';}); });
-  return p;
-}
-function planFor(i){
-  const L = LEVELS[i];
-  if(!plans[L.id]){
-    let p = emptyPlan(L);
-    if(L.draft) L.equipe.forEach(em=>{ if(L.draft[em.id]) p[em.id]=L.draft[em.id].slice(); });
-    plans[L.id] = applyLocks(L,p);
-  }
-  return plans[L.id];
-}
-function isLocked(L,em,d){ return (em.indispo && em.indispo[d]!==undefined) || L.jours[d].ferme; }
-
-function save(){ try{ localStorage.setItem('cdf_v2', JSON.stringify({plans,lvlIndex,lang})); }catch(_){} }
-function load(){
-  try{
-    const raw = localStorage.getItem('cdf_v2'); if(!raw) return;
-    const d = JSON.parse(raw);
-    if(d.plans) plans = d.plans;
-    if(typeof d.lvlIndex==='number' && LEVELS[d.lvlIndex]) lvlIndex = d.lvlIndex;
-    if(d.lang && T[d.lang]) lang = d.lang;
-  }catch(_){}
-}
-
-/* ===================== moteur ===================== */
 function coutSalarie(em,h){
-  const paye = Math.max(h, em.contrat), tx = em.taux;
-  let c = Math.min(paye,35)*tx;
-  if(paye>35) c += (Math.min(paye,39)-35)*tx*1.10;
-  if(paye>39) c += (Math.min(paye,43)-39)*tx*1.20;
-  if(paye>43) c += (paye-43)*tx*1.50;
+  const p=Math.max(h,em.contrat), tx=em.taux;
+  let c=Math.min(p,35)*tx;
+  if(p>35)c+=(Math.min(p,39)-35)*tx*1.10;
+  if(p>39)c+=(Math.min(p,43)-39)*tx*1.20;
+  if(p>43)c+=(p-43)*tx*1.50;
   return c;
 }
 function fmtH(h){
-  const hh = Math.floor(h+1e-9), mm = Math.round((h-hh)*60);
-  if(lang==='en') return mm ? `${hh}h${String(mm).padStart(2,'0')}` : `${hh}h`;
-  return mm ? `${hh} h ${String(mm).padStart(2,'0')}` : `${hh} h`;
+  const hh=Math.floor(h+1e-9), mm=Math.round((h-hh)*60);
+  if(lang==='en') return mm?`${hh}h${String(mm).padStart(2,'0')}`:`${hh}h`;
+  return mm?`${hh} h ${String(mm).padStart(2,'0')}`:`${hh} h`;
 }
 const nf = n => Math.round(n).toLocaleString(lang==='en'?'en-GB':'fr-FR');
+const cur = v => lang==='en' ? `€${nf(v)}` : `${nf(v)} €`;
 
-function evaluate(L,p){
-  const issues=[], flags=new Set(), hours={}, cost={};
+function evaluate(S,p){
+  const issues=[],flags=new Set(),hours={},cost={};
   let total=0;
-  const D = t('days'), Ds = t('daysShort'), SV = t('services');
-
-  L.equipe.forEach(em=>{
-    const row = p[em.id];
-    let h=0, repos=0;
-    row.forEach(c=>{ h+=SHIFTS[c].h; if(c==='R') repos++; });
+  const D=t('days'),Ds=t('daysShort'),SV=t('services');
+  S.equipe.forEach(em=>{
+    const row=p[em.id];
+    let h=0,repos=0;
+    row.forEach(c=>{h+=SHIFTS[c].h; if(c==='R')repos++;});
     hours[em.id]=h; cost[em.id]=coutSalarie(em,h); total+=cost[em.id];
-
-    for(let d=0; d<6; d++){
-      const a=SHIFTS[row[d]], n=SHIFTS[row[d+1]];
-      if(a.fin===null || n.deb===null) continue;
-      const rep = (n.deb+24)-a.fin;
-      if(rep < 11){
+    for(let d=0;d<6;d++){
+      const a=SHIFTS[row[d]],n=SHIFTS[row[d+1]];
+      if(a.fin===null||n.deb===null)continue;
+      const rep=(n.deb+24)-a.fin;
+      if(rep<11){
         issues.push({cat:'legal',pts:20,txt:t('iRest')(fmtH(rep),Ds[d],Ds[d+1]),who:t('iRestWho')(em.nom)});
         flags.add(em.id+'-'+d); flags.add(em.id+'-'+(d+1));
       }
     }
     if(repos<2){
       issues.push({cat:'legal',pts:20,txt:t('iOff'),who:t('iOffWho')(em.nom,repos)});
-      row.forEach((c,d)=>{ if(c!=='R') flags.add(em.id+'-'+d); });
+      row.forEach((c,d)=>{if(c!=='R')flags.add(em.id+'-'+d);});
     }
-    if(L.reposConsecutifs && repos>=2){
+    if(S.reposConsecutifs&&repos>=2){
       let ok=false;
       for(let d=0;d<6;d++) if(row[d]==='R'&&row[d+1]==='R') ok=true;
       if(!ok) issues.push({cat:'conf',pts:5,txt:t('iConsec'),who:t('iConsecWho')(em.nom)});
     }
     if(h>48){
       issues.push({cat:'legal',pts:20,txt:t('i48')(fmtH(h)),who:t('i48Who')(em.nom)});
-      row.forEach((c,d)=>{ if(c!=='R') flags.add(em.id+'-'+d); });
+      row.forEach((c,d)=>{if(c!=='R')flags.add(em.id+'-'+d);});
     }
-    if(h < em.contrat-0.01){
-      const perdu = em.contrat-h;
+    const dispo=S.jours.filter((j,d)=>!j.ferme&&!(em.indispo&&em.indispo[d]!==undefined)).length;
+    if(h<em.contrat-0.01&&dispo>0){
+      const perdu=em.contrat-h;
       issues.push({cat:'eco',pts:Math.min(10,Math.round(perdu)),
-        txt:t('iPaid')(fmtH(perdu)), who:t('iPaidWho')(em.nom,em.contrat,fmtH(h))});
+        txt:t('iPaid')(fmtH(perdu)),who:t('iPaidWho')(em.nom,em.contrat,fmtH(h))});
     }
   });
-
-  let postesOK=0, postesTot=0;
-  L.jours.forEach((j,d)=>{
+  let postesOK=0,postesTot=0;
+  S.jours.forEach((j,d)=>{
     ['midi','soir'].forEach(sv=>{
       ['cuisine','salle'].forEach(pole=>{
-        const need = j.besoin[sv][pole];
-        if(need<=0) return;
-        postesTot += need;
-        const present = L.equipe.filter(em=>em.pole===pole && SHIFTS[p[em.id][d]].couvre.includes(sv));
-        postesOK += Math.min(present.length,need);
-        if(present.length < need){
-          const m = need-present.length;
-          issues.push({cat:'couv',pts:12*m,
-            txt:t('iCover')(D[d],SV[sv],m,pole), who:t('iCoverWho')(present.length,need,pole)});
+        const need=j.besoin[sv][pole];
+        if(need<=0)return;
+        postesTot+=need;
+        const pres=S.equipe.filter(em=>em.pole===pole&&SHIFTS[p[em.id][d]].couvre.includes(sv));
+        postesOK+=Math.min(pres.length,need);
+        if(pres.length<need){
+          const m=need-pres.length;
+          issues.push({cat:'couv',pts:12*m,txt:t('iCover')(D[d],SV[sv],m,pole),
+            who:t('iCoverWho')(pres.length,need,pole)});
         }
-        if(present.length>0 && !present.some(em=>em.resp)){
+        if(pres.length>0&&!pres.some(em=>em.resp))
           issues.push({cat:'couv',pts:8,txt:t('iResp')(D[d],SV[sv],pole),who:t('iRespWho')(pole)});
-        }
       });
     });
   });
-
-  (L.prefs||[]).forEach(pr=>{
-    if(p[pr.emp] && p[pr.emp][pr.jour] !== pr.veut)
+  (S.prefs||[]).forEach(pr=>{
+    if(p[pr.emp]&&p[pr.emp][pr.jour]!==pr.veut)
       issues.push({cat:'conf',pts:3,txt:t('iWish'),who:X(pr.txt)});
   });
-
-  const over = total - L.budget;
+  const over=total-S.budget;
   if(over>0){
-    const pct = over/L.budget*100;
+    const pct=over/S.budget*100;
     issues.push({cat:'eco',pts:Math.min(25,Math.round(pct*1.5)),
-      txt:t('iBudget')(nf(over)), who:t('iBudgetWho')(nf(total),nf(L.budget))});
+      txt:t('iBudget')(nf(over)),who:t('iBudgetWho')(nf(total),nf(S.budget))});
   }
-
-  const score = Math.max(0, 100 - issues.reduce((s,i)=>s+i.pts,0));
+  const score=Math.max(0,100-issues.reduce((s,i)=>s+i.pts,0));
   return {issues,flags,hours,cost,total,score,postesOK,postesTot};
 }
 
-/* ===================== rendu ===================== */
-const $ = s => document.querySelector(s);
+/* ======================= données ======================= */
+const b=(cm,cs,sm,ss)=>({midi:{cuisine:cm,salle:cs},soir:{cuisine:sm,salle:ss}});
+function e(id,nom,pole,role,contrat,taux,resp,opts){
+  return Object.assign({id,nom,pole,role,contrat,taux,resp:!!resp},opts||{});
+}
+const wish=(fr,en)=>({fr,en});
+
+const LEVELS=[
+{ id:'l1', n:{fr:'Niveau 1',en:'Level 1'},
+  titre:{fr:'Novembre, semaine calme',en:'November, a quiet week'},
+  sous:{fr:'6 salariés · fermé le lundi',en:'6 staff · closed Mondays'},
+  brief:{fr:"Basse saison à Bayeux. Fermé le lundi et le dimanche soir. L'équipe est au complet et les besoins sont modestes : le vrai enjeu, c'est de coller aux contrats sans payer d'heures dans le vide. Léa a cours le mardi et le mercredi.",
+    en:"Low season in Bayeux. Closed Mondays and Sunday evenings. The team is complete and demand is modest: the real challenge is matching the contracts without paying for hours nobody works. Léa has classes on Tuesday and Wednesday."},
+  ca:12500,budget:4100,reposConsecutifs:false,
+  jours:[{ferme:true,besoin:b(0,0,0,0),note:'ferme'},{besoin:b(1,1,2,2)},{besoin:b(1,1,2,2)},
+    {besoin:b(2,1,2,2)},{besoin:b(2,2,3,3)},{besoin:b(2,2,3,3)},{besoin:b(2,2,0,0),note:'soirFerme'}],
+  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+    e('c2','Inès Diallo','cuisine','second',35,19,true),
+    e('c3','Tom Berger','cuisine','commis',35,15,false),
+    e('s1','Claire Aubert','salle','mh',39,21,true),
+    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
+    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{1:'cours',2:'cours'}})],
+  prefs:[{emp:'s2',jour:6,veut:'R',txt:wish("Yanis a demandé son dimanche","Yanis asked for Sunday off")}],
+  draft:{c1:['R','C','S','P','C','C','R'],c2:['R','R','C','C','C','S','R'],
+    c3:['R','S','R','C','S','C','M'],s1:['R','C','S','R','C','C','M'],
+    s2:['R','S','C','C','S','S','R'],s3:['R','R','R','S','C','C','M']} },
+
+{ id:'l2', n:{fr:'Niveau 2',en:'Level 2'},
+  titre:{fr:'Le pont du 8 mai',en:'The May bank holiday'},
+  sous:{fr:'8 salariés · ouvert 7 jours',en:'8 staff · open all week'},
+  brief:{fr:"Premier coup de chaud de l'année : ouvert tous les jours, le 8 mai tombe un jeudi et les tables du soir sont pleines. Inès a posé ses congés vendredi et samedi — les deux services où vous auriez le plus besoin d'elle. Hugo est en contrat d'extra 20 h.",
+    en:"The first rush of the year: open every day, the holiday falls on Thursday and every dinner table is booked. Inès has taken leave on Friday and Saturday — the two services where you need her most. Hugo is on a 20-hour casual contract."},
+  ca:16500,budget:4950,reposConsecutifs:false,
+  jours:[{besoin:b(1,1,2,2)},{besoin:b(1,1,2,2)},{besoin:b(2,2,2,2)},{besoin:b(2,2,3,3),note:'ferie'},
+    {besoin:b(2,2,3,2)},{besoin:b(2,2,3,3)},{besoin:b(2,2,0,0),note:'soirFerme'}],
+  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+    e('c2','Inès Diallo','cuisine','second',35,19,true,{indispo:{4:'conge',5:'conge'}}),
+    e('c3','Tom Berger','cuisine','commis',35,15,false),
+    e('c4','Hugo Pellerin','cuisine','extra',20,16,false),
+    e('s1','Claire Aubert','salle','mh',39,21,true),
+    e('s4','Nora Benali','salle','rang',30,17,true),
+    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
+    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{1:'cours'}})],
+  prefs:[{emp:'s2',jour:6,veut:'R',txt:wish("Yanis a demandé son dimanche","Yanis asked for Sunday off")},
+    {emp:'c3',jour:5,veut:'R',txt:wish("Tom ne peut pas fermer le samedi","Tom cannot close on Saturday")}] },
+
+{ id:'l3', n:{fr:'Niveau 3',en:'Level 3'},
+  titre:{fr:'Plein été, semaine du 6 juin',en:'High summer, D-Day week'},
+  sous:{fr:'10 salariés · budget sous tension',en:'10 staff · budget under pressure'},
+  brief:{fr:"Les commémorations remplissent Bayeux, la salle tourne midi et soir sept jours sur sept. Tom est en arrêt jusqu'à mercredi inclus. Le budget est calé sur 31 % du chiffre d'affaires. Règle maison ce mois-ci : deux jours de repos consécutifs pour tout le monde.",
+    en:"The commemorations fill Bayeux and the dining room turns over at lunch and dinner, seven days a week. Tom is on sick leave through Wednesday. Payroll is capped at 31% of revenue. House rule this month: two consecutive days off for everyone."},
+  ca:21000,budget:6600,reposConsecutifs:true,
+  jours:[{besoin:b(2,2,2,2)},{besoin:b(2,2,2,2)},{besoin:b(2,2,3,3)},{besoin:b(2,2,3,3)},
+    {besoin:b(3,3,3,3)},{besoin:b(3,3,4,4)},{besoin:b(3,3,2,2)}],
+  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+    e('c2','Inès Diallo','cuisine','second',35,19,true),
+    e('c3','Tom Berger','cuisine','commis',35,15,false,{indispo:{0:'arret',1:'arret',2:'arret'}}),
+    e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
+    e('c5','Sami Ouaddah','cuisine','plongeur',24,15,false),
+    e('s1','Claire Aubert','salle','mh',39,21,true),
+    e('s4','Nora Benali','salle','rang',30,17,true),
+    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
+    e('s5','Emma Caron','salle','rang',35,16.5,true),
+    e('s3','Léa Marchand','salle','serveuse',24,15.5,false,{indispo:{3:'cours'}})],
+  prefs:[{emp:'s2',jour:6,veut:'R',txt:wish("Yanis a demandé son dimanche","Yanis asked for Sunday off")},
+    {emp:'c5',jour:0,veut:'R',txt:wish("Sami a un rendez-vous lundi","Sami has an appointment on Monday")},
+    {emp:'s5',jour:2,veut:'R',txt:wish("Emma a demandé son mercredi","Emma asked for Wednesday off")}] },
+
+{ id:'l4', n:{fr:'Niveau 4',en:'Level 4'},
+  titre:{fr:'Réouverture après travaux',en:'Reopening after the works'},
+  sous:{fr:'8 salariés · 5 jours, tout en soirée',en:'8 staff · 5 days, dinner-heavy'},
+  brief:{fr:"La salle a été refaite, vous rouvrez le mercredi. Deux jours de fermeture en début de semaine, puis cinq services du soir pleins à craquer : tout le monde veut voir la nouvelle déco. Aucun salarié en congé, mais des besoins du soir que la brigade ne peut couvrir qu'en coupures bien placées.",
+    en:"The dining room has been redone and you reopen on Wednesday. Two closed days, then five packed dinner services: everyone wants to see the new look. Nobody is on leave, but the dinner headcount can only be met with well-placed splits."},
+  ca:17000,budget:5400,reposConsecutifs:false,
+  jours:[{ferme:true,besoin:b(0,0,0,0),note:'ferme'},{ferme:true,besoin:b(0,0,0,0),note:'ferme'},
+    {besoin:b(2,2,3,3)},{besoin:b(2,2,3,3)},{besoin:b(3,3,4,4)},{besoin:b(3,3,4,4)},{besoin:b(3,3,2,2)}],
+  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+    e('c2','Inès Diallo','cuisine','second',35,19,true),
+    e('c3','Tom Berger','cuisine','commis',35,15,false),
+    e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
+    e('s1','Claire Aubert','salle','mh',39,21,true),
+    e('s4','Nora Benali','salle','rang',35,17,true),
+    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
+    e('s5','Emma Caron','salle','rang',35,16.5,true)],
+  prefs:[{emp:'c3',jour:6,veut:'R',txt:wish("Tom voudrait son dimanche","Tom would like Sunday off")}] },
+
+{ id:'l5', n:{fr:'Niveau 5',en:'Level 5'},
+  titre:{fr:'La semaine de Noël',en:'Christmas week'},
+  sous:{fr:'10 salariés · tout le monde veut partir',en:'10 staff · everyone wants time off'},
+  brief:{fr:"Six jours d'ouverture, fermé le 25. Les réservations du soir sont complètes depuis novembre et la moitié de l'équipe a de la famille à voir. Quatre souhaits sur la table, un budget calé à 28 % du CA, et deux jours de repos consécutifs exigés par la direction. Bon courage.",
+    en:"Six days open, closed on the 25th. Dinner has been fully booked since November and half the team has family to see. Four requests on the table, payroll capped at 28% of revenue, and management wants two consecutive days off for everyone. Good luck."},
+  ca:23000,budget:6550,reposConsecutifs:true,
+  jours:[{besoin:b(2,2,3,3)},{besoin:b(2,2,3,3)},{ferme:true,besoin:b(0,0,0,0),note:'noel'},
+    {besoin:b(3,3,4,4)},{besoin:b(3,3,4,4)},{besoin:b(3,3,4,4)},{besoin:b(2,2,3,3)}],
+  equipe:[e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+    e('c2','Inès Diallo','cuisine','second',35,19,true),
+    e('c3','Tom Berger','cuisine','commis',35,15,false),
+    e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
+    e('c5','Sami Ouaddah','cuisine','plongeur',35,15,false),
+    e('s1','Claire Aubert','salle','mh',39,21,true),
+    e('s4','Nora Benali','salle','rang',35,17,true),
+    e('s2','Yanis Roux','salle','rangM',35,16.5,true),
+    e('s5','Emma Caron','salle','rang',35,16.5,true),
+    e('s3','Léa Marchand','salle','serveuse',35,15.5,false)],
+  prefs:[{emp:'s3',jour:0,veut:'R',txt:wish("Léa part en famille le lundi","Léa travels to family on Monday")},
+    {emp:'c5',jour:6,veut:'R',txt:wish("Sami a demandé son dimanche","Sami asked for Sunday off")},
+    {emp:'s5',jour:1,veut:'R',txt:wish("Emma voudrait le 24 au soir","Emma would like Christmas Eve off")},
+    {emp:'c3',jour:3,veut:'R',txt:wish("Tom a un train le jeudi","Tom has a train on Thursday")}] },
+];
+
+/* ---------- saison ---------- */
+const SEASON_TEAM=[
+  e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+  e('c2','Inès Diallo','cuisine','second',35,19,true),
+  e('c3','Tom Berger','cuisine','commis',35,15,false),
+  e('c4','Hugo Pellerin','cuisine','cuisinier',35,16,false),
+  e('c5','Sami Ouaddah','cuisine','plongeur',30,15,false),
+  e('s1','Claire Aubert','salle','mh',39,21,true),
+  e('s4','Nora Benali','salle','rang',35,17,true),
+  e('s2','Yanis Roux','salle','rangM',35,16.5,true),
+  e('s5','Emma Caron','salle','rang',35,16.5,true),
+  e('s3','Léa Marchand','salle','serveuse',30,15.5,false),
+];
+const SEASON_WEEKS=[
+ {nom:{fr:"Mars — reprise",en:"March — back open"},ca:13000,mult:.62,
+  txt:{fr:"On rouvre après la coupure d'hiver. Peu de monde en semaine, un peu de passage le week-end. Semaine idéale pour caler les contrats sans creuser la trésorerie.",
+       en:"Reopening after the winter break. Quiet midweek, a little weekend trade. A good week to settle into the contracts without burning cash."},
+  ferme:[0], staff:['c1','c2','c3','s1','s4','s2']},
+ {nom:{fr:"Mars — premiers cars",en:"March — first coaches"},ca:14500,mult:.68,
+  txt:{fr:"Les premiers autocars de touristes s'arrêtent à Bayeux. Les midis se remplissent, les soirs restent calmes.",
+       en:"The first tourist coaches stop in Bayeux. Lunches fill up, evenings stay quiet."},
+  ferme:[0], staff:['c1','c2','c3','s1','s4','s2']},
+ {nom:{fr:"Avril — vacances de Pâques",en:"April — Easter holidays"},ca:17000,mult:.80,
+  txt:{fr:"Vacances scolaires : familles au déjeuner, couples le soir. Vous ouvrez sept jours sur sept à partir de maintenant.",
+       en:"School holidays: families at lunch, couples at dinner. You are open seven days a week from now on."},
+  ferme:[], staff:['c1','c2','c3','c4','s1','s4','s2','s5']},
+ {nom:{fr:"Avril — creux",en:"April — the dip"},ca:14000,mult:.66,
+  txt:{fr:"Fin des vacances, la fréquentation retombe d'un coup. Profitez-en pour faire souffler ceux qui ont tiré.",
+       en:"Holidays over, footfall drops sharply. Use it to rest whoever has been pushing hardest."},
+  ferme:[0], staff:['c1','c2','c3','s1','s4','s2']},
+ {nom:{fr:"Mai — le pont",en:"May — bank holiday"},ca:19000,mult:.88,
+  txt:{fr:"Long week-end férié, la ville est pleine. Trois services du soir à quatre en cuisine.",
+       en:"A long weekend and the town is full. Three dinner services need four in the kitchen."},
+  ferme:[], staff:['c1','c2','c3','c4','s1','s4','s2','s5']},
+ {nom:{fr:"Mai — mariages",en:"May — wedding season"},ca:18000,mult:.84,
+  txt:{fr:"Deux mariages en ville : les samedis sont saturés, le reste de la semaine respire.",
+       en:"Two weddings in town: Saturdays are packed, the rest of the week breathes."},
+  ferme:[], staff:['c1','c2','c3','c4','s1','s4','s2','s5']},
+ {nom:{fr:"Juin — le 6",en:"June — the 6th"},ca:22000,mult:1.0,
+  txt:{fr:"Commémorations du Débarquement. La semaine la plus dense de la saison, midi et soir, tous les jours.",
+       en:"D-Day commemorations. The busiest week of the season, lunch and dinner, every day."},
+  ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
+ {nom:{fr:"Juin — après la vague",en:"June — after the wave"},ca:18500,mult:.86,
+  txt:{fr:"La ville se vide un peu. L'équipe, elle, sort de la semaine la plus dure de l'année.",
+       en:"The town empties a little. The team, on the other hand, is coming off the hardest week of the year."},
+  ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
+ {nom:{fr:"Juillet — plein été",en:"July — high summer"},ca:21000,mult:.96,
+  txt:{fr:"Saison pleine et stable. C'est le moment où les compteurs d'heures explosent si vous n'avez rien anticipé.",
+       en:"Full, steady season. This is when the overtime banks blow up if you haven't planned ahead."},
+  ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
+ {nom:{fr:"Juillet — le 14",en:"July — Bastille Day"},ca:23000,mult:1.05,
+  txt:{fr:"Dernière semaine de la campagne, et la plus chargée. Terminez sans casser personne.",
+       en:"Final week of the campaign, and the heaviest. Finish without breaking anyone."},
+  ferme:[], staff:['c1','c2','c3','c4','c5','s1','s4','s2','s5','s3']},
+];
+const SEASON_EVENTS={
+  2:{emp:'c2',motif:'conge',jours:[4,5]},
+  5:{emp:'s5',motif:'conge',jours:[1,2]},
+  7:{emp:'c4',motif:'conge',jours:[0,1,2]},
+};
+const SEASON_WISHES={
+  1:[{emp:'s2',jour:6,txt:wish("Yanis a demandé son dimanche","Yanis asked for Sunday off")}],
+  3:[{emp:'c3',jour:0,txt:wish("Tom a un rendez-vous lundi","Tom has an appointment on Monday")}],
+  4:[{emp:'s5',jour:2,txt:wish("Emma a demandé son mercredi","Emma asked for Wednesday off")}],
+  6:[{emp:'c3',jour:3,txt:wish("Tom voudrait son jeudi","Tom would like Thursday off")},
+     {emp:'s2',jour:6,txt:wish("Yanis redemande son dimanche","Yanis asks again for Sunday off")}],
+  8:[{emp:'s3',jour:5,txt:wish("Léa a un examen samedi","Léa has an exam on Saturday")}],
+  9:[{emp:'s1',jour:0,txt:wish("Claire pose son lundi","Claire is taking Monday off")}],
+};
+const MARGE_BRUTE=0.34;  // part du CA restant pour la masse salariale (après matières et charges fixes)
+
+// Les besoins de la semaine sont dérivés de l'effectif réellement présent :
+// le volume horaire demandé colle aux contrats, donc chaque semaine reste jouable.
+function deriveNeeds(equipe,W){
+  const open=[];
+  for(let d=0;d<7;d++) if(!W.ferme.includes(d)) open.push(d);
+  const dimSoirFerme = W.mult<0.80 && open.includes(6);
+  const needs={};
+  ['cuisine','salle'].forEach(pole=>{
+    const contracts=equipe.filter(x=>x.pole===pole).reduce((s,x)=>s+x.contrat,0);
+    const target=contracts;
+    const w={}; let tot=0;
+    open.forEach(d=>{ const v=(d>=4?1.35:1)*(d===6?0.85:1); w[d]=v; tot+=v; });
+    needs[pole]={};
+    open.forEach(d=>{
+      const dayH=target*w[d]/tot;
+      if(d===6&&dimSoirFerme){ needs[pole][d]={m:Math.max(1,Math.round(dayH/4)),s:0}; return; }
+      const m=Math.max(1,Math.round(dayH*0.30/4));
+      const s=Math.max(1,Math.round((dayH-4*m)/5.75));
+      needs[pole][d]={m,s};
+    });
+    // rattrapage : les arrondis journaliers font perdre des heures, or un volume
+    // inférieur aux contrats se paie en heures payées non travaillées.
+    const vol=()=>open.reduce((a,d)=>a+needs[pole][d].m*4+needs[pole][d].s*5.75,0);
+    const order=open.slice().sort((a,c)=>w[c]-w[a]);
+    let guard=0;
+    while(target-vol()>=2 && guard++<40){
+      const d=order.find(x=>!(x===6&&dimSoirFerme))||order[0];
+      if(target-vol()>=5.75 && !(d===6&&dimSoirFerme)) needs[pole][d].s++;
+      else needs[pole][d].m++;
+      order.push(order.shift());
+    }
+    guard=0;
+    while(vol()-target>=5 && guard++<40){
+      const d=order.find(x=>needs[pole][x].s>1)||order.find(x=>needs[pole][x].m>1);
+      if(d===undefined) break;
+      if(needs[pole][d].s>1) needs[pole][d].s--; else needs[pole][d].m--;
+      order.push(order.shift());
+    }
+  });
+  const jours=[];
+  for(let d=0;d<7;d++){
+    if(W.ferme.includes(d)){jours.push({ferme:true,besoin:b(0,0,0,0),note:'ferme'});continue;}
+    const c=needs.cuisine[d], s=needs.salle[d];
+    jours.push({besoin:b(c.m,s.m,c.s,s.s), note:(d===6&&c.s===0)?'soirFerme':null});
+  }
+  return jours;
+}
+
+function seasonScenario(st){
+  const w=st.week, W=SEASON_WEEKS[w];
+  const equipe=st.roster.filter(r=>!r.parti&&(W.staff.includes(r.id)||r.id[0]==='x')).map(r=>{
+    const src=Object.assign({},r);
+    src.indispo={};
+    if(r.arret) for(let d=0;d<7;d++) src.indispo[d]='arret';
+    return src;
+  });
+  const ev=SEASON_EVENTS[w];
+  if(ev){
+    const em=equipe.find(x=>x.id===ev.emp);
+    if(em&&!em.arret) ev.jours.forEach(d=>{em.indispo[d]=ev.motif;});
+  }
+  const jours=deriveNeeds(equipe,W);
+  const prefs=(SEASON_WISHES[w]||[]).filter(p=>equipe.some(x=>x.id===p.emp&&!x.arret))
+    .map(p=>({emp:p.emp,jour:p.jour,veut:'R',txt:p.txt}));
+  let hours=0;
+  jours.forEach(j=>{hours+=(j.besoin.midi.cuisine+j.besoin.midi.salle)*4
+    +(j.besoin.soir.cuisine+j.besoin.soir.salle)*5.75;});
+  const contracts=equipe.reduce((s,x)=>s+x.contrat,0);
+  let cost=0;
+  const extra=Math.max(0,hours-contracts);
+  equipe.forEach(x=>{cost+=coutSalarie(x,x.contrat+extra*(x.contrat/contracts));});
+  return {id:'sn'+w, equipe, jours, prefs, reposConsecutifs:w>=6,
+    budget:Math.round(cost*1.05/10)*10, ca:W.ca,
+    n:{fr:`Semaine ${w+1} / 10`,en:`Week ${w+1} / 10`},
+    titre:X(W.nom), brief:X(W.txt)};
+}
+
+function applySeasonWeek(st,S,ev){
+  const deltas=[];
+  const payroll=ev.total;
+  const gain=Math.round(S.ca*MARGE_BRUTE-payroll);
+  st.tresorerie+=gain;
+  deltas.push({tag:gain>=0?'good':'bad',txt:t('dTreso')(nf(gain))});
+  st.scores.push(ev.score);
+  let allRest=true, allWishes=true;
+  (S.prefs||[]).forEach(pr=>{ if(st.plan[pr.emp]&&st.plan[pr.emp][pr.jour]!=='R') allWishes=false; });
+  st.roster.forEach(r=>{
+    if(r.parti) return;
+    if(r.arret){ r.arret=false; r.fatigue=Math.max(0,r.fatigue-45); return; }
+    const row=st.plan[r.id]; if(!row) return;
+    let h=0,repos=0,coupures=0,fermetures=0;
+    row.forEach(c=>{ h+=SHIFTS[c].h; if(c==='R')repos++; if(c==='C')coupures++;
+      if(c==='S'||c==='C')fermetures++; });
+    if(repos<2) allRest=false;
+    r.fatigue=Math.max(0,Math.min(100, r.fatigue + (7-repos)*4 + coupures*5 + fermetures*2 - repos*11));
+    r.compteurHS+=Math.max(0,h-35);
+    let dm=0;
+    if(h>44) dm-=10;
+    if(coupures>4) dm-=6;
+    let conse=false;
+    for(let d=0;d<6;d++) if(row[d]==='R'&&row[d+1]==='R') conse=true;
+    if(conse) dm+=5;
+    (S.prefs||[]).forEach(pr=>{ if(pr.emp===r.id) dm += (row[pr.jour]==='R'? 8 : -12); });
+    if(repos>=2) dm+=3;
+    r.moral=Math.max(0,Math.min(100,r.moral+dm));
+    if(r.fatigue>=85){
+      r.arret=true;
+      deltas.push({tag:'bad',txt:t('dArret')(r.nom)});
+    } else if(r.fatigue>=70){
+      deltas.push({tag:'warn',txt:t('dFatigue')(r.nom)});
+    }
+    if(r.moral<=18){
+      r.parti=true;
+      deltas.push({tag:'bad',txt:t('dQuit')(r.nom)});
+      st.roster.push(Object.assign(e('x'+st.roster.length,
+        lang==='en'?'Agency cover':'Extra intérim', r.pole,'interim',35,Math.round(r.taux*1.4),false),
+        {fatigue:20,moral:60,compteurHS:0,arret:false,parti:false}));
+    } else if(r.moral<=30){
+      deltas.push({tag:'warn',txt:t('dMoral')(r.nom)});
+    }
+    if(r.compteurHS>=40) deltas.push({tag:'warn',txt:t('dHSwarn')(r.nom)});
+    else if(r.compteurHS>=22) deltas.push({tag:'info',txt:t('dHS')(r.nom,fmtH(r.compteurHS))});
+  });
+  if(allRest) deltas.push({tag:'good',txt:t('dGoodRest')});
+  if(allWishes&&(S.prefs||[]).length) deltas.push({tag:'good',txt:t('dWishes')});
+  st.log.push({week:st.week,score:ev.score,gain});
+  st.week++;
+  st.plan=null;
+  return deltas;
+}
+function newSeason(){
+  return {week:0,tresorerie:0,scores:[],log:[],plan:null,
+    roster:SEASON_TEAM.map(x=>Object.assign({},x,{fatigue:12,moral:72,compteurHS:0,arret:false,parti:false}))};
+}
+
+/* ---------- générateur ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function seedToInt(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function randomSeed(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';
+  for(let i=0;i<5;i++)s+=A[Math.floor(Math.random()*A.length)];return s;}
+
+// Les responsables sont tirés séparément : un commis ou un serveur ne peut pas
+// encadrer un service, donc le rôle doit suivre la fonction, pas l'ordre de tirage.
+const RND_NAMES={
+  cuisine:{
+    leads:[['Marc','chef'],['Inès','second'],['Nadia','second'],['Karim','chef']],
+    others:[['Tom','commis'],['Hugo','cuisinier'],['Sami','plongeur'],['Lucas','cuisinier'],
+            ['Rachid','commis'],['Iris','cuisinier'],['Bilal','plongeur'],['Jonas','commis']]},
+  salle:{
+    leads:[['Claire','mh'],['Nora','rang'],['Yanis','rangM'],['Emma','rang'],['Victor','rangM']],
+    others:[['Léa','serveuse'],['Paul','serveur'],['Zoé','serveuse'],['Théo','serveur'],
+            ['Mina','serveuse'],['Adam','serveur'],['Jade','serveuse']]}};
+
+function generateWeek(seedStr,diff){
+  const rnd=mulberry32(seedToInt(seedStr+'|'+diff));
+  const pick=(a)=>a[Math.floor(rnd()*a.length)];
+  const openDays=[5,6,6,7,7][diff-1];
+  const closed=[];
+  while(closed.length<7-openDays){const d=Math.floor(rnd()*7);if(!closed.includes(d))closed.push(d);}
+  const intensity=[0.62,0.78,0.92,1.06,1.2][diff-1];
+  const jours=[];
+  for(let d=0;d<7;d++){
+    if(closed.includes(d)){jours.push({ferme:true,besoin:b(0,0,0,0),note:'ferme'});continue;}
+    const we=(d>=4)?1.28:1;
+    const m=Math.max(1,Math.round(intensity*we*2.1+rnd()*0.6));
+    const s=Math.max(1,Math.round(intensity*we*2.9+rnd()*0.6));
+    jours.push({besoin:b(m,m,s,s)});
+  }
+  const scen={jours,equipe:[],prefs:[],reposConsecutifs:diff>=4};
+  ['cuisine','salle'].forEach(pole=>{
+    let lunch=0,dinner=0,maxC=0;
+    jours.forEach(j=>{const l=j.besoin.midi[pole],dd=j.besoin.soir[pole];
+      lunch+=l;dinner+=dd;maxC+=Math.min(l,dd);});
+    const hours=lunch*4+dinner*5.75;
+    const personDays=lunch+dinner-maxC;
+    const openCount=7-closed.length;
+    const perPerson=Math.max(1,Math.min(openCount, openCount-Math.max(0,2-closed.length)));
+    // l'effectif doit suffire à la fois en jours disponibles et en volume horaire :
+    // sans le second critère, une petite brigade se retrouve à 48 h par tête.
+    const slack=[1.10,1.05,1.0,0.97,0.94][diff-1];
+    const size=Math.max(3,Math.ceil(personDays/perPerson),Math.ceil(hours*slack/39));
+    let budgetH=hours*slack;
+    const leads=RND_NAMES[pole].leads.slice(), others=RND_NAMES[pole].others.slice();
+    const nLeads=Math.min(leads.length, size>=6?3:2);
+    const take=(arr)=>arr.length?arr.splice(Math.floor(rnd()*arr.length),1)[0]:null;
+    for(let i=0;i<size;i++){
+      const isResp=i<nLeads;
+      const entry=(isResp?take(leads):take(others))||take(others)||take(leads)
+        ||[(lang==='en'?'Casual':'Extra')+' '+(i+1),isResp?'rang':'extra'];
+      const [nom,role]=entry;
+      // un peu de dispersion : une brigade réelle mélange temps pleins et partiels
+      const part=budgetH/(size-i)*(0.82+rnd()*0.38);
+      let contrat=Math.max(20,Math.min(39,Math.round(part)));
+      budgetH-=contrat;
+      const taux=pole==='cuisine'
+        ? (role==='chef'?24:role==='second'?19:15+Math.round(rnd()*2))
+        : (role==='mh'?21:role==='rang'||role==='rangM'?17:15.5);
+      scen.equipe.push(e(pole[0]+i,nom,pole,role,contrat,taux,isResp));
+    }
+  });
+  let hours=0;
+  jours.forEach(j=>{hours+=(j.besoin.midi.cuisine+j.besoin.midi.salle)*4
+    +(j.besoin.soir.cuisine+j.besoin.soir.salle)*5.75;});
+  const contracts=scen.equipe.reduce((s,x)=>s+x.contrat,0);
+  const extra=Math.max(0,hours-contracts);
+  let cost=0;
+  scen.equipe.forEach(x=>{cost+=coutSalarie(x,x.contrat+extra*(x.contrat/contracts));});
+  const marge=[1.14,1.10,1.07,1.04,1.02][diff-1];
+  scen.budget=Math.round(cost*marge/10)*10;
+  scen.ca=Math.round(scen.budget/([0.30,0.31,0.32,0.33,0.34][diff-1])/100)*100;
+  scen.id='rnd-'+seedStr+'-'+diff;
+  scen.n={fr:`Graine ${seedStr}`,en:`Seed ${seedStr}`};
+  scen.titre=t('diffs')[diff-1];
+  scen.brief=lang==='en'
+    ? `Generated week, difficulty "${t('diffs')[diff-1]}". ${7-closed.length} days open, ${scen.equipe.length} staff. A 100/100 solution exists — the seed guarantees it.`
+    : `Semaine générée, difficulté « ${t('diffs')[diff-1]} ». ${7-closed.length} jours ouverts, ${scen.equipe.length} salariés. Une solution à 100/100 existe — la graine le garantit.`;
+  return scen;
+}
+
+/* ======================= état ======================= */
+let screen='home', mode=null, scen=null, plan=null, brush='C', painting=false;
+let progress={}, season=null, rnd={seed:randomSeed(),diff:2};
+
+function emptyPlan(S){const p={};S.equipe.forEach(em=>{p[em.id]=[0,0,0,0,0,0,0].map(()=> 'R');});return p;}
+function applyLocks(S,p){
+  S.equipe.forEach(em=>{if(em.indispo)Object.keys(em.indispo).forEach(d=>{p[em.id][+d]='R';});});
+  S.jours.forEach((j,d)=>{if(j.ferme)S.equipe.forEach(em=>{p[em.id][d]='R';});});
+  return p;
+}
+function isLocked(S,em,d){return (em.indispo&&em.indispo[d]!==undefined)||S.jours[d].ferme;}
+
+function save(){
+  try{ localStorage.setItem('cdf_v3',JSON.stringify({lang,progress,season,rnd})); }catch(_){}
+}
+function load(){
+  try{
+    const raw=localStorage.getItem('cdf_v3'); if(!raw)return;
+    const d=JSON.parse(raw);
+    if(d.lang&&T[d.lang])lang=d.lang;
+    if(d.progress)progress=d.progress;
+    if(d.season)season=d.season;
+    if(d.rnd)rnd=d.rnd;
+  }catch(_){}
+}
+const stars = s => s>=100?3 : s>=80?2 : s>=60?1 : 0;
+
+/* ======================= rendu ======================= */
+const $=s=>document.querySelector(s);
+const SCREENS=['home','levels','season','random','play'];
+function show(name){
+  screen=name;
+  SCREENS.forEach(s=>{ $('#scr-'+s).hidden = (s!==name); });
+  $('#topbar').hidden = (name==='home');
+  window.scrollTo(0,0);
+  renderChrome();
+  if(name==='home')   renderHome();
+  if(name==='levels') renderLevels();
+  if(name==='season') renderSeason();
+  if(name==='random') renderRandom();
+  if(name==='play')   renderPlay();
+}
 
 function renderChrome(){
-  document.documentElement.setAttribute('lang', t('html'));
-  $('#langbtn').textContent = t('other');
-  $('#themebtn').textContent = t('theme');
-  $('#brandline').textContent = t('brandline');
-  $('#tagline').textContent = t('tagline');
-  $('#btnClear').textContent = t('btnClear');
-  $('#btnDraft').textContent = t('btnDraft');
-  $('#btnCheck').textContent = t('btnCheck');
-  $('#btnShare').textContent = t('btnShare');
-  $('#hint').innerHTML = t('hint');
-  $('#h3board').textContent = t('h3board');
-  $('#h3live').textContent = t('h3live');
-  $('#h3rules').textContent = t('h3rules');
-  $('#lblCost').textContent = t('lblCost');
-  $('#lblCov').textContent = t('lblCov');
-  $('#sumLegal').textContent = t('sumLegal');
-  $('#sumHouse').textContent = t('sumHouse');
-  $('#ulLegal').innerHTML = t('ulLegal').map(x=>`<li>${x}</li>`).join('');
-  $('#ulHouse').innerHTML = t('ulHouse').map(x=>`<li>${x}</li>`).join('');
-  $('#disclaim').textContent = t('disclaim');
-  $('#footL').textContent = t('footL');
-  const fr = $('#footR');
-  if(REPO_URL){ fr.innerHTML = `<a href="${REPO_URL}" rel="noopener">${t('footR')}</a>`; fr.hidden = false; }
-  else fr.hidden = true;
+  document.documentElement.setAttribute('lang',t('html'));
+  ['#langbtn','#langbtn2'].forEach(s=>{const el=$(s);if(el)el.textContent=t('other');});
+  ['#themebtn','#themebtn2'].forEach(s=>{const el=$(s);if(el)el.textContent=t('theme');});
+  $('#btnHome').textContent=t('menu');
+}
+
+function renderHome(){
+  $('#h-brand').textContent=t('brand');
+  $('#h-tag').textContent=t('tag');
+  $('#h-footL').textContent=t('footL');
+  $('#h-footR').innerHTML=`<a href="${REPO_URL}" rel="noopener">${t('footR')}</a>`;
+  const w=$('#modes'); w.innerHTML='';
+  const keys=['levels','season','random'];
+  t('modes').forEach((m,i)=>{
+    const btn=document.createElement('button');
+    btn.className='mode'; btn.type='button';
+    btn.innerHTML=`<span class="mk">${m.k}</span><span class="mt">${m.t}</span>
+      <span class="md">${m.d}</span><span class="mf">${m.f}</span>`;
+    btn.onclick=()=>{mode=keys[i];show(keys[i]);};
+    w.appendChild(btn);
+  });
 }
 
 function renderLevels(){
-  const w = $('#levels'); w.innerHTML='';
+  $('#lv-title').textContent=t('lvTitle');
+  $('#lv-sub').textContent=t('lvSub');
+  const w=$('#lvlgrid'); w.innerHTML='';
   LEVELS.forEach((L,i)=>{
-    const btn = document.createElement('button');
-    btn.className='lvl'; btn.type='button';
-    btn.setAttribute('aria-pressed', String(i===lvlIndex));
-    btn.innerHTML = `<span class="n">${X(L.n)}</span><span class="t">${X(L.titre)}</span><span class="d">${X(L.sous)}</span>`;
-    btn.onclick = ()=>{ lvlIndex=i; save(); renderAll(); };
+    const best=progress[L.id]||0;
+    const prev=i===0?null:LEVELS[i-1];
+    const locked=prev? (progress[prev.id]||0)<60 : false;
+    const btn=document.createElement('button');
+    btn.className='lcard'+(locked?' locked':''); btn.type='button';
+    const st=stars(best);
+    btn.innerHTML=`
+      <div class="lrow"><span class="ln">${X(L.n)}</span>
+        <span class="stars">${[0,1,2].map(k=>`<i class="${k<st?'on':''}">★</i>`).join('')}</span></div>
+      <span class="lt">${X(L.titre)}</span>
+      <span class="ld">${X(L.sous)}</span>
+      <span class="lb"><span>${locked?t('lvLocked'):(best?t('lvBest')+' '+best+'/100':t('lvNever'))}</span>
+        <span>${cur(L.budget)}</span></span>`;
+    if(!locked) btn.onclick=()=>{startScenario(L,'levels');};
     w.appendChild(btn);
   });
 }
 
-function renderPalette(){
-  const w = $('#palette'); w.innerHTML='';
-  ORDER.forEach(code=>{
-    const s = SHIFTS[code];
-    const btn = document.createElement('button');
-    btn.className='chip'; btn.type='button';
-    btn.setAttribute('aria-pressed', String(code===brush));
-    const k = Object.keys(KEYMAP).find(x=>KEYMAP[x]===code);
-    btn.innerHTML = `<span class="sw" style="background:var(${s.col})"></span>${t('shifts')[code]}
-      <span class="hh">${s.h?fmtH(s.h):s.label}</span><span class="key">${k}</span>`;
-    btn.title = s.label;
-    btn.onclick = ()=>{ brush=code; renderPalette(); };
-    w.appendChild(btn);
-  });
-}
+function renderSeason(){
+  if(!season) season=newSeason();
+  $('#sn-title').textContent=t('snTitle');
+  $('#sn-sub').textContent=t('snSub');
+  $('#sn-logttl').textContent=t('snLogTtl');
+  $('#sn-kpittl').textContent=t('snKpiTtl');
+  $('#sn-teamttl').textContent=t('snTeamTtl');
+  $('#sn-reset').textContent=t('snReset');
 
-function renderBrief(L){
-  $('#briefTitle').textContent = `${X(L.n)} — ${X(L.titre)}`;
-  $('#briefText').textContent = X(L.brief);
-  const hTot = L.equipe.reduce((s,x)=>s+x.contrat,0);
-  const cur = lang==='en' ? v=>`€${nf(v)}` : v=>`${nf(v)} €`;
-  $('#briefStats').innerHTML =
-    `<span>${t('statTeam')} <b>${L.equipe.length}</b></span>
-     <span>${t('statHours')} <b>${hTot} h</b></span>
-     <span>${t('statCA')} <b>${cur(L.ca)}</b></span>
-     <span>${t('statBudget')} <b>${cur(L.budget)}</b> (${Math.round(L.budget/L.ca*100)} %)</span>`;
-}
-
-function renderGrid(L,p,ev){
-  const g = $('#grid'); g.innerHTML='';
-  const D = t('days');
-  const add = (cls,html,last)=>{
+  const done=season.week>=SEASON_WEEKS.length;
+  const wk=$('#sn-weeks'); wk.innerHTML='';
+  SEASON_WEEKS.forEach((W,i)=>{
     const d=document.createElement('div');
-    d.className=cls+(last?' r-end':''); d.innerHTML=html; g.appendChild(d); return d;
-  };
+    const rec=season.log.find(l=>l.week===i);
+    let cls='wk';
+    if(rec) cls+=' done'+(rec.score>=80?'':rec.score>=55?' mid':' low');
+    if(i===season.week&&!done) cls+=' now';
+    d.className=cls; d.textContent=i+1;
+    d.title=X(W.nom);
+    wk.appendChild(d);
+  });
+
+  if(done){
+    $('#sn-wtitle').textContent=t('snDone');
+    $('#sn-wtext').textContent=t('snDoneSub');
+    $('#sn-wstats').innerHTML='';
+    $('#sn-play').hidden=true;
+  }else{
+    const S=seasonScenario(season);
+    $('#sn-wtitle').textContent=`${X(S.n)} — ${S.titre}`;
+    $('#sn-wtext').textContent=S.brief;
+    const hTot=S.equipe.reduce((s,x)=>s+x.contrat,0);
+    $('#sn-wstats').innerHTML=
+      `<span>${t('statTeam')} <b>${S.equipe.filter(x=>!x.indispo||Object.keys(x.indispo).length<7).length}</b></span>
+       <span>${t('statHours')} <b>${hTot} h</b></span>
+       <span>${t('statCA')} <b>${cur(S.ca)}</b></span>
+       <span>${t('statBudget')} <b>${cur(S.budget)}</b></span>`;
+    $('#sn-play').hidden=false;
+    $('#sn-play').textContent=t('snPlay')(season.week+1);
+  }
+
+  const avg=season.scores.length?Math.round(season.scores.reduce((a,c)=>a+c,0)/season.scores.length):0;
+  const hsTot=season.roster.filter(r=>!r.parti).reduce((s,r)=>s+r.compteurHS,0);
+  $('#sn-kpis').innerHTML=`
+    <div class="kpi"><div class="kl">${t('kWeek')}</div><div class="kv">${Math.min(season.week+1,10)}<span style="font-size:14px;color:var(--muted)">/10</span></div></div>
+    <div class="kpi"><div class="kl">${t('kTreso')}</div><div class="kv ${season.tresorerie>=0?'g':'b'}">${cur(season.tresorerie)}</div></div>
+    <div class="kpi"><div class="kl">${t('kScore')}</div><div class="kv">${avg||'—'}</div></div>
+    <div class="kpi"><div class="kl">${t('kHS')}</div><div class="kv">${fmtH(hsTot)}</div></div>`;
+
+  const ul=$('#sn-roster'); ul.innerHTML='';
+  season.roster.filter(r=>!r.parti).forEach(r=>{
+    const li=document.createElement('li');
+    if(r.arret) li.className='out';
+    const fc=r.fatigue>=70?'var(--bad)':r.fatigue>=45?'var(--warn)':'var(--ok)';
+    const mc=r.moral<=30?'var(--bad)':r.moral<=55?'var(--warn)':'var(--ok)';
+    li.innerHTML=`
+      <div><div class="rn">${r.nom}</div><div class="rr">${t('roles')[r.role]} · ${r.contrat} h</div></div>
+      <div class="gauge"><span>${t('gFatigue')}</span><div class="gbar"><i style="width:${r.fatigue}%;background:${fc}"></i></div></div>
+      <div class="gauge"><span>${t('gMoral')}</span><div class="gbar"><i style="width:${r.moral}%;background:${mc}"></i></div></div>`;
+    ul.appendChild(li);
+  });
+
+  const lg=$('#sn-log'); lg.innerHTML='';
+  if(!season.log.length){
+    lg.innerHTML=`<li><span class="dot" style="background:var(--muted)"></span><span class="txt">${t('snEmptyLog')}</span></li>`;
+  }else{
+    season.log.slice().reverse().forEach(l=>{
+      const li=document.createElement('li');
+      li.className=l.score>=80?'clean':l.score>=55?'couv':'legal';
+      li.innerHTML=`<span class="dot"></span><span class="txt"><b>${X(SEASON_WEEKS[l.week].nom)}</b>
+        <span class="who">${l.score}/100 · ${l.gain>=0?'+':''}${cur(l.gain)}</span></span>`;
+      lg.appendChild(li);
+    });
+  }
+}
+
+function renderRandom(){
+  $('#rd-title').textContent=t('rdTitle');
+  $('#rd-sub').textContent=t('rdSub');
+  $('#rd-difflbl').textContent=t('rdDiffLbl');
+  $('#rd-seedlbl').textContent=t('rdSeedLbl');
+  $('#rd-seedhelp').textContent=t('rdSeedHelp');
+  $('#rd-play').textContent=t('rdPlay');
+  $('#rd-roll').textContent=t('rdRoll');
+  $('#rd-prevttl').textContent=t('rdPrevTtl');
+  $('#rd-seed').value=rnd.seed;
+  const dw=$('#rd-diff'); dw.innerHTML='';
+  t('diffs').forEach((d,i)=>{
+    const btn=document.createElement('button');
+    btn.type='button'; btn.textContent=d;
+    btn.setAttribute('aria-pressed',String(rnd.diff===i+1));
+    btn.onclick=()=>{rnd.diff=i+1;save();renderRandom();};
+    dw.appendChild(btn);
+  });
+  const S=generateWeek(rnd.seed,rnd.diff);
+  const open=S.jours.filter(j=>!j.ferme).length;
+  let slots=0;
+  S.jours.forEach(j=>{slots+=j.besoin.midi.cuisine+j.besoin.midi.salle+j.besoin.soir.cuisine+j.besoin.soir.salle;});
+  $('#rd-preview').innerHTML=
+    `<span>${t('rdOpen')} <b>${open}</b></span>
+     <span>${t('rdStaff')} <b>${S.equipe.length}</b></span>
+     <span>${t('rdSlots')} <b>${slots}</b></span>
+     <span>${t('statBudget')} <b>${cur(S.budget)}</b></span>`;
+}
+
+/* ---------- écran de jeu ---------- */
+function startScenario(S,from){
+  scen=S; mode=from;
+  plan=applyLocks(S,emptyPlan(S));
+  if(from==='season'&&season&&season.plan) plan=season.plan;
+  show('play');
+}
+function renderPlay(){
+  const S=scen, ev=evaluate(S,plan);
+  $('#btnClear').textContent=t('btnClear');
+  $('#btnDraft').textContent=t('btnDraft');
+  $('#btnDraft').hidden=!S.draft;
+  $('#btnCheck').textContent=t('btnCheck');
+  $('#btnShare').textContent=t('btnShare');
+  $('#hint').innerHTML=t('hint');
+  $('#h3board').textContent=t('h3board');
+  $('#h3live').textContent=t('h3live');
+  $('#h3rules').textContent=t('h3rules');
+  $('#lblCost').textContent=t('lblCost');
+  $('#lblCov').textContent=t('lblCov');
+  $('#sumLegal').textContent=t('sumLegal');
+  $('#sumHouse').textContent=t('sumHouse');
+  $('#ulLegal').innerHTML=t('ulLegal').map(x=>`<li>${x}</li>`).join('');
+  $('#ulHouse').innerHTML=t('ulHouse').map(x=>`<li>${x}</li>`).join('');
+  $('#disclaim').textContent=t('disclaim');
+  $('#briefTitle').textContent=`${X(S.n)} — ${X(S.titre)}`;
+  $('#briefText').textContent=X(S.brief);
+  const hTot=S.equipe.reduce((s,x)=>s+x.contrat,0);
+  $('#briefStats').innerHTML=
+    `<span>${t('statTeam')} <b>${S.equipe.length}</b></span>
+     <span>${t('statHours')} <b>${hTot} h</b></span>
+     <span>${t('statCA')} <b>${cur(S.ca)}</b></span>
+     <span>${t('statBudget')} <b>${cur(S.budget)}</b> (${Math.round(S.budget/S.ca*100)} %)</span>`;
+  renderPalette(); renderGrid(S,plan,ev); renderPanel(S,ev);
+}
+function renderPalette(){
+  const w=$('#palette'); w.innerHTML='';
+  ORDER.forEach(code=>{
+    const s=SHIFTS[code];
+    const btn=document.createElement('button');
+    btn.className='chip'; btn.type='button';
+    btn.setAttribute('aria-pressed',String(code===brush));
+    const k=Object.keys(KEYMAP).find(x=>KEYMAP[x]===code);
+    btn.innerHTML=`<span class="sw" style="background:var(${s.col})"></span>${t('shifts')[code]}
+      <span class="hh">${s.h?fmtH(s.h):s.label}</span><span class="key">${k}</span>`;
+    btn.title=s.label;
+    btn.onclick=()=>{brush=code;renderPalette();};
+    w.appendChild(btn);
+  });
+}
+function renderGrid(S,p,ev){
+  const g=$('#grid'); g.innerHTML='';
+  const D=t('days');
+  const add=(cls,html,last)=>{const d=document.createElement('div');
+    d.className=cls+(last?' r-end':'');d.innerHTML=html;g.appendChild(d);return d;};
   add('hd namecell',`<span class="dn">${t('team')}</span>`);
-  L.jours.forEach((j,d)=>{
-    const sub = j.note ? t('notes')[j.note]
-      : `${t('midiCount')(j.besoin.midi.cuisine+j.besoin.midi.salle)} · ${t('soirCount')(j.besoin.soir.cuisine+j.besoin.soir.salle)}`;
-    add('hd'+(j.ferme?' closed':''), `<span class="dn">${D[d]}</span><span>${sub}</span>`);
+  S.jours.forEach((j,d)=>{
+    const sub=j.note?t('notes')[j.note]
+      :`${t('midiCount')(j.besoin.midi.cuisine+j.besoin.midi.salle)} · ${t('soirCount')(j.besoin.soir.cuisine+j.besoin.soir.salle)}`;
+    add('hd'+(j.ferme?' closed':''),`<span class="dn">${D[d]}</span><span>${sub}</span>`);
   });
   add('hd',`<span class="dn">${t('total')}</span><span>${t('contract')}</span>`,true);
-
-  L.equipe.forEach(em=>{
+  S.equipe.forEach(em=>{
     add('namecell '+em.pole,
       `<span class="nm">${em.nom}</span><span class="rl"><span class="pole">${t('poleShort')[em.pole]}</span>${t('roles')[em.role]}${em.resp?' ·&nbsp;'+t('resp'):''}</span>`);
-    L.jours.forEach((j,d)=>{
-      const code = p[em.id][d], s = SHIFTS[code];
-      const lock = isLocked(L,em,d);
-      const motif = em.indispo && em.indispo[d];
-      const cls = ['cell','s-'+code];
-      if(lock) cls.push('locked');
-      if(j.ferme) cls.push('closedday');
-      if(ev.flags.has(em.id+'-'+d)) cls.push('flagged');
-      const label = lock ? (motif ? t('motifs')[motif] : t('motifs').ferme) : t('shifts')[code];
-      const sub = lock ? '' : (s.h?fmtH(s.h):'—');
-      const c = add(cls.join(' '), `<span class="code">${lock?'· '+label:code+' · '+label}</span><span class="hrs">${sub}</span>`);
-      c.dataset.emp = em.id; c.dataset.day = d;
-      c.title = lock ? label : `${t('shifts')[code]} — ${s.label}`;
+    S.jours.forEach((j,d)=>{
+      const code=p[em.id][d], s=SHIFTS[code];
+      const lock=isLocked(S,em,d);
+      const motif=em.indispo&&em.indispo[d];
+      const cls=['cell','s-'+code];
+      if(lock)cls.push('locked');
+      if(j.ferme)cls.push('closedday');
+      if(ev.flags.has(em.id+'-'+d))cls.push('flagged');
+      const label=lock?(motif?t('motifs')[motif]:t('motifs').ferme):t('shifts')[code];
+      const sub=lock?'':(s.h?fmtH(s.h):'—');
+      const c=add(cls.join(' '),
+        `<span class="code">${lock?'· '+label:code+' · '+label}</span><span class="hrs">${sub}</span>`);
+      c.title=lock?label:`${t('shifts')[code]} — ${s.label}`;
       if(!lock){
-        c.tabIndex = 0;
-        c.addEventListener('pointerdown', ev2=>{ ev2.preventDefault(); painting=true; setCell(em.id,d,brush); });
-        c.addEventListener('pointerenter', ()=>{ if(painting) setCell(em.id,d,brush); });
-        c.addEventListener('keydown', ke=>{
-          if(KEYMAP[ke.key]){ ke.preventDefault(); setCell(em.id,d,KEYMAP[ke.key]); }
-          else if(ke.key==='Enter'||ke.key===' '){ ke.preventDefault(); setCell(em.id,d,brush); }
+        c.tabIndex=0;
+        c.addEventListener('pointerdown',e2=>{e2.preventDefault();painting=true;setCell(em.id,d,brush);});
+        c.addEventListener('pointerenter',()=>{if(painting)setCell(em.id,d,brush);});
+        c.addEventListener('keydown',ke=>{
+          if(KEYMAP[ke.key]){ke.preventDefault();setCell(em.id,d,KEYMAP[ke.key]);}
+          else if(ke.key==='Enter'||ke.key===' '){ke.preventDefault();setCell(em.id,d,brush);}
         });
       }
     });
-    const h = ev.hours[em.id], diff = h-em.contrat;
+    const h=ev.hours[em.id], diff=h-em.contrat;
     let tc='totcell';
-    if(diff>4) tc+=' way'; else if(diff>0.01) tc+=' over'; else if(diff<-0.01) tc+=' under';
-    const cur = lang==='en' ? `€${nf(ev.cost[em.id])}` : `${nf(ev.cost[em.id])} €`;
-    add(tc, `<span class="big">${fmtH(h)}</span><span class="sub">/ ${em.contrat} h · ${cur}</span>`, true);
+    if(diff>4)tc+=' way'; else if(diff>0.01)tc+=' over'; else if(diff<-0.01)tc+=' under';
+    add(tc,`<span class="big">${fmtH(h)}</span><span class="sub">/ ${em.contrat} h · ${cur(ev.cost[em.id])}</span>`,true);
   });
-
   ['midi','soir'].forEach(sv=>{
-    add('covrow covlabel', t('needFor')(t('services')[sv]));
-    L.jours.forEach((j,d)=>{
+    add('covrow covlabel',t('needFor')(t('services')[sv]));
+    S.jours.forEach((j,d)=>{
       const nc=j.besoin[sv].cuisine, ns=j.besoin[sv].salle;
-      if(nc+ns===0){ add('covrow covcell none','<span class="ln">—</span>'); return; }
-      const cnt = pole => L.equipe.filter(em=>em.pole===pole && SHIFTS[p[em.id][d]].couvre.includes(sv)).length;
-      const line = (lab,got,need)=>{
-        if(need===0) return '';
-        const k = got<need?'short':(got>need?'plus':'okk');
+      if(nc+ns===0){add('covrow covcell none','<span class="ln">—</span>');return;}
+      const cnt=pole=>S.equipe.filter(em=>em.pole===pole&&SHIFTS[p[em.id][d]].couvre.includes(sv)).length;
+      const line=(lab,got,need)=>{
+        if(need===0)return '';
+        const k=got<need?'short':(got>need?'plus':'okk');
         return `<span class="ln ${k}">${lab}<b>${got}/${need}</b></span>`;
       };
-      add('covrow covcell', line(t('poleShort').cuisine+' ',cnt('cuisine'),nc)+line(t('poleShort').salle+' ',cnt('salle'),ns));
+      add('covrow covcell',line(t('poleShort').cuisine+' ',cnt('cuisine'),nc)+line(t('poleShort').salle+' ',cnt('salle'),ns));
     });
     add('covrow covcell none','',true);
   });
 }
-
-function renderPanel(L,ev){
-  $('#score').textContent = ev.score;
-  const r = $('#rank');
-  if(ev.score>=90){ r.className='rank g'; r.textContent=t('rankGood'); }
-  else if(ev.score>=70){ r.className='rank w'; r.textContent=t('rankMid'); }
-  else { r.className='rank b'; r.textContent=t('rankBad'); }
-
-  const cur = lang==='en' ? v=>`€${nf(v)}` : v=>`${nf(v)} €`;
-  const pctCost = ev.total/L.budget*100;
-  $('#costTxt').textContent = `${cur(ev.total)} / ${cur(L.budget)}`;
-  const cb = $('#costBar');
-  cb.style.width = Math.min(100,pctCost)+'%';
-  cb.style.background = pctCost>100 ? 'var(--bad)' : (pctCost>92 ? 'var(--warn)' : 'var(--ok)');
-
-  const pctCov = ev.postesTot ? ev.postesOK/ev.postesTot*100 : 100;
-  $('#covTxt').textContent = `${ev.postesOK} / ${ev.postesTot}`;
-  const vb = $('#covBar');
-  vb.style.width = pctCov+'%';
-  vb.style.background = pctCov>=100 ? 'var(--ok)' : (pctCov>=90 ? 'var(--warn)' : 'var(--bad)');
-
-  const ul = $('#issues'); ul.innerHTML='';
+function renderPanel(S,ev){
+  $('#score').textContent=ev.score;
+  const r=$('#rank');
+  if(ev.score>=90){r.className='rank g';r.textContent=t('rankGood');}
+  else if(ev.score>=70){r.className='rank w';r.textContent=t('rankMid');}
+  else {r.className='rank b';r.textContent=t('rankBad');}
+  const pctCost=ev.total/S.budget*100;
+  $('#costTxt').textContent=`${cur(ev.total)} / ${cur(S.budget)}`;
+  const cb=$('#costBar');
+  cb.style.width=Math.min(100,pctCost)+'%';
+  cb.style.background=pctCost>100?'var(--bad)':(pctCost>92?'var(--warn)':'var(--ok)');
+  const pctCov=ev.postesTot?ev.postesOK/ev.postesTot*100:100;
+  $('#covTxt').textContent=`${ev.postesOK} / ${ev.postesTot}`;
+  const vb=$('#covBar');
+  vb.style.width=pctCov+'%';
+  vb.style.background=pctCov>=100?'var(--ok)':(pctCov>=90?'var(--warn)':'var(--bad)');
+  const ul=$('#issues'); ul.innerHTML='';
   if(!ev.issues.length){
-    ul.innerHTML = `<li class="clean"><span class="dot"></span><span class="txt">${t('clean')}</span></li>`;
+    ul.innerHTML=`<li class="clean"><span class="dot"></span><span class="txt">${t('clean')}</span></li>`;
     return;
   }
-  const rank = {legal:0,couv:1,eco:2,conf:3};
-  const sorted = ev.issues.slice().sort((a,c)=>(rank[a.cat]-rank[c.cat])||(c.pts-a.pts));
+  const rk={legal:0,couv:1,eco:2,conf:3};
+  const sorted=ev.issues.slice().sort((a,c)=>(rk[a.cat]-rk[c.cat])||(c.pts-a.pts));
   sorted.slice(0,14).forEach(i=>{
-    const li = document.createElement('li');
-    li.className = i.cat;
-    li.innerHTML = `<span class="dot"></span><span class="txt"><b>${i.txt}</b><span class="who">${i.who||''}</span></span><span class="pts">−${i.pts}</span>`;
+    const li=document.createElement('li');
+    li.className=i.cat;
+    li.innerHTML=`<span class="dot"></span><span class="txt"><b>${i.txt}</b><span class="who">${i.who||''}</span></span><span class="pts">−${i.pts}</span>`;
     ul.appendChild(li);
   });
   if(sorted.length>14){
-    const li = document.createElement('li');
-    li.innerHTML = `<span class="dot" style="background:var(--muted)"></span><span class="txt">${t('more')(sorted.length-14)}</span>`;
+    const li=document.createElement('li');
+    li.innerHTML=`<span class="dot" style="background:var(--muted)"></span><span class="txt">${t('more')(sorted.length-14)}</span>`;
     ul.appendChild(li);
   }
 }
-
-function renderAll(){
-  const L = LEVELS[lvlIndex], p = planFor(lvlIndex), ev = evaluate(L,p);
-  renderChrome(); renderLevels(); renderPalette(); renderBrief(L);
-  renderGrid(L,p,ev); renderPanel(L,ev);
-}
-
 function setCell(empId,d,code){
-  const L = LEVELS[lvlIndex], p = planFor(lvlIndex);
-  const em = L.equipe.find(x=>x.id===empId);
-  if(!em || isLocked(L,em,d) || p[empId][d]===code) return;
-  p[empId][d] = code; save(); renderAll();
+  const em=scen.equipe.find(x=>x.id===empId);
+  if(!em||isLocked(scen,em,d)||plan[empId][d]===code)return;
+  plan[empId][d]=code;
+  if(mode==='season'&&season) season.plan=plan;
+  save();
+  renderPlay();
 }
 
-/* ===================== actions ===================== */
+/* ---------- débrief saison ---------- */
+function openDebrief(ev,deltas,weekNo){
+  const ovl=document.createElement('div');
+  ovl.className='ovl';
+  ovl.innerHTML=`
+    <div class="sheet" role="dialog" aria-modal="true">
+      <header><div class="ek">${t('snTitle')}</div><h2>${t('dbWeek')(weekNo)}</h2></header>
+      <div class="body">
+        <div class="kpis">
+          <div class="kpi"><div class="kl">Score</div><div class="kv">${ev.score}</div></div>
+          <div class="kpi"><div class="kl">${t('lblCost')}</div><div class="kv" style="font-size:19px">${cur(ev.total)}</div></div>
+          <div class="kpi"><div class="kl">${t('kTreso')}</div><div class="kv ${season.tresorerie>=0?'g':'b'}" style="font-size:19px">${cur(season.tresorerie)}</div></div>
+        </div>
+        <ul class="deltas">${deltas.map(d=>`<li><span class="tag ${d.tag}">${
+          d.tag==='good'?'+':d.tag==='bad'?'!':d.tag==='warn'?'~':'i'}</span><span>${d.txt}</span></li>`).join('')}</ul>
+      </div>
+      <footer><button class="btn primary" id="db-ok">${t('dbNext')}</button></footer>
+    </div>`;
+  document.body.appendChild(ovl);
+  ovl.querySelector('#db-ok').onclick=()=>{ovl.remove();show('season');};
+}
+
+/* ---------- actions ---------- */
 let toastT;
 function toast(msg){
   clearTimeout(toastT);
-  let el = document.querySelector('.toast');
-  if(!el){ el = document.createElement('div'); el.className='toast'; document.body.appendChild(el); }
-  el.textContent = msg;
-  toastT = setTimeout(()=>{ el.remove(); }, 5600);
+  let el=document.querySelector('.toast');
+  if(!el){el=document.createElement('div');el.className='toast';document.body.appendChild(el);}
+  el.textContent=msg;
+  toastT=setTimeout(()=>{el.remove();},5600);
 }
-
-$('#btnClear').onclick = ()=>{
-  const L = LEVELS[lvlIndex];
-  plans[L.id] = applyLocks(L, emptyPlan(L));
-  save(); renderAll(); toast(t('tClear'));
+$('#btnHome').onclick=()=>{show('home');};
+$('#btnClear').onclick=()=>{
+  plan=applyLocks(scen,emptyPlan(scen));
+  if(mode==='season'&&season)season.plan=plan;
+  save(); renderPlay(); toast(t('tClear'));
 };
-$('#btnDraft').onclick = ()=>{
-  const L = LEVELS[lvlIndex];
-  if(!L.draft){ toast(t('tNoDraft')); return; }
-  let p = emptyPlan(L);
-  L.equipe.forEach(em=>{ if(L.draft[em.id]) p[em.id]=L.draft[em.id].slice(); });
-  plans[L.id] = applyLocks(L,p);
-  save(); renderAll(); toast(t('tDraft'));
+$('#btnDraft').onclick=()=>{
+  if(!scen.draft){toast(t('tNoDraft'));return;}
+  let p=emptyPlan(scen);
+  scen.equipe.forEach(em=>{if(scen.draft[em.id])p[em.id]=scen.draft[em.id].slice();});
+  plan=applyLocks(scen,p);
+  save(); renderPlay(); toast(t('tDraft'));
 };
-$('#btnCheck').onclick = ()=>{
-  const L = LEVELS[lvlIndex], ev = evaluate(L, planFor(lvlIndex));
-  const legal = ev.issues.filter(i=>i.cat==='legal').length;
-  const couv  = ev.issues.filter(i=>i.cat==='couv').length;
-  if(!ev.issues.length) toast(t('tPerfect'));
-  else if(legal) toast(t('tLegal')(ev.score,legal));
-  else if(couv) toast(t('tCouv')(ev.score,couv));
+$('#btnCheck').onclick=()=>{
+  const ev=evaluate(scen,plan);
+  const legal=ev.issues.filter(i=>i.cat==='legal').length;
+  const couv=ev.issues.filter(i=>i.cat==='couv').length;
+  if(mode==='levels'){
+    const prev=progress[scen.id]||0;
+    if(ev.score>prev){progress[scen.id]=ev.score;save();}
+  }
+  if(mode==='season'&&season){
+    if(legal){toast(t('tLegal')(ev.score,legal));return;}
+    const weekNo=season.week+1;
+    const deltas=applySeasonWeek(season,scen,ev);
+    save();
+    openDebrief(ev,deltas,weekNo);
+    return;
+  }
+  if(!ev.issues.length)toast(t('tPerfect'));
+  else if(legal)toast(t('tLegal')(ev.score,legal));
+  else if(couv)toast(t('tCouv')(ev.score,couv));
   else toast(t('tOpti')(ev.score));
 };
-$('#btnShare').onclick = async ()=>{
-  const L = LEVELS[lvlIndex], ev = evaluate(L, planFor(lvlIndex));
-  const txt = t('shareTxt')(`${X(L.n)} « ${X(L.titre)} »`, ev.score, nf(ev.total), nf(L.budget));
+$('#btnShare').onclick=async()=>{
+  const ev=evaluate(scen,plan);
+  const txt=t('shareTxt')(`${X(scen.n)} « ${X(scen.titre)} »`,ev.score,nf(ev.total),nf(scen.budget));
   try{
-    if(navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)){
-      await navigator.share({title:'Planning Coup de Feu', text:txt});
-      return;
+    if(navigator.share&&/Android|iPhone|iPad/i.test(navigator.userAgent)){
+      await navigator.share({title:'Planning Coup de Feu',text:txt}); return;
     }
-    await navigator.clipboard.writeText(txt);
-    toast(t('tCopied'));
+    await navigator.clipboard.writeText(txt); toast(t('tCopied'));
   }catch(_){
     try{
-      const ta = document.createElement('textarea');
-      ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+      const ta=document.createElement('textarea');
+      ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
       document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); ta.remove();
-      toast(t('tCopied'));
-    }catch(__){ toast(t('tCopyFail')); }
+      document.execCommand('copy'); ta.remove(); toast(t('tCopied'));
+    }catch(__){toast(t('tCopyFail'));}
   }
 };
-
-document.addEventListener('pointerup', ()=>{ painting=false; });
-document.addEventListener('pointercancel', ()=>{ painting=false; });
-document.addEventListener('keydown', ev=>{
-  if(ev.target && /input|textarea/i.test(ev.target.tagName)) return;
-  if(KEYMAP[ev.key] && !(document.activeElement && document.activeElement.classList.contains('cell'))){
-    brush = KEYMAP[ev.key]; renderPalette();
-  }
+$('#sn-play').onclick=()=>{
+  const S=seasonScenario(season);
+  scen=S; mode='season';
+  plan=season.plan||applyLocks(S,emptyPlan(S));
+  season.plan=plan;
+  show('play');
+};
+$('#sn-reset').onclick=()=>{season=newSeason();save();renderSeason();toast(t('snResetOk'));};
+$('#rd-play').onclick=()=>{
+  rnd.seed=($('#rd-seed').value||randomSeed()).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)||randomSeed();
+  save();
+  startScenario(generateWeek(rnd.seed,rnd.diff),'random');
+};
+$('#rd-roll').onclick=()=>{rnd.seed=randomSeed();save();renderRandom();};
+$('#rd-seed').addEventListener('change',()=>{
+  rnd.seed=($('#rd-seed').value||randomSeed()).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)||randomSeed();
+  save(); renderRandom();
 });
 
-$('#themebtn').onclick = ()=>{
-  const cur = document.documentElement.getAttribute('data-theme');
-  const dark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-  document.documentElement.setAttribute('data-theme', dark?'light':'dark');
-};
-$('#langbtn').onclick = ()=>{ lang = (lang==='fr'?'en':'fr'); save(); renderAll(); };
+document.addEventListener('pointerup',()=>{painting=false;});
+document.addEventListener('pointercancel',()=>{painting=false;});
+document.addEventListener('keydown',ev=>{
+  if(screen!=='play')return;
+  if(ev.target&&/input|textarea/i.test(ev.target.tagName))return;
+  if(KEYMAP[ev.key]&&!(document.activeElement&&document.activeElement.classList.contains('cell'))){
+    brush=KEYMAP[ev.key]; renderPalette();
+  }
+});
+function toggleTheme(){
+  const c=document.documentElement.getAttribute('data-theme');
+  const dark=c?c==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+}
+function toggleLang(){
+  lang=(lang==='fr'?'en':'fr'); save(); show(screen);
+}
+['#themebtn','#themebtn2'].forEach(s=>{$(s).onclick=toggleTheme;});
+['#langbtn','#langbtn2'].forEach(s=>{$(s).onclick=toggleLang;});
 
+/* ---------- démarrage ---------- */
 (function start(){
-  let hadSave = false;
-  try{ hadSave = !!localStorage.getItem('cdf_v2'); }catch(_){}
+  let had=false;
+  try{had=!!localStorage.getItem('cdf_v3');}catch(_){}
   load();
-  if(!hadSave && /^en/i.test(navigator.language||'')) lang='en';
-  renderAll();
+  if(!had&&/^en/i.test(navigator.language||''))lang='en';
+  const u=new URLSearchParams(location.search);
+  const s=u.get('seed');
+  if(s){
+    rnd.seed=s.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)||rnd.seed;
+    const d=parseInt(u.get('d')||'2',10);
+    rnd.diff=(d>=1&&d<=5)?d:2;
+    show('random');
+  } else show('home');
 })();
 </script>
 </body>
