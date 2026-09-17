@@ -228,6 +228,27 @@ h1,h2,h3{text-wrap:balance}
 .cell.ro{cursor:default}
 .cell.ro:hover{box-shadow:none}
 
+/* ---------- brouillons ---------- */
+.slots{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.slot{border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;
+  display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;background:var(--surface-2)}
+.slot.auto{border-style:dashed}
+.slot .sn{flex:1 1 160px;min-width:0;display:grid;gap:2px}
+.slot .sn input{font:inherit;font-size:13.5px;font-weight:600;padding:4px 7px;
+  border:1px solid transparent;border-radius:4px;background:none;color:var(--ink);width:100%}
+.slot .sn input:hover{border-color:var(--line)}
+.slot .sn input:focus{border-color:var(--line-strong);background:var(--surface);outline:none}
+.slot .sm{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--muted);padding-left:7px}
+.slot .ss{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;
+  font-variant-numeric:tabular-nums;flex:none}
+.slot .sb{display:flex;gap:6px;flex:none;flex-wrap:wrap}
+.slot .sb button{font:inherit;font-size:12px;cursor:pointer;padding:5px 10px;border-radius:4px;
+  border:1px solid var(--line-strong);background:var(--surface);color:var(--ink)}
+.slot .sb button:hover{background:var(--line)}
+.slot .sb button.danger{color:var(--bad);border-color:var(--bad-soft)}
+.slot.vide{opacity:.75}
+.slot.vide .sn{color:var(--muted);font-style:italic;font-size:13px;padding-left:7px}
+
 /* ---------- historique ---------- */
 .hist{list-style:none;margin:0;padding:0}
 .hist li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
@@ -666,6 +687,7 @@ footer.foot a{color:var(--ink-2)}
     <span class="grow"></span>
     <button class="btn" id="btnClear" type="button"></button>
     <button class="btn" id="btnDraft" type="button" hidden></button>
+    <button class="btn" id="btnSlots" type="button"></button>
     <button class="btn primary" id="btnCheck" type="button"></button>
   </div>
 
@@ -889,6 +911,14 @@ fr:{
   dbSee:"Voir cette grille", dbClose:"Fermer",
   dbRefName:"Meilleure grille trouvée",
   dbNotSure:"Grille trouvée par recherche, pas nécessairement l'optimum absolu.",
+  /* brouillons */
+  btnSlots:"Brouillons", drTtl:"Brouillons",
+  drSub:"Trois emplacements par épreuve, plus une reprise automatique.",
+  drAuto:"Reprise automatique", drAutoNone:"Rien encore",
+  drFree:"Emplacement libre", drSave:"Enregistrer ici", drOver:"Écraser",
+  drLoad:"Charger", drDel:"Supprimer", drName:"Nom",
+  drSaved:"Brouillon enregistré.", drLoaded:"Brouillon chargé.", drDeleted:"Brouillon supprimé.",
+  drScore:n=>`${n}/100`,
   snNotDone:"Terminez les dix semaines d'abord.",
 },
 en:{
@@ -1043,6 +1073,13 @@ en:{
   dbSee:"View that roster", dbClose:"Close",
   dbRefName:"Best roster found",
   dbNotSure:"Found by search, not necessarily the absolute optimum.",
+  btnSlots:"Drafts", drTtl:"Drafts",
+  drSub:"Three slots per challenge, plus one autosave.",
+  drAuto:"Autosave", drAutoNone:"Nothing yet",
+  drFree:"Empty slot", drSave:"Save here", drOver:"Overwrite",
+  drLoad:"Load", drDel:"Delete", drName:"Name",
+  drSaved:"Draft saved.", drLoaded:"Draft loaded.", drDeleted:"Draft deleted.",
+  drScore:n=>`${n}/100`,
   snNotDone:"Finish all ten weeks first.",
 }};
 let lang = "fr";
@@ -1563,6 +1600,7 @@ function setCell(empId,d,code){
   plan[empId][d]=code;
   if(mode==='season'&&season) season.plan=plan;
   save();
+  scheduleAutosave();
   renderPlay();
 }
 
@@ -1634,6 +1672,7 @@ $('#btnDraft').onclick=()=>{
   plan=applyLocks(scen,p);
   save(); renderPlay(); toast(t('tDraft'));
 };
+$('#btnSlots').onclick=openSlots;
 $('#btnCheck').onclick=()=>{
   const ev=evaluate(scen,plan);
   const legal=ev.issues.filter(i=>i.cat==='legal').length;
@@ -1734,6 +1773,107 @@ function toggleLang(){
 }
 ['#themebtn','#themebtn2'].forEach(s=>{$(s).onclick=toggleTheme;});
 ['#langbtn','#langbtn2'].forEach(s=>{$(s).onclick=toggleLang;});
+
+/* ---------- brouillons ---------- */
+/* Trois emplacements manuels par épreuve, plus une reprise automatique
+   à part pour qu'elle ne consomme jamais un emplacement. Rangés dans la
+   progression, donc synchronisés avec le compte. */
+const SLOTS = 3;
+const scenKey = () => scen ? scen.id : null;
+
+function drafts(){
+  progress.drafts = progress.drafts || {};
+  const k = scenKey();
+  if(!k) return [];
+  progress.drafts[k] = progress.drafts[k] || [];
+  return progress.drafts[k];
+}
+function autosaveOf(){
+  progress.autosave = progress.autosave || {};
+  return progress.autosave[scenKey()] || null;
+}
+function stamp(ms){
+  return new Date(ms||Date.now()).toLocaleString(lang==='en'?'en-GB':'fr-FR',
+    {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+function snapshot(){
+  const c={}; scen.equipe.forEach(em=>{ c[em.id]=plan[em.id].slice(); });
+  return c;
+}
+
+let autoT=null;
+function scheduleAutosave(){
+  if(!scen || replayInfo || mode==='tuto') return;
+  clearTimeout(autoT);
+  autoT=setTimeout(()=>{
+    if(!scen) return;
+    progress.autosave = progress.autosave || {};
+    progress.autosave[scenKey()] = { at:Date.now(), plan:snapshot() };
+    save(); pushProgress();
+  }, 2000);
+}
+
+function openSlots(){
+  const ovl=document.createElement('div');
+  ovl.className='ovl';
+  const draw=()=>{
+    const list=drafts(), au=autosaveOf();
+    const scoreDe=pl=>evaluate(scen, applyLocks(scen, Object.assign(emptyPlan(scen), pl))).score;
+    const vide=i=>`<li class="slot vide">
+        <span class="sn">${t('drFree')}</span>
+        <span class="sb"><button data-save="${i}">${t('drSave')}</button></span></li>`;
+    const plein=(d,i,isAuto)=>{
+      const sc=scoreDe(d.plan);
+      const col=sc>=90?'var(--ok)':sc>=70?'var(--warn)':'var(--bad)';
+      return `<li class="slot${isAuto?' auto':''}">
+        <span class="sn">
+          ${isAuto ? `<b style="padding-left:7px">${t('drAuto')}</b>`
+                   : `<input data-name="${i}" value="${String(d.name||'').replace(/"/g,'&quot;')}" maxlength="40">`}
+          <span class="sm">${d.at}</span>
+        </span>
+        <span class="ss" style="color:${col}">${t('drScore')(sc)}</span>
+        <span class="sb">
+          <button data-load="${isAuto?'auto':i}">${t('drLoad')}</button>
+          ${isAuto?'':`<button data-save="${i}">${t('drOver')}</button>
+                       <button class="danger" data-del="${i}">${t('drDel')}</button>`}
+        </span></li>`;
+    };
+    const lignes=[ au ? plein({name:'',at:stamp(au.at),plan:au.plan},'auto',true)
+                      : `<li class="slot auto vide"><span class="sn">${t('drAuto')} · ${t('drAutoNone')}</span></li>` ]
+      .concat(Array.from({length:SLOTS},(_,i)=> list[i] ? plein(list[i],i,false) : vide(i)));
+    ovl.innerHTML=`
+      <div class="sheet" role="dialog" aria-modal="true" style="max-width:560px">
+        <header><div class="ek">${X(scen.n)}</div><h2>${t('drTtl')}</h2></header>
+        <div class="body">
+          <p class="disclaim" style="border:0;padding:0">${t('drSub')}</p>
+          <ul class="slots">${lignes.join('')}</ul>
+        </div>
+        <footer><button class="btn primary" id="sl-x" type="button">${t('dbClose')}</button></footer>
+      </div>`;
+    ovl.querySelector('#sl-x').onclick=()=>ovl.remove();
+    ovl.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>{
+      const i=+b.dataset.save, l=drafts();
+      l[i]={ name:(l[i]&&l[i].name)||`${X(scen.n)} · ${stamp()}`, at:stamp(), plan:snapshot() };
+      save(); pushProgress(); draw(); toast(t('drSaved'));
+    });
+    ovl.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{
+      const src = b.dataset.load==='auto' ? autosaveOf() : drafts()[+b.dataset.load];
+      if(!src) return;
+      plan=applyLocks(scen, Object.assign(emptyPlan(scen), src.plan));
+      if(mode==='season'&&season) season.plan=plan;
+      save(); ovl.remove(); renderPlay(); toast(t('drLoaded'));
+    });
+    ovl.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+      drafts()[+b.dataset.del]=null; save(); pushProgress(); draw(); toast(t('drDeleted'));
+    });
+    ovl.querySelectorAll('[data-name]').forEach(inp=>{
+      inp.onchange=()=>{ const l=drafts(), i=+inp.dataset.name;
+        if(l[i]){ l[i].name=inp.value; save(); pushProgress(); } };
+    });
+  };
+  draw();
+  mountOvl(ovl);
+}
 
 /* ---------- débrief comparatif ---------- */
 let solverWorker = null;
