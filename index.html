@@ -483,11 +483,18 @@ h1,h2,h3{text-wrap:balance}
 .disclaim{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:9px;margin:0}
 
 /* ---------- débrief ---------- */
-.ovl{position:fixed;inset:0;z-index:70;background:rgba(10,14,12,.62);
-  display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
-.sheet{background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;
-  box-shadow:0 24px 60px -20px rgba(0,0,0,.5);max-width:620px;width:100%;
-  max-height:calc(100vh - 32px);overflow-y:auto}
+/* Modale centrée. Grille plutôt que flex : le contenu trop haut se
+   défile sans que le haut du panneau soit coupé. */
+.ovl{position:fixed;top:0;left:0;right:0;bottom:0;z-index:70;
+  background:rgba(10,14,12,.62);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  display:grid;place-items:center;padding:16px;overflow-y:auto;overscroll-behavior:contain}
+.sheet{background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;
+  box-shadow:0 30px 70px -22px rgba(0,0,0,.6);max-width:620px;width:100%;margin:auto;
+  max-height:calc(100dvh - 32px);overflow-y:auto;
+  animation:popIn .18s ease-out}
+@keyframes popIn{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+body.locked{overflow:hidden}
 .sheet header{padding:20px 22px 14px;border-bottom:1px solid var(--line)}
 .sheet header .ek{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--accent);margin-bottom:6px}
@@ -1577,12 +1584,36 @@ function openDebrief(ev,deltas,weekNo){
       </div>
       <footer><button class="btn primary" id="db-ok">${t('dbNext')}</button></footer>
     </div>`;
-  document.body.appendChild(ovl);
   ovl.querySelector('#db-ok').onclick=()=>{ovl.remove();show('season');};
+  mountOvl(ovl);
 }
 
 /* ---------- actions ---------- */
 let toastT;
+/* Ouvre une modale : verrouille le défilement, ferme au clic sur le fond
+   et à la touche Échap. */
+function mountOvl(ovl){
+  document.body.appendChild(ovl);
+  document.body.classList.add('locked');
+  const close=()=>{
+    ovl.remove();
+    document.body.classList.remove('locked');
+    document.removeEventListener('keydown',onKey);
+  };
+  const onKey=e=>{ if(e.key==='Escape') close(); };
+  document.addEventListener('keydown',onKey);
+  ovl.addEventListener('mousedown',e=>{ if(e.target===ovl) close(); });
+  const obs=new MutationObserver(()=>{
+    if(!document.body.contains(ovl)){
+      document.body.classList.remove('locked');
+      document.removeEventListener('keydown',onKey);
+      obs.disconnect();
+    }
+  });
+  obs.observe(document.body,{childList:true});
+  return close;
+}
+
 function toast(msg){
   clearTimeout(toastT);
   let el=document.querySelector('.toast');
@@ -1763,7 +1794,7 @@ function openAnalysis(ev){
     };
   };
   draw(null);
-  document.body.appendChild(ovl);
+  mountOvl(ovl);
 
   // Repli : si le worker ne démarre pas (module non supporté, fichier
   // manquant, erreur de chargement), on calcule sur le fil principal.
@@ -1935,7 +1966,7 @@ function openAuth(){
     }
   }
   draw();
-  document.body.appendChild(ovl);
+  mountOvl(ovl);
   setTimeout(()=>{ const el=ovl.querySelector('#au-mail'); if(el) el.focus(); },30);
 }
 
@@ -1955,7 +1986,7 @@ function openAccount(){
   ovl.querySelector('#ac-out').onclick=async()=>{
     await cloud.signOut(); me=null; ovl.remove(); refreshAccount(); renderAll();
   };
-  document.body.appendChild(ovl);
+  mountOvl(ovl);
 }
 
 /* --- progression : le nuage fait autorité au moment de la connexion --- */
