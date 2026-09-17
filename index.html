@@ -110,8 +110,9 @@ h1,h2,h3{text-wrap:balance}
 .topttl{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:20px;letter-spacing:-.01em;margin:0}
 .topttl em{font-style:italic;font-weight:600;color:var(--accent)}
 .grow{flex:1 1 auto;min-width:4px}
-.pill{font:inherit;font-size:12px;background:var(--surface);color:var(--ink-2);
-  border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer}
+.pill{font:inherit;font-size:13px;background:var(--surface);color:var(--ink-2);
+  border:1px solid var(--line);border-radius:999px;padding:0 15px;min-height:38px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px}
 .pill:hover{border-color:var(--line-strong);color:var(--ink)}
 
 /* ---------- accueil ---------- */
@@ -397,23 +398,47 @@ h1,h2,h3{text-wrap:balance}
 .toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin-top:16px;padding:10px;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;box-shadow:var(--shadow)}
-.palette{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font:inherit;cursor:pointer;border-radius:5px;padding:5px 10px;border:1px solid var(--line);
-  background:var(--surface-2);color:var(--ink-2);display:flex;align-items:center;gap:7px;line-height:1.2}
-.chip .key{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--muted);
-  border:1px solid var(--line-strong);border-radius:3px;padding:0 3px}
-.chip .sw{width:10px;height:10px;border-radius:2px;flex:none}
+/* Palette : le pinceau du joueur. Assez gros pour être visé sans regarder,
+   coloré comme la case qu'il pose, avec la touche clavier en rappel. */
+/* Deux blocs : le pinceau à gauche, les actions à droite. Quand la largeur
+   manque, c'est le bloc d'actions entier qui passe à la ligne, aligné à
+   droite : jamais un bouton orphelin. */
+.palette{display:flex;flex-wrap:wrap;gap:8px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto;align-items:center}
+.tools .btn{padding:0 14px}
+@media(max-width:700px){.tools{margin-left:0;width:100%}}
+.chip{font:inherit;cursor:pointer;border-radius:8px;padding:7px 12px 7px 10px;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);
+  display:flex;align-items:center;gap:9px;line-height:1.15;min-height:48px;
+  transition:border-color .12s,transform .12s}
+.chip .sw{width:30px;height:30px;border-radius:6px;flex:none;
+  display:flex;align-items:center;justify-content:center;color:#fff}
+.chip .sw .i{width:17px;height:17px}
+.chip .lb2{display:grid;gap:1px;text-align:left}
+.chip .nm2{font-weight:600;font-size:14px;color:var(--ink)}
 .chip .hh{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.chip .key{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);
+  border:1px solid var(--line-strong);border-radius:4px;padding:1px 5px;margin-left:2px}
 .chip:hover{border-color:var(--line-strong)}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
-.chip[aria-pressed="true"] .hh,.chip[aria-pressed="true"] .key{color:var(--surface);opacity:.75;border-color:currentColor}
-.btn{font:inherit;cursor:pointer;border-radius:5px;padding:6px 14px;
-  border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink)}
+.chip[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);
+  background:var(--surface)}
+.chip[aria-pressed="true"] .nm2{color:var(--ink)}
+.chip[aria-pressed="true"] .key{border-color:var(--ink);color:var(--ink)}
+/* Icônes : une seule classe, la taille suit celle du texte qui les porte. */
+.i{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.19em;flex:none}
+
+/* Cibles tactiles : 44 px de haut partout, y compris à la souris. Un bouton
+   que l'on rate est un bouton qui n'existe pas. */
+.btn{font:inherit;font-size:14.5px;cursor:pointer;border-radius:7px;padding:0 16px;
+  min-height:44px;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink);
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;line-height:1.2}
 .btn:hover{background:var(--line)}
+.btn:active{transform:translateY(1px)}
 .btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:600}
 .btn.primary:hover{opacity:.88}
-.btn.big{padding:10px 20px;font-size:15px}
-.btn.ico{font-size:17px;line-height:1;padding:6px 11px;font-family:system-ui,sans-serif}
+.btn.big{padding:0 24px;min-height:52px;font-size:16px}
+.btn.ico{padding:0;min-width:44px;line-height:1}
+.btn.ico .i{width:20px;height:20px;vertical-align:middle}
 .lnk{font:inherit;background:none;border:0;padding:0;color:var(--accent);
   text-decoration:underline;cursor:pointer}
 .btn[disabled]{opacity:.38;cursor:default}
@@ -536,9 +561,12 @@ h1,h2,h3{text-wrap:balance}
 .dayrow .who2 b{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dayrow .who2 span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dayrow .hrs2{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:none}
-.dayrow .pick{flex:none;font:inherit;font-family:"IBM Plex Mono",monospace;font-weight:700;
-  font-size:15px;cursor:pointer;border-radius:7px;padding:11px 15px;min-width:64px;
-  border:1px solid var(--line-strong);text-align:center}
+.dayrow .pick{flex:none;font:inherit;font-weight:700;font-size:13px;cursor:pointer;
+  border-radius:9px;padding:8px 12px;min-width:92px;min-height:56px;
+  border:1px solid var(--line-strong);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;line-height:1.1}
+.dayrow .pick .i{width:19px;height:19px}
+.dayrow .pick:active{transform:scale(.97)}
 .dayrow .pick.s-R{background:var(--repos-soft);color:var(--repos)}
 .dayrow .pick.s-P{background:var(--prep-soft);color:var(--prep)}
 .dayrow .pick.s-M{background:var(--midi-soft);color:var(--midi)}
@@ -588,7 +616,12 @@ h1,h2,h3{text-wrap:balance}
   box-shadow:var(--shadow);overflow:hidden}
 .panel h3{margin:0;padding:11px 14px;font-family:"IBM Plex Mono",monospace;font-size:11px;
   letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
-  border-bottom:1px solid var(--line);background:var(--surface-2);font-weight:500}
+  border-bottom:1px solid var(--line);background:var(--surface-2);font-weight:500;
+  display:flex;align-items:center;gap:8px}
+.panel h3 .i{width:15px;height:15px;opacity:.75}
+.mode .mk,.daily .dk,.boardband .bk{display:flex;align-items:center;gap:6px}
+.mode .mk .i,.daily .dk .i{width:15px;height:15px}
+.boardband .bk .i{width:14px;height:14px}
 .scorebox{padding:14px;display:grid;gap:12px}
 .scoreline{display:flex;align-items:baseline;gap:10px}
 .scorenum{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:54px;line-height:.85;
@@ -607,6 +640,29 @@ h1,h2,h3{text-wrap:balance}
 .bar{height:9px;border-radius:999px;background:var(--surface-2);overflow:hidden;
   border:1px solid var(--line)}
 .bar i{display:block;height:100%;border-radius:999px;transition:width .35s ease}
+/* Quatre compteurs plutôt qu'un mur de texte : on voit d'un coup d'oeil où
+   partent les points, et on ouvre le détail seulement quand on le veut. */
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.cat{font:inherit;text-align:left;cursor:pointer;border:0;background:var(--surface);
+  padding:13px 14px;display:grid;gap:7px;min-height:88px;align-content:start;
+  transition:background .12s}
+.cat:hover{background:var(--surface-2)}
+.cat .ct{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.cat .ct .i{width:17px;height:17px;color:var(--muted)}
+.cat .cv{font-family:"Fraunces",Georgia,serif;font-size:27px;font-weight:700;line-height:1;
+  font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:7px}
+.cat .cn{font-size:11.5px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.cat.ok .cv{color:var(--ok);font-size:22px}
+.cat.ok .cv .i{width:22px;height:22px}
+.cat.ok{cursor:default}
+.cat.legal .cv{color:var(--bad)}
+.cat.couv .cv{color:var(--warn)}
+.cat.eco .cv{color:var(--soir)}
+.cat.conf .cv{color:var(--coup)}
+.cathint{margin:0;padding:10px 14px;border-top:1px solid var(--line);color:var(--muted);
+  font-size:12.5px;background:var(--surface-2)}
+@media(max-width:330px){.cats{grid-template-columns:1fr}}
+
 .issues{list-style:none;margin:0;padding:0}
 .issues li{display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line);align-items:flex-start}
 .issues li:last-child{border-bottom:none}
@@ -678,6 +734,33 @@ footer.foot a{color:var(--ink-2)}
 </style>
 </head>
 <body>
+<!-- Jeu d'icônes. Un seul trait, currentColor, pas d'emoji : elles suivent
+     le thème clair comme sombre et l'accent du texte qui les porte. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-repos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.2 8.2 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z"/></symbol>
+<symbol id="i-prep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18M7.5 18a4.5 4.5 0 0 1 9 0M12 4.5v3M5.6 7.6l2.1 2.1M18.4 7.6l-2.1 2.1"/></symbol>
+<symbol id="i-midi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></symbol>
+<symbol id="i-soir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.2 8.2 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z"/><path d="M17 3.5v3M15.5 5h3"/></symbol>
+<symbol id="i-coup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.6" y="4.4" width="4.6" height="15.2" rx="1.5"/><rect x="14.8" y="4.4" width="4.6" height="15.2" rx="1.5"/></symbol>
+<symbol id="i-jauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17a8.5 8.5 0 1 1 17 0"/><path d="M12 17l4.2-5"/><circle cx="12" cy="17" r="1.3"/></symbol>
+<symbol id="i-legal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2v17.6M6 6.5h12M4.2 20.8h15.6"/><path d="M6 6.5 3 13h6ZM18 6.5 15 13h6Z"/></symbol>
+<symbol id="i-couv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.2 19.4a5.8 5.8 0 0 1 11.6 0"/><path d="M16.4 5.4a3.1 3.1 0 0 1 0 5.6M18.2 19.4a5.8 5.8 0 0 0-2-4.4"/></symbol>
+<symbol id="i-budget" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 7.5H10a2.5 2.5 0 0 0 0 5h4a2.5 2.5 0 0 1 0 5H8"/><path d="M12 4.5v15"/></symbol>
+<symbol id="i-conf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.3S3.8 15.4 3.8 9.6a4.4 4.4 0 0 1 8.2-2.3 4.4 4.4 0 0 1 8.2 2.3c0 5.8-8.2 10.7-8.2 10.7Z"/></symbol>
+<symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></symbol>
+<symbol id="i-niveaux" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5h5v-7h-5zM9.5 20.5h5V8h-5zM15.5 20.5h5V3.5h-5z"/></symbol>
+<symbol id="i-saison" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.3" y="5" width="17.4" height="15.7" rx="2"/><path d="M3.3 9.6h17.4M8 3.3v3.4M16 3.3v3.4"/></symbol>
+<symbol id="i-alea" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="3.4" width="17.2" height="17.2" rx="3"/><circle cx="8.4" cy="8.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.6" cy="15.6" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-trophee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.2h10v4.3a5 5 0 0 1-10 0z"/><path d="M7 5.8H4.4v1.4A3.2 3.2 0 0 0 7.6 10.4M17 5.8h2.6v1.4a3.2 3.2 0 0 1-3.2 3.2"/><path d="M12 13.5v3.4M8.6 20.3h6.8l-.7-3.4H9.3z"/></symbol>
+<symbol id="i-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-aide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.8-.9 1.4v.5"/><circle cx="12" cy="16.8" r="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-annuler" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5h10.5a5 5 0 0 1 0 10H9"/><path d="M7.5 6.5 3.5 10.5l4 4"/></symbol>
+<symbol id="i-retablir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10.5H9.5a5 5 0 0 0 0 10H15"/><path d="m16.5 6.5 4 4-4 4"/></symbol>
+<symbol id="i-vider" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.6h15M9.4 6.6V4.4h5.2v2.2M6.6 6.6l1 13h8.8l1-13"/><path d="M10.2 10.4v5.4M13.8 10.4v5.4"/></symbol>
+<symbol id="i-brouillon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.8h9.5L19 8.3v11.9H5z"/><path d="M14 3.8v4.8h5M8.4 12.6h7.2M8.4 16.2h4.8"/></symbol>
+<symbol id="i-chef" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20.2h10v-6H7z"/><path d="M7 14.2a4.2 4.2 0 0 1-1.4-8.1 3.6 3.6 0 0 1 6.4-2.1 3.6 3.6 0 0 1 6.4 2.1A4.2 4.2 0 0 1 17 14.2"/></symbol>
+<symbol id="i-valider" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9 17l10.5-11"/></symbol>
+</defs></svg>
 <div class="wrap">
 
 <!-- ===== barre haute (masquée sur l'accueil) ===== -->
@@ -828,14 +911,15 @@ footer.foot a{color:var(--ink-2)}
 
   <div class="toolbar">
     <div class="palette" id="palette"></div>
-    <span class="grow"></span>
-    <button class="btn" id="btnClear" type="button"></button>
-    <button class="btn" id="btnDraft" type="button" hidden></button>
-    <button class="btn ico" id="btnHelp" type="button">?</button>
-    <button class="btn ico" id="btnUndo" type="button">&#8630;</button>
-    <button class="btn ico" id="btnRedo" type="button">&#8631;</button>
-    <button class="btn" id="btnSlots" type="button"></button>
-    <button class="btn primary" id="btnCheck" type="button"></button>
+    <div class="tools">
+      <button class="btn ico" id="btnUndo" type="button"></button>
+      <button class="btn ico" id="btnRedo" type="button"></button>
+      <button class="btn ico" id="btnHelp" type="button"></button>
+      <button class="btn" id="btnClear" type="button"></button>
+      <button class="btn" id="btnDraft" type="button" hidden></button>
+      <button class="btn" id="btnSlots" type="button"></button>
+      <button class="btn primary" id="btnCheck" type="button"></button>
+    </div>
   </div>
 
   <div class="cols">
@@ -865,7 +949,8 @@ footer.foot a{color:var(--ink-2)}
       </div>
       <div class="panel">
         <h3 id="h3live"></h3>
-        <ul class="issues" id="issues"></ul>
+        <div class="cats" id="cats"></div>
+        <p class="cathint" id="cathint"></p>
       </div>
 
     </aside>
@@ -945,6 +1030,12 @@ fr:{
   disclaim:"Modèle pédagogique inspiré de la convention collective HCR et du Code du travail, volontairement simplifié. Équipe et chiffres fictifs. Ne remplace ni un conseil juridique, ni un logiciel de paie.",
   clean:"<b>Semaine conforme.</b><span class='who'>Couverture complète, repos respectés, budget tenu.</span>",
   more:n=>`… et ${n} autre${n>1?'s':''} point${n>1?'s':''} à corriger`,
+  catName:{legal:"Droit du travail",couv:"Couverture",eco:"Budget",conf:"Confort"},
+  catCount:n=>`${n} point${n>1?'s':''} à voir`,
+  catClean:"rien à signaler",
+  catOpen:"Voir le détail",
+  catHint:c=>`C'est « ${c} » qui vous coûte le plus. Cliquez pour voir.`,
+  catAllClean:"Semaine conforme, couverte et dans le budget.",
   iRest:(h,d1,d2)=>`Repos quotidien de ${h} entre ${d1} et ${d2}`,
   iRestWho:n=>`${n} : il en faut 11 h`,
   iOff:"Moins de 2 jours de repos hebdomadaires",
@@ -1130,6 +1221,12 @@ en:{
   disclaim:"Teaching model based on the French HCR collective agreement and Labour Code, deliberately simplified. Fictional team and figures. Not legal advice, and not a payroll system.",
   clean:"<b>Compliant week.</b><span class='who'>Every post covered, rest respected, budget held.</span>",
   more:n=>`… and ${n} more issue${n>1?'s':''} to fix`,
+  catName:{legal:"Labour law",couv:"Coverage",eco:"Budget",conf:"Comfort"},
+  catCount:n=>`${n} issue${n>1?'s':''} to see`,
+  catClean:"nothing to report",
+  catOpen:"See the detail",
+  catHint:c=>`"${c}" is costing you the most. Click to see why.`,
+  catAllClean:"Compliant, covered and on budget.",
   iRest:(h,d1,d2)=>`Only ${h} of rest between ${d1} and ${d2}`,
   iRestWho:n=>`${n}: 11 hours are required`,
   iOff:"Fewer than 2 days off this week",
@@ -1454,7 +1551,7 @@ function renderHome(){
   const jour=dt.toLocaleDateString(lang==='en'?'en-GB':'fr-FR',
     {weekday:'long',day:'numeric',month:'long'});
   $('#h-daily').innerHTML=`
-    <span class="dk">${t('dTtl')}</span>
+    <span class="dk">${ico('defi')}${t('dTtl')}</span>
     <h3>${jour.charAt(0).toUpperCase()+jour.slice(1)}</h3>
     <p>${t('dSub')}</p>
     <div class="dmeta"><span>${t('dSeed')(seed)}</span><span>${t('dDiff')}</span>
@@ -1483,17 +1580,18 @@ function renderHome(){
   // cartes de mode
   const w=$('#modes'); w.innerHTML='';
   const keys=['levels','season','random'];
+  const MODE_ICON=['niveaux','saison','alea'];
   t('modes').forEach((m,i)=>{
     const btn=document.createElement('button');
     btn.className='mode'; btn.type='button';
-    btn.innerHTML=`<span class="mk">${m.k}</span><span class="mt">${m.t}</span>
+    btn.innerHTML=`<span class="mk">${ico(MODE_ICON[i])}${m.k}</span><span class="mt">${m.t}</span>
       <span class="md">${m.d}</span><span class="mf">${m.f}</span>`;
     btn.onclick=()=>{mode=keys[i];show(keys[i]);};
     w.appendChild(btn);
   });
 
   const band=$('#h-board');
-  band.innerHTML=`<span><span class="bk">${t('bandK')}</span><span class="bt">${t('bandT')}</span></span>
+  band.innerHTML=`<span><span class="bk">${ico('trophee')}${t('bandK')}</span><span class="bt">${t('bandT')}</span></span>
     <span class="bd">${t('bandD')}</span>
     <span class="bchips">${t('bandC').map(c=>`<span class="bchip">${c}</span>`).join('')}</span>
     <span class="barrow">&rsaquo;</span>`;
@@ -1666,21 +1764,23 @@ function startScenario(S,from){
 }
 function renderPlay(){
   const S=scen, ev=evaluate(S,plan);
-  $('#btnClear').textContent=t('btnClear');
-  $('#btnDraft').textContent=t('btnDraft');
+  $('#btnClear').innerHTML=ico('vider')+t('btnClear');
+  $('#btnDraft').innerHTML=ico('chef')+t('btnDraft');
   $('#btnDraft').hidden=!S.draft||!!replayInfo;
   document.querySelector('.toolbar').style.display=replayInfo?'none':'';
-  $('#btnCheck').textContent=t('btnCheck');
+  $('#btnCheck').innerHTML=ico('valider')+t('btnCheck');
   $('#btnShare').textContent=t('btnShare');
-  $('#btnSlots').textContent=t('btnSlots');
+  $('#btnSlots').innerHTML=ico('brouillon')+t('btnSlots');
   $('#btnSlots').hidden=!!replayInfo||mode==='tuto';
   const bu=$('#btnUndo'), br=$('#btnRedo');
   bu.hidden=br.hidden=!!replayInfo;
   bu.disabled=!undoStack.length; br.disabled=!redoStack.length;
   bu.title=t('undo'); br.title=t('redo');
   $('#btnHelp').title=t('help');
-  $('#h3board').textContent=t('h3board');
-  $('#h3live').textContent=t('h3live');
+  $('#btnHelp').innerHTML=ico('aide');
+  bu.innerHTML=ico('annuler'); br.innerHTML=ico('retablir');
+  $('#h3board').innerHTML=ico('jauge')+t('h3board');
+  $('#h3live').innerHTML=ico('valider')+t('h3live');
   $('#lblCost').textContent=t('lblCost');
   $('#lblCov').textContent=t('lblCov');
   const lab = S.diff ? randomLabels(S) : {titre:X(S.titre), brief:X(S.brief)};
@@ -1725,6 +1825,11 @@ function renderRuleChips(S){
     : `<span class="rulechip" style="opacity:.6">${t('noRules')}</span>`;
 }
 
+/* Petit utilitaire : une icône du sprite, à la taille du texte porteur. */
+const ico = n => `<svg class="i" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+
+const ICON_SHIFT={R:'repos',P:'prep',M:'midi',S:'soir',C:'coup'};
+
 function renderPalette(){
   const w=$('#palette'); w.innerHTML='';
   if(petitEcran.matches){ w.hidden=true; return; }
@@ -1735,8 +1840,11 @@ function renderPalette(){
     btn.className='chip'; btn.type='button';
     btn.setAttribute('aria-pressed',String(code===brush));
     const k=Object.keys(KEYMAP).find(x=>KEYMAP[x]===code);
-    btn.innerHTML=`<span class="sw" style="background:var(${s.col})"></span>${t('shifts')[code]}
-      <span class="hh">${s.h?fmtH(s.h):s.label}</span><span class="key">${k}</span>`;
+    btn.innerHTML=`<span class="sw" style="background:var(${s.col})">
+        <svg class="i"><use href="#i-${ICON_SHIFT[code]}"/></svg></span>
+      <span class="lb2"><span class="nm2">${t('shifts')[code]}</span>
+        <span class="hh">${s.h?fmtH(s.h):'—'}</span></span>
+      <span class="key">${k}</span>`;
     btn.title=s.label;
     btn.onclick=()=>{brush=code;renderPalette();};
     w.appendChild(btn);
@@ -1822,30 +1930,43 @@ function renderPanel(S,ev){
   const vb=$('#covBar');
   vb.style.width=pctCov+'%';
   vb.style.background=pctCov>=100?'var(--ok)':(pctCov>=90?'var(--warn)':'var(--bad)');
-  const ul=$('#issues'); ul.innerHTML='';
-  if(!ev.issues.length){
-    ul.innerHTML=`<li class="clean"><span class="dot"></span><span class="txt">${t('clean')}</span></li>`;
-    return;
-  }
-  const rk={legal:0,couv:1,eco:2,conf:3};
-  const sorted=ev.issues.slice().sort((a,c)=>(rk[a.cat]-rk[c.cat])||(c.pts-a.pts));
-  const VU=3;
-  sorted.slice(0,VU).forEach(i=>{
-    const li=document.createElement('li');
-    li.className=i.cat;
-    const [ttl,who]=fmtIssue(i);
-    li.innerHTML=`<span class="dot"></span><span class="txt"><b>${ttl}</b><span class="who">${who}</span></span><span class="pts">−${i.pts}</span>`;
-    ul.appendChild(li);
+  renderCats(ev);
+}
+
+/* Quatre compteurs : légal, couverture, budget, confort. Chacun porte les
+   points perdus dans sa catégorie et ouvre le détail au clic. Un compteur à
+   zéro passe au vert et n'est plus cliquable : il n'y a rien à lire. */
+const CATS=[
+  {k:'legal', ic:'legal'},
+  {k:'couv',  ic:'couv'},
+  {k:'eco',   ic:'budget'},
+  {k:'conf',  ic:'conf'},
+];
+function renderCats(ev){
+  const w=$('#cats'); if(!w) return;
+  w.innerHTML='';
+  let pire=null;
+  CATS.forEach(c=>{
+    const list=ev.issues.filter(i=>i.cat===c.k);
+    const pts=list.reduce((a,i)=>a+i.pts,0);
+    if(pts && (!pire || pts>pire.pts)) pire={pts, list, k:c.k};
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='cat '+(pts?c.k:'ok');
+    b.innerHTML=`
+      <span class="ct"><svg class="i"><use href="#i-${c.ic}"/></svg>${t('catName')[c.k]}</span>
+      <span class="cv">${pts
+        ? '\u2212'+pts
+        : `<svg class="i"><use href="#i-ok"/></svg>`}</span>
+      <span class="cn">${pts ? t('catCount')(list.length) : t('catClean')}</span>`;
+    if(pts){
+      b.onclick=()=>openRules(list.slice().sort((a,c2)=>c2.pts-a.pts));
+      b.title=t('catOpen');
+    } else b.disabled=true;
+    w.appendChild(b);
   });
-  if(sorted.length>VU){
-    const reste=sorted.slice(VU), pts=reste.reduce((a,i)=>a+i.pts,0);
-    const li=document.createElement('li');
-    li.innerHTML=`<span class="dot" style="background:var(--muted)"></span>
-      <span class="txt">${t('more')(reste.length)}</span><span class="pts">-${pts}</span>`;
-    li.style.cursor='pointer';
-    li.onclick=()=>{ openRules(sorted); };
-    ul.appendChild(li);
-  }
+  const h=$('#cathint');
+  h.textContent = pire ? t('catHint')(t('catName')[pire.k]) : t('catAllClean');
 }
 function setCell(empId,d,code){
   if(replayInfo) return;          // grille d'un autre joueur : on ne touche pas
@@ -2096,7 +2217,9 @@ function renderDayView(S, p, ev){
       return `<li class="dayrow ${em.pole}${flag?' flag':''}">
         <span class="who2"><b>${em.nom}</b><span>${t('roles')[em.role]} · ${fmtH(h)} / ${em.contrat} h</span></span>
         <button class="pick s-${code}" data-emp="${em.id}" ${lock||replayInfo?'disabled':''}>
-          ${lock ? (motif ? t('motifs')[motif] : t('motifs').ferme) : code}
+          ${lock
+            ? (motif ? t('motifs')[motif] : t('motifs').ferme)
+            : ico(ICON_SHIFT[code]) + t('shifts')[code]}
         </button></li>`;
     }).join('')}</ul>`;
 
