@@ -871,6 +871,17 @@ fr:{
   histTtl:"Ma progression", histEmpty:"Aucune tentative enregistrée pour l'instant.",
   histGuest:"Connectez-vous pour suivre votre progression.",
   histAttempts:n=>`${n} tentative${n>1?'s':''}`,
+  /* debrief */
+  dbTtl:"Débrief", dbWait:"Recherche de la meilleure grille…",
+  dbYou:"Votre score", dbBest:"Meilleur trouvé", dbPay:"Votre masse salariale", dbRefPay:"La sienne",
+  dbPerfect:"Vous avez trouvé le meilleur planning possible.",
+  dbGap:(p,e)=>`Il vous manque ${p} point${p>1?'s':''}, et ${e} € de masse salariale en trop.`,
+  dbGapPts:p=>`Il vous manque ${p} point${p>1?'s':''}.`,
+  dbGapEur:e=>`Même score, mais ${e} € de masse salariale en trop.`,
+  dbCat:{legal:"Droit du travail",couv:"Couverture des services",eco:"Coût et heures perdues",conf:"Souhaits et confort"},
+  dbSee:"Voir cette grille", dbClose:"Fermer",
+  dbRefName:"Meilleure grille trouvée",
+  dbNotSure:"Grille trouvée par recherche, pas nécessairement l'optimum absolu.",
   snNotDone:"Terminez les dix semaines d'abord.",
 },
 en:{
@@ -1015,6 +1026,16 @@ en:{
   histTtl:"My progress", histEmpty:"No attempt recorded yet.",
   histGuest:"Sign in to track your progress.",
   histAttempts:n=>`${n} attempt${n>1?'s':''}`,
+  dbTtl:"Debrief", dbWait:"Looking for the best roster…",
+  dbYou:"Your score", dbBest:"Best found", dbPay:"Your payroll", dbRefPay:"Its payroll",
+  dbPerfect:"You found the best roster possible.",
+  dbGap:(p,e)=>`You are ${p} point${p>1?'s':''} short, and €${e} over on payroll.`,
+  dbGapPts:p=>`You are ${p} point${p>1?'s':''} short.`,
+  dbGapEur:e=>`Same score, but €${e} over on payroll.`,
+  dbCat:{legal:"Labour law",couv:"Service coverage",eco:"Cost and wasted hours",conf:"Requests and comfort"},
+  dbSee:"View that roster", dbClose:"Close",
+  dbRefName:"Best roster found",
+  dbNotSure:"Found by search, not necessarily the absolute optimum.",
   snNotDone:"Finish all ten weeks first.",
 }};
 let lang = "fr";
@@ -1611,6 +1632,7 @@ $('#btnCheck').onclick=()=>{
   else toast(t('tOpti')(ev.score));
   if(me && !legal) setTimeout(()=>submitCurrent(ev),1200);
   pushProgress();
+  if(!replayInfo && (mode==='levels'||mode==='random'||mode==='daily')) setTimeout(()=>openAnalysis(ev),900);
 };
 /* Bloc de partage : une ligne par salarié, une case par jour.
    Du texte, pas une image : ça se colle partout et ça garde la
@@ -1681,6 +1703,92 @@ function toggleLang(){
 }
 ['#themebtn','#themebtn2'].forEach(s=>{$(s).onclick=toggleTheme;});
 ['#langbtn','#langbtn2'].forEach(s=>{$(s).onclick=toggleLang;});
+
+/* ---------- débrief comparatif ---------- */
+let solverWorker = null;
+function getWorker(){
+  if(!solverWorker){
+    try{ solverWorker = new Worker('./solver-worker.js', {type:'module'}); }
+    catch(_){ return null; }
+  }
+  return solverWorker;
+}
+
+function openAnalysis(ev){
+  const kind = mode==='levels' ? 'level' : 'seed';
+  const ref  = mode==='levels' ? scen.id : `${scen.seed}:${scen.diff}`;
+  const w = getWorker();
+
+  const ovl=document.createElement('div');
+  ovl.className='ovl';
+  const draw=(d)=>{
+    const corps = !d
+      ? `<p class="disclaim" style="border:0;padding:0">${t('dbWait')}</p>`
+      : (()=>{
+          const dp = d.refScore - d.score, de = d.cost - d.refCost;
+          const titre = dp<=0 && de<=0 ? t('dbPerfect')
+                      : dp>0 && de>0   ? t('dbGap')(dp, nf(de))
+                      : dp>0           ? t('dbGapPts')(dp)
+                                       : t('dbGapEur')(nf(de));
+          const cats = Object.entries(d.perdus).filter(([,v])=>v>0)
+            .sort((a,b)=>b[1]-a[1])
+            .map(([k,v])=>`<li><span class="tag ${k==='legal'?'bad':k==='couv'?'warn':'info'}">-${v}</span>
+                 <span>${t('dbCat')[k]}</span></li>`).join('');
+          return `<div class="kpis">
+              <div class="kpi"><div class="kl">${t('dbYou')}</div><div class="kv">${d.score}</div></div>
+              <div class="kpi"><div class="kl">${t('dbBest')}</div><div class="kv ${d.refScore>d.score?'g':''}">${d.refScore}</div></div>
+              <div class="kpi"><div class="kl">${t('dbPay')}</div><div class="kv" style="font-size:19px">${cur(d.cost)}</div></div>
+              <div class="kpi"><div class="kl">${t('dbRefPay')}</div><div class="kv" style="font-size:19px">${cur(d.refCost)}</div></div>
+            </div>
+            <p style="margin:0">${titre}</p>
+            ${cats?`<ul class="deltas">${cats}</ul>`:''}
+            <p class="disclaim">${t('dbNotSure')}</p>`;
+        })();
+    ovl.innerHTML=`
+      <div class="sheet" role="dialog" aria-modal="true">
+        <header><div class="ek">${t('dbTtl')}</div><h2>${X(scen.n)}</h2></header>
+        <div class="body">${corps}</div>
+        <footer>
+          ${d&&d.refPlan?`<button class="btn" id="db-see" type="button">${t('dbSee')}</button>`:''}
+          <button class="btn primary" id="db-x" type="button">${t('dbClose')}</button>
+        </footer>
+      </div>`;
+    ovl.querySelector('#db-x').onclick=()=>ovl.remove();
+    const see=ovl.querySelector('#db-see');
+    if(see) see.onclick=()=>{
+      ovl.remove();
+      plan=applyLocks(scen,Object.assign(emptyPlan(scen),d.refPlan));
+      replayInfo={pseudo:t('dbRefName'),score:d.refScore};
+      renderPlay();
+    };
+  };
+  draw(null);
+  document.body.appendChild(ovl);
+
+  // Repli : si le worker ne démarre pas (module non supporté, fichier
+  // manquant, erreur de chargement), on calcule sur le fil principal.
+  // Mieux vaut une seconde de gel qu'un panneau bloqué sur « recherche ».
+  let repondu=false;
+  const fallback=async()=>{
+    if(repondu||!document.body.contains(ovl))return;
+    repondu=true;
+    try{
+      const {compare}=await import('./solver.js');
+      const c=compare(scen,plan,{ms:1200});
+      draw({ok:true,score:c.score,refScore:c.refScore,cost:c.cost,refCost:c.refCost,
+            perdus:c.perdus,refPlan:c.refPlan});
+    }catch(_){ ovl.remove(); }
+  };
+  if(!w){ fallback(); return; }
+  w.onmessage=(e)=>{
+    if(!document.body.contains(ovl))return;
+    if(e.data&&e.data.ok){ repondu=true; draw(e.data); }
+    else fallback();
+  };
+  w.onerror=()=>{ solverWorker=null; fallback(); };
+  setTimeout(fallback,6000);
+  try{ w.postMessage({kind, ref, plan, ms:2000}); }catch(_){ fallback(); }
+}
 
 /* ---------- tutoriel guidé ---------- */
 const TU_STEPS=[
