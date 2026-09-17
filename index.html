@@ -33,18 +33,18 @@
 
 <style>
 :root{
-  --bg:#E9ECE8; --surface:#FDFDFC; --surface-2:#F2F4F0;
-  --ink:#171C1A; --ink-2:#4A544F; --muted:#79837D;
-  --line:#D2D8D0; --line-strong:#B4BDB4;
-  --midi:#C06A16; --midi-soft:#F6E5D0;
-  --prep:#8A6A2F; --prep-soft:#EFE7D4;
-  --soir:#33527E; --soir-soft:#DBE3EF;
-  --coup:#6B4A7C; --coup-soft:#E8DEEE;
-  --repos:#8E9790; --repos-soft:#E6E9E4;
-  --ok:#2F6B45; --ok-soft:#DCEAE0;
-  --warn:#9A6206; --warn-soft:#F6E8CE;
-  --bad:#A8322B; --bad-soft:#F5DEDB;
-  --accent:#A8322B;
+  --bg:#E3E8E1; --surface:#FDFDFC; --surface-2:#EFF2EC;
+  --ink:#101513; --ink-2:#39433E; --muted:#68726C;
+  --line:#CDD4CB; --line-strong:#A9B3A9;
+  --midi:#B05B08; --midi-soft:#F8DEB8;
+  --prep:#7A5A1D; --prep-soft:#EFE2C2;
+  --soir:#294670; --soir-soft:#D0DCF0;
+  --coup:#5C3C70; --coup-soft:#E4D4EE;
+  --repos:#828C86; --repos-soft:#E0E5DE;
+  --ok:#256B3E; --ok-soft:#D3E9DA;
+  --warn:#8C5703; --warn-soft:#F8E6C2;
+  --bad:#9E2B24; --bad-soft:#F7DAD6;
+  --accent:#9E2B24;
   --shadow:0 1px 2px rgba(23,28,26,.06), 0 6px 18px -10px rgba(23,28,26,.22);
   --radius:6px;
   padding-top:env(safe-area-inset-top,0px);
@@ -53,34 +53,34 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#111513; --surface:#191E1C; --surface-2:#212725;
-    --ink:#E7ECE7; --ink-2:#AEB8B1; --muted:#8A948D;
-    --line:#2C3330; --line-strong:#3C443F;
-    --midi:#E6A055; --midi-soft:#3A2A16;
-    --prep:#C7A667; --prep-soft:#332C1B;
-    --soir:#8DAEDC; --soir-soft:#1C263A;
-    --coup:#BC9BD0; --coup-soft:#2B2234;
-    --repos:#7E8882; --repos-soft:#232825;
-    --ok:#7BC496; --ok-soft:#18291F;
-    --warn:#E0B462; --warn-soft:#2E2413;
-    --bad:#EE8B81; --bad-soft:#331B19;
-    --accent:#EE8B81;
+    --bg:#0D1110; --surface:#151A18; --surface-2:#1D2321;
+    --ink:#EEF3EE; --ink-2:#BAC4BD; --muted:#8E988F;
+    --line:#2A322E; --line-strong:#3E4741;
+    --midi:#F2A95B; --midi-soft:#432E13;
+    --prep:#D4B26E; --prep-soft:#3A3119;
+    --soir:#9BBBEA; --soir-soft:#1D2B44;
+    --coup:#CCA8E0; --coup-soft:#32263C;
+    --repos:#828C86; --repos-soft:#212724;
+    --ok:#86D3A2; --ok-soft:#142A1D;
+    --warn:#EBBD69; --warn-soft:#332711;
+    --bad:#F79488; --bad-soft:#3A1C18;
+    --accent:#F79488;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#111513; --surface:#191E1C; --surface-2:#212725;
-  --ink:#E7ECE7; --ink-2:#AEB8B1; --muted:#8A948D;
-  --line:#2C3330; --line-strong:#3C443F;
-  --midi:#E6A055; --midi-soft:#3A2A16;
-  --prep:#C7A667; --prep-soft:#332C1B;
-  --soir:#8DAEDC; --soir-soft:#1C263A;
-  --coup:#BC9BD0; --coup-soft:#2B2234;
-  --repos:#7E8882; --repos-soft:#232825;
-  --ok:#7BC496; --ok-soft:#18291F;
-  --warn:#E0B462; --warn-soft:#2E2413;
-  --bad:#EE8B81; --bad-soft:#331B19;
-  --accent:#EE8B81;
+  --bg:#0D1110; --surface:#151A18; --surface-2:#1D2321;
+  --ink:#EEF3EE; --ink-2:#BAC4BD; --muted:#8E988F;
+  --line:#2A322E; --line-strong:#3E4741;
+  --midi:#F2A95B; --midi-soft:#432E13;
+  --prep:#D4B26E; --prep-soft:#3A3119;
+  --soir:#9BBBEA; --soir-soft:#1D2B44;
+  --coup:#CCA8E0; --coup-soft:#32263C;
+  --repos:#828C86; --repos-soft:#212724;
+  --ok:#86D3A2; --ok-soft:#142A1D;
+  --warn:#EBBD69; --warn-soft:#332711;
+  --bad:#F79488; --bad-soft:#3A1C18;
+  --accent:#F79488;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
 }
 
@@ -88,7 +88,7 @@
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
 img{max-width:100%}
 [hidden]{display:none!important}
 .wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:24px 56px}
@@ -331,8 +331,8 @@ h1,h2,h3{text-wrap:balance}
 /* ---------- brief ---------- */
 .brief{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
   border-radius:var(--radius);padding:14px 16px;display:grid;gap:10px;box-shadow:var(--shadow)}
-.brief h2{font-family:"Fraunces",Georgia,serif;font-size:19px;margin:0;font-weight:600}
-.brief p{margin:0;color:var(--ink-2);max-width:72ch}
+.brief h2{font-family:"Fraunces",Georgia,serif;font-size:22px;margin:0;font-weight:600}
+.brief p{margin:0;color:var(--ink-2);max-width:68ch;font-size:15px}
 .briefstats{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:"IBM Plex Mono",monospace;
   font-size:12px;font-variant-numeric:tabular-nums}
 .briefstats b{font-weight:600;color:var(--ink)}
@@ -359,6 +359,8 @@ h1,h2,h3{text-wrap:balance}
 .btn.primary:hover{opacity:.88}
 .btn.big{padding:10px 20px;font-size:15px}
 .btn.ico{font-size:17px;line-height:1;padding:6px 11px;font-family:system-ui,sans-serif}
+.lnk{font:inherit;background:none;border:0;padding:0;color:var(--accent);
+  text-decoration:underline;cursor:pointer}
 .btn[disabled]{opacity:.38;cursor:default}
 .btn[disabled]:hover{background:var(--surface-2)}
 
@@ -382,16 +384,16 @@ h1,h2,h3{text-wrap:balance}
 .namecell{position:sticky;left:0;z-index:4;background:var(--surface);
   display:flex;flex-direction:column;justify-content:center;gap:1px}
 .hd.namecell{z-index:6;background:var(--surface-2)}
-.namecell .nm{font-weight:600;font-size:13px;line-height:1.25}
-.namecell .rl{font-size:11px;color:var(--muted)}
+.namecell .nm{font-weight:700;font-size:14.5px;line-height:1.2}
+.namecell .rl{font-size:12px;color:var(--muted)}
 .namecell .rl .pole{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.08em;
   text-transform:uppercase;border:1px solid var(--line-strong);border-radius:3px;padding:0 3px;margin-right:4px}
 .namecell.cuisine{box-shadow:inset 3px 0 0 var(--midi)}
 .namecell.salle{box-shadow:inset 3px 0 0 var(--soir)}
 .cell{cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:center;
   gap:1px;user-select:none;-webkit-user-select:none;transition:box-shadow .1s}
-.cell .code{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:11.5px;letter-spacing:.02em}
-.cell .hrs{font-family:"IBM Plex Mono",monospace;font-size:10px;opacity:.72}
+.cell .code{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:13px;letter-spacing:.01em}
+.cell .hrs{font-family:"IBM Plex Mono",monospace;font-size:11px;opacity:.8}
 .cell:hover{box-shadow:inset 0 0 0 2px var(--line-strong)}
 .cell:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .cell.s-R{background:var(--repos-soft);color:var(--repos)}
@@ -408,7 +410,7 @@ h1,h2,h3{text-wrap:balance}
   border-radius:50%;background:var(--bad)}
 .totcell{display:flex;flex-direction:column;justify-content:center;gap:1px;
   font-family:"IBM Plex Mono",monospace;background:var(--surface-2);font-variant-numeric:tabular-nums}
-.totcell .big{font-size:14px;font-weight:600}
+.totcell .big{font-size:15px;font-weight:700}
 .totcell .sub{font-size:10px;color:var(--muted)}
 .totcell.over .big{color:var(--warn)}
 .totcell.way .big{color:var(--bad)}
@@ -426,6 +428,56 @@ h1,h2,h3{text-wrap:balance}
 .covcell .okk b{color:var(--ok)}
 .covcell .plus b{color:var(--warn)}
 .covcell.none{color:var(--muted)}
+
+/* ---------- vue mobile : un jour à la fois ---------- */
+@media(max-width:700px){
+  .toolbar{gap:7px;padding:9px}
+  .toolbar .grow{display:none}
+  .toolbar .btn{flex:0 0 auto}
+  .toolbar .btn.primary{flex:1 1 100%;order:9;padding:11px;font-size:16px}
+}
+.daynav{display:flex;align-items:center;gap:8px;margin-top:14px}
+.daynav button{font:inherit;cursor:pointer;background:var(--surface);color:var(--ink);
+  border:1px solid var(--line-strong);border-radius:8px;padding:10px 14px;font-size:19px;line-height:1}
+.daynav button[disabled]{opacity:.35}
+.daynav .dcur{flex:1;text-align:center;display:grid;gap:2px}
+.daynav .dcur b{font-family:"Fraunces",Georgia,serif;font-size:21px;font-weight:600}
+.daynav .dcur span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted)}
+.daydots{display:flex;gap:5px;justify-content:center;margin-top:8px}
+.daydots i{width:22px;height:5px;border-radius:3px;background:var(--line);display:block}
+.daydots i.on{background:var(--ink)}
+.daydots i.ko{background:var(--bad)}
+.daydots i.okk{background:var(--ok)}
+
+.dayneed{display:flex;gap:8px;margin-top:12px}
+.dayneed div{flex:1;background:var(--surface);border:1px solid var(--line);
+  border-radius:8px;padding:9px 11px;display:grid;gap:3px}
+.dayneed .k{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted)}
+.dayneed .v{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;
+  display:flex;gap:10px;flex-wrap:wrap}
+.dayneed .v s{text-decoration:none}
+.dayneed .v s.short{color:var(--bad)} .dayneed .v s.okk{color:var(--ok)}
+
+.dayrows{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:7px}
+.dayrow{display:flex;align-items:center;gap:10px;background:var(--surface);
+  border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+.dayrow.cuisine{box-shadow:inset 4px 0 0 var(--midi)}
+.dayrow.salle{box-shadow:inset 4px 0 0 var(--soir)}
+.dayrow .who2{flex:1;min-width:0;display:grid;gap:1px}
+.dayrow .who2 b{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dayrow .who2 span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dayrow .hrs2{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:none}
+.dayrow .pick{flex:none;font:inherit;font-family:"IBM Plex Mono",monospace;font-weight:700;
+  font-size:15px;cursor:pointer;border-radius:7px;padding:11px 15px;min-width:64px;
+  border:1px solid var(--line-strong);text-align:center}
+.dayrow .pick.s-R{background:var(--repos-soft);color:var(--repos)}
+.dayrow .pick.s-P{background:var(--prep-soft);color:var(--prep)}
+.dayrow .pick.s-M{background:var(--midi-soft);color:var(--midi)}
+.dayrow .pick.s-S{background:var(--soir-soft);color:var(--soir)}
+.dayrow .pick.s-C{background:var(--coup-soft);color:var(--coup)}
+.dayrow .pick[disabled]{opacity:.5;cursor:not-allowed}
+.dayrow.flag{border-color:var(--bad)}
 
 /* ---------- panneaux ---------- */
 .cols{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
@@ -488,9 +540,9 @@ h1,h2,h3{text-wrap:balance}
 .issues li{display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line);align-items:flex-start}
 .issues li:last-child{border-bottom:none}
 .issues .dot{width:7px;height:7px;border-radius:50%;flex:none;margin-top:6px}
-.issues .txt{flex:1;font-size:12.5px;line-height:1.45}
+.issues .txt{flex:1;font-size:14px;line-height:1.45}
 .issues .txt b{font-weight:600}
-.issues .who{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.issues .who{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
 .issues .pts{font-family:"IBM Plex Mono",monospace;font-size:11px;flex:none}
 .issues li.legal .dot{background:var(--bad)} .issues li.legal .pts{color:var(--bad)}
 .issues li.couv .dot{background:var(--warn)} .issues li.couv .pts{color:var(--warn)}
@@ -690,6 +742,7 @@ footer.foot a{color:var(--ink-2)}
     <span class="grow"></span>
     <button class="btn" id="btnClear" type="button"></button>
     <button class="btn" id="btnDraft" type="button" hidden></button>
+    <button class="btn ico" id="btnHelp" type="button">?</button>
     <button class="btn ico" id="btnUndo" type="button">&#8630;</button>
     <button class="btn ico" id="btnRedo" type="button">&#8631;</button>
     <button class="btn" id="btnSlots" type="button"></button>
@@ -698,8 +751,8 @@ footer.foot a{color:var(--ink-2)}
 
   <div class="cols">
     <div>
-      <div class="gridwrap"><div class="grid" id="grid"></div></div>
-      <p class="hint" id="hint"></p>
+      <div class="gridwrap" id="gridwrap"><div class="grid" id="grid"></div></div>
+      <div id="dayview" hidden></div>
     </div>
     <aside style="display:grid;gap:16px">
       <div class="panel">
@@ -725,14 +778,7 @@ footer.foot a{color:var(--ink-2)}
         <h3 id="h3live"></h3>
         <ul class="issues" id="issues"></ul>
       </div>
-      <div class="panel">
-        <h3 id="h3rules"></h3>
-        <div class="rules">
-          <details><summary id="sumLegal"></summary><ul id="ulLegal"></ul></details>
-          <details><summary id="sumHouse"></summary><ul id="ulHouse"></ul></details>
-          <p class="disclaim" id="disclaim"></p>
-        </div>
-      </div>
+
     </aside>
   </div>
 </section>
@@ -752,6 +798,13 @@ import * as cloud from './cloud.js';
 // Bascule sur planningmaster.arthurhugard.com une fois le CNAME actif.
 const SITE = "jeu.arthurhugard.com";
 const REPO_URL = "https://github.com/arthurhugard/planningmaster";
+
+/* Constantes partagées, déclarées avant tout usage. */
+const HIST_MAX = 60;          // pas d'annulation conservés
+const SLOTS = 3;              // emplacements de brouillon par épreuve
+const petitEcran = window.matchMedia('(max-width:700px)');
+let undoStack = [], redoStack = [];
+let jourVu = 1;               // jour affiché en vue mobile
 
 /* ======================= i18n ======================= */
 const T = {
@@ -918,7 +971,8 @@ fr:{
   dbNotSure:"Grille trouvée par recherche, pas nécessairement l'optimum absolu.",
   /* brouillons */
   btnSlots:"Brouillons", drTtl:"Brouillons",
-  undo:"Annuler", redo:"Rétablir",
+  undo:"Annuler", redo:"Rétablir", help:"Règles", more2:"en savoir plus",
+  allIssues:"Tout ce qui coûte des points",
   drSub:"Trois emplacements par épreuve, plus une reprise automatique.",
   drAuto:"Reprise automatique", drAutoNone:"Rien encore",
   drFree:"Emplacement libre", drSave:"Enregistrer ici", drOver:"Écraser",
@@ -1080,7 +1134,8 @@ en:{
   dbRefName:"Best roster found",
   dbNotSure:"Found by search, not necessarily the absolute optimum.",
   btnSlots:"Drafts", drTtl:"Drafts",
-  undo:"Undo", redo:"Redo",
+  undo:"Undo", redo:"Redo", help:"Rules", more2:"more",
+  allIssues:"Everything costing points",
   drSub:"Three slots per challenge, plus one autosave.",
   drAuto:"Autosave", drAutoNone:"Nothing yet",
   drFree:"Empty slot", drSave:"Save here", drOver:"Overwrite",
@@ -1471,30 +1526,42 @@ function renderPlay(){
   bu.hidden=br.hidden=!!replayInfo;
   bu.disabled=!undoStack.length; br.disabled=!redoStack.length;
   bu.title=t('undo'); br.title=t('redo');
-  $('#hint').innerHTML=t('hint');
+  $('#btnHelp').title=t('help');
   $('#h3board').textContent=t('h3board');
   $('#h3live').textContent=t('h3live');
-  $('#h3rules').textContent=t('h3rules');
   $('#lblCost').textContent=t('lblCost');
   $('#lblCov').textContent=t('lblCov');
-  $('#sumLegal').textContent=t('sumLegal');
-  $('#sumHouse').textContent=t('sumHouse');
-  $('#ulLegal').innerHTML=t('ulLegal').map(x=>`<li>${x}</li>`).join('');
-  $('#ulHouse').innerHTML=t('ulHouse').map(x=>`<li>${x}</li>`).join('');
-  $('#disclaim').textContent=t('disclaim');
   const lab = S.diff ? randomLabels(S) : {titre:X(S.titre), brief:X(S.brief)};
   $('#briefTitle').textContent=`${X(S.n)} · ${lab.titre}`;
-  $('#briefText').textContent=lab.brief;
+  // une phrase à l'écran, le reste replié : c'est le plus gros bloc de
+  // lecture de la page et il ne sert qu'une fois
+  const bt=$('#briefText'), txt=lab.brief||'';
+  const coupe=txt.indexOf('. ');
+  if(coupe>0 && coupe<txt.length-2){
+    bt.innerHTML=`${txt.slice(0,coupe+1)} <button class="lnk" id="brief-more" type="button">${t('more2')}</button>`
+      +`<span id="brief-rest" hidden> ${txt.slice(coupe+2)}</span>`;
+    $('#brief-more').onclick=()=>{
+      $('#brief-rest').hidden=false;
+      $('#brief-more').remove();
+    };
+  } else bt.textContent=txt;
   const hTot=S.equipe.reduce((s,x)=>s+x.contrat,0);
   $('#briefStats').innerHTML=
     `<span>${t('statTeam')} <b>${S.equipe.length}</b></span>
      <span>${t('statHours')} <b>${hTot} h</b></span>
      <span>${t('statCA')} <b>${cur(S.ca)}</b></span>
      <span>${t('statBudget')} <b>${cur(S.budget)}</b> (${Math.round(S.budget/S.ca*100)} %)</span>`;
-  renderPalette(); renderGrid(S,plan,ev); renderPanel(S,ev); renderTutobar(ev);
+  const mobile = petitEcran.matches;
+  $('#gridwrap').hidden = mobile;
+  $('#dayview').hidden = !mobile;
+  renderPalette();
+  if(mobile) renderDayView(S,plan,ev); else renderGrid(S,plan,ev);
+  renderPanel(S,ev); renderTutobar(ev);
 }
 function renderPalette(){
   const w=$('#palette'); w.innerHTML='';
+  if(petitEcran.matches){ w.hidden=true; return; }
+  w.hidden=false;
   ORDER.forEach(code=>{
     const s=SHIFTS[code];
     const btn=document.createElement('button');
@@ -1594,16 +1661,21 @@ function renderPanel(S,ev){
   }
   const rk={legal:0,couv:1,eco:2,conf:3};
   const sorted=ev.issues.slice().sort((a,c)=>(rk[a.cat]-rk[c.cat])||(c.pts-a.pts));
-  sorted.slice(0,14).forEach(i=>{
+  const VU=3;
+  sorted.slice(0,VU).forEach(i=>{
     const li=document.createElement('li');
     li.className=i.cat;
     const [ttl,who]=fmtIssue(i);
     li.innerHTML=`<span class="dot"></span><span class="txt"><b>${ttl}</b><span class="who">${who}</span></span><span class="pts">−${i.pts}</span>`;
     ul.appendChild(li);
   });
-  if(sorted.length>14){
+  if(sorted.length>VU){
+    const reste=sorted.slice(VU), pts=reste.reduce((a,i)=>a+i.pts,0);
     const li=document.createElement('li');
-    li.innerHTML=`<span class="dot" style="background:var(--muted)"></span><span class="txt">${t('more')(sorted.length-14)}</span>`;
+    li.innerHTML=`<span class="dot" style="background:var(--muted)"></span>
+      <span class="txt">${t('more')(reste.length)}</span><span class="pts">-${pts}</span>`;
+    li.style.cursor='pointer';
+    li.onclick=()=>{ openRules(sorted); };
     ul.appendChild(li);
   }
 }
@@ -1690,6 +1762,7 @@ $('#btnDraft').onclick=()=>{
   save(); renderPlay(); toast(t('tDraft'));
 };
 $('#btnSlots').onclick=openSlots;
+$('#btnHelp').onclick=()=>openRules(null);
 $('#btnUndo').onclick=undo;
 $('#btnRedo').onclick=redo;
 $('#btnCheck').onclick=()=>{
@@ -1773,6 +1846,7 @@ $('#rd-seed').addEventListener('change',()=>{
   save(); renderRandom();
 });
 
+petitEcran.addEventListener('change',()=>{ if(screen==='play') renderPlay(); });
 document.addEventListener('pointerup',()=>{painting=false;});
 document.addEventListener('pointercancel',()=>{painting=false;});
 document.addEventListener('keydown',ev=>{
@@ -1797,11 +1871,125 @@ function toggleLang(){
 ['#themebtn','#themebtn2'].forEach(s=>{$(s).onclick=toggleTheme;});
 ['#langbtn','#langbtn2'].forEach(s=>{$(s).onclick=toggleLang;});
 
+/* ---------- vue mobile : un jour à la fois ---------- */
+/* Neuf colonnes sur un téléphone, ce n'est pas jouable. Sous 700 px on
+   bascule sur une journée à la fois : l'équipe en liste, un gros bouton
+   de service par personne, et on glisse pour changer de jour. */
+
+function prochainCode(c){ return ORDER[(ORDER.indexOf(c) + 1) % ORDER.length]; }
+
+function renderDayView(S, p, ev){
+  const hote = $('#dayview');
+  const D = t('days');
+  // on se cale sur un jour ouvert
+  let sec = 0;
+  while(S.jours[jourVu] && S.jours[jourVu].ferme && sec++ < 7) jourVu = (jourVu + 1) % 7;
+  const j = S.jours[jourVu];
+
+  const couvert = (sv,pole) => S.equipe.filter(em =>
+    em.pole===pole && SHIFTS[p[em.id][jourVu]].couvre.includes(sv)).length;
+  const bloc = sv => {
+    if(!j.besoin[sv].cuisine && !j.besoin[sv].salle)
+      return `<div><span class="k">${t('services')[sv]}</span><span class="v">${t('notes').soirFerme}</span></div>`;
+    const part = pole => {
+      const need = j.besoin[sv][pole]; if(!need) return '';
+      const got = couvert(sv,pole);
+      return `<s class="${got<need?'short':'okk'}">${t('poleShort')[pole]} ${got}/${need}</s>`;
+    };
+    return `<div><span class="k">${t('services')[sv]}</span>
+      <span class="v">${part('cuisine')}${part('salle')}</span></div>`;
+  };
+
+  const etatJour = d => {
+    if(S.jours[d].ferme) return '';
+    const manque = ['midi','soir'].some(sv => ['cuisine','salle'].some(pole => {
+      const need = S.jours[d].besoin[sv][pole];
+      return need && S.equipe.filter(em => em.pole===pole
+        && SHIFTS[p[em.id][d]].couvre.includes(sv)).length < need;
+    }));
+    return manque ? 'ko' : 'okk';
+  };
+
+  hote.innerHTML = `
+    <div class="daynav">
+      <button id="dv-prev" type="button" aria-label="${D[(jourVu+6)%7]}">&#8249;</button>
+      <span class="dcur"><b>${D[jourVu]}</b><span>${j.note ? t('notes')[j.note] : ''}</span></span>
+      <button id="dv-next" type="button" aria-label="${D[(jourVu+1)%7]}">&#8250;</button>
+    </div>
+    <div class="daydots">${S.jours.map((x,d)=>
+      `<i class="${d===jourVu?'on':etatJour(d)}"></i>`).join('')}</div>
+    ${j.ferme ? '' : `<div class="dayneed">${bloc('midi')}${bloc('soir')}</div>`}
+    <ul class="dayrows">${S.equipe.map(em=>{
+      const code = p[em.id][jourVu];
+      const lock = isLocked(S,em,jourVu);
+      const motif = em.indispo && em.indispo[jourVu];
+      const h = ev.hours[em.id];
+      const flag = ev.flags.has(em.id+'-'+jourVu);
+      return `<li class="dayrow ${em.pole}${flag?' flag':''}">
+        <span class="who2"><b>${em.nom}</b><span>${t('roles')[em.role]} · ${fmtH(h)} / ${em.contrat} h</span></span>
+        <button class="pick s-${code}" data-emp="${em.id}" ${lock||replayInfo?'disabled':''}>
+          ${lock ? (motif ? t('motifs')[motif] : t('motifs').ferme) : code}
+        </button></li>`;
+    }).join('')}</ul>`;
+
+  const bouge = n => { jourVu = (jourVu + n + 7) % 7;
+    let g=0; while(S.jours[jourVu].ferme && g++<7) jourVu = (jourVu + n + 7) % 7;
+    renderPlay(); };
+  $('#dv-prev').onclick = () => bouge(-1);
+  $('#dv-next').onclick = () => bouge(1);
+  hote.querySelectorAll('.pick').forEach(b => b.onclick = () => {
+    const id = b.dataset.emp;
+    setCell(id, jourVu, prochainCode(p[id][jourVu]));
+  });
+
+  // glissement horizontal pour changer de jour
+  let x0 = null;
+  hote.ontouchstart = e => { x0 = e.touches[0].clientX; };
+  hote.ontouchend = e => {
+    if(x0===null) return;
+    const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if(Math.abs(dx) > 60) bouge(dx < 0 ? 1 : -1);
+  };
+}
+
+/* ---------- règles et liste complète ---------- */
+/* Les règles ne restent plus en permanence sur l'écran : on les lit une
+   fois. Le même panneau sert à dérouler toutes les infractions quand la
+   liste courte en masque. */
+function openRules(issues){
+  const ovl=document.createElement('div');
+  ovl.className='ovl';
+  const liste = issues && issues.length
+    ? `<h4 style="font:inherit;font-weight:600;margin:4px 0 0">${t('allIssues')}</h4>
+       <ul class="issues" style="border:1px solid var(--line);border-radius:6px">
+         ${issues.map(i=>{const [a,b]=fmtIssue(i);
+           return `<li class="${i.cat}"><span class="dot"></span>
+             <span class="txt"><b>${a}</b><span class="who">${b}</span></span>
+             <span class="pts">-${i.pts}</span></li>`;}).join('')}
+       </ul>` : '';
+  ovl.innerHTML=`
+    <div class="sheet" role="dialog" aria-modal="true">
+      <header><div class="ek">PlanningMaster</div><h2>${t('help')}</h2></header>
+      <div class="body">
+        ${liste}
+        <div><b style="font-size:14px">${t('sumLegal')}</b>
+          <ul style="margin:6px 0 0;padding-left:18px;display:grid;gap:5px;color:var(--ink-2);font-size:14px">
+            ${t('ulLegal').map(x=>`<li>${x}</li>`).join('')}</ul></div>
+        <div><b style="font-size:14px">${t('sumHouse')}</b>
+          <ul style="margin:6px 0 0;padding-left:18px;display:grid;gap:5px;color:var(--ink-2);font-size:14px">
+            ${t('ulHouse').map(x=>`<li>${x}</li>`).join('')}</ul></div>
+        <p class="disclaim">${t('disclaim')}</p>
+      </div>
+      <footer><button class="btn primary" id="rl-x" type="button">${t('dbClose')}</button></footer>
+    </div>`;
+  ovl.querySelector('#rl-x').onclick=()=>ovl.remove();
+  mountOvl(ovl);
+}
+
 /* ---------- annuler / rétablir ---------- */
 /* Pile de photos de la grille, bornée : au-delà de 60 pas en arrière,
    personne ne remonte, et la mémoire n'a pas à suivre. */
-const HIST_MAX = 60;
-let undoStack = [], redoStack = [];
+
 
 function pushHistory(){
   if(!scen) return;
@@ -1818,15 +2006,14 @@ function stepTo(pile, autre){
   if(mode==='season'&&season) season.plan = plan;
   save(); scheduleAutosave(); renderPlay();
 }
-const undo = () => stepTo(undoStack, redoStack);
-const redo = () => stepTo(redoStack, undoStack);
+function undo(){ stepTo(undoStack, redoStack); }
+function redo(){ stepTo(redoStack, undoStack); }
 
 /* ---------- brouillons ---------- */
 /* Trois emplacements manuels par épreuve, plus une reprise automatique
    à part pour qu'elle ne consomme jamais un emplacement. Rangés dans la
    progression, donc synchronisés avec le compte. */
-const SLOTS = 3;
-const scenKey = () => scen ? scen.id : null;
+function scenKey(){ return scen ? scen.id : null; }
 
 function drafts(){
   progress.drafts = progress.drafts || {};
