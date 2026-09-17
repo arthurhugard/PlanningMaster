@@ -358,6 +358,9 @@ h1,h2,h3{text-wrap:balance}
 .btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:600}
 .btn.primary:hover{opacity:.88}
 .btn.big{padding:10px 20px;font-size:15px}
+.btn.ico{font-size:17px;line-height:1;padding:6px 11px;font-family:system-ui,sans-serif}
+.btn[disabled]{opacity:.38;cursor:default}
+.btn[disabled]:hover{background:var(--surface-2)}
 
 /* ---------- grille ---------- */
 .gridwrap{margin-top:14px;overflow-x:auto;background:var(--surface);
@@ -687,6 +690,8 @@ footer.foot a{color:var(--ink-2)}
     <span class="grow"></span>
     <button class="btn" id="btnClear" type="button"></button>
     <button class="btn" id="btnDraft" type="button" hidden></button>
+    <button class="btn ico" id="btnUndo" type="button">&#8630;</button>
+    <button class="btn ico" id="btnRedo" type="button">&#8631;</button>
     <button class="btn" id="btnSlots" type="button"></button>
     <button class="btn primary" id="btnCheck" type="button"></button>
   </div>
@@ -913,6 +918,7 @@ fr:{
   dbNotSure:"Grille trouvée par recherche, pas nécessairement l'optimum absolu.",
   /* brouillons */
   btnSlots:"Brouillons", drTtl:"Brouillons",
+  undo:"Annuler", redo:"Rétablir",
   drSub:"Trois emplacements par épreuve, plus une reprise automatique.",
   drAuto:"Reprise automatique", drAutoNone:"Rien encore",
   drFree:"Emplacement libre", drSave:"Enregistrer ici", drOver:"Écraser",
@@ -1074,6 +1080,7 @@ en:{
   dbRefName:"Best roster found",
   dbNotSure:"Found by search, not necessarily the absolute optimum.",
   btnSlots:"Drafts", drTtl:"Drafts",
+  undo:"Undo", redo:"Redo",
   drSub:"Three slots per challenge, plus one autosave.",
   drAuto:"Autosave", drAutoNone:"Nothing yet",
   drFree:"Empty slot", drSave:"Save here", drOver:"Overwrite",
@@ -1444,6 +1451,7 @@ function renderRandom(){
 /* ---------- écran de jeu ---------- */
 function startScenario(S,from){
   replayInfo=null;
+  resetHistory();
   scen=S; mode=from;
   plan=applyLocks(S,emptyPlan(S));
   if(from==='season'&&season&&season.plan) plan=season.plan;
@@ -1457,6 +1465,12 @@ function renderPlay(){
   document.querySelector('.toolbar').style.display=replayInfo?'none':'';
   $('#btnCheck').textContent=t('btnCheck');
   $('#btnShare').textContent=t('btnShare');
+  $('#btnSlots').textContent=t('btnSlots');
+  $('#btnSlots').hidden=!!replayInfo||mode==='tuto';
+  const bu=$('#btnUndo'), br=$('#btnRedo');
+  bu.hidden=br.hidden=!!replayInfo;
+  bu.disabled=!undoStack.length; br.disabled=!redoStack.length;
+  bu.title=t('undo'); br.title=t('redo');
   $('#hint').innerHTML=t('hint');
   $('#h3board').textContent=t('h3board');
   $('#h3live').textContent=t('h3live');
@@ -1597,6 +1611,7 @@ function setCell(empId,d,code){
   if(replayInfo) return;          // grille d'un autre joueur : on ne touche pas
   const em=scen.equipe.find(x=>x.id===empId);
   if(!em||isLocked(scen,em,d)||plan[empId][d]===code)return;
+  pushHistory();
   plan[empId][d]=code;
   if(mode==='season'&&season) season.plan=plan;
   save();
@@ -1661,18 +1676,22 @@ function toast(msg){
 }
 $('#btnHome').onclick=()=>{show('home');};
 $('#btnClear').onclick=()=>{
+  pushHistory();
   plan=applyLocks(scen,emptyPlan(scen));
   if(mode==='season'&&season)season.plan=plan;
   save(); renderPlay(); toast(t('tClear'));
 };
 $('#btnDraft').onclick=()=>{
   if(!scen.draft){toast(t('tNoDraft'));return;}
+  pushHistory();
   let p=emptyPlan(scen);
   scen.equipe.forEach(em=>{if(scen.draft[em.id])p[em.id]=scen.draft[em.id].slice();});
   plan=applyLocks(scen,p);
   save(); renderPlay(); toast(t('tDraft'));
 };
 $('#btnSlots').onclick=openSlots;
+$('#btnUndo').onclick=undo;
+$('#btnRedo').onclick=redo;
 $('#btnCheck').onclick=()=>{
   const ev=evaluate(scen,plan);
   const legal=ev.issues.filter(i=>i.cat==='legal').length;
@@ -1758,6 +1777,10 @@ document.addEventListener('pointerup',()=>{painting=false;});
 document.addEventListener('pointercancel',()=>{painting=false;});
 document.addEventListener('keydown',ev=>{
   if(screen!=='play')return;
+  if((ev.ctrlKey||ev.metaKey) && ev.key.toLowerCase()==='z'){
+    ev.preventDefault(); ev.shiftKey?redo():undo(); return;
+  }
+  if((ev.ctrlKey||ev.metaKey) && ev.key.toLowerCase()==='y'){ ev.preventDefault(); redo(); return; }
   if(ev.target&&/input|textarea/i.test(ev.target.tagName))return;
   if(KEYMAP[ev.key]&&!(document.activeElement&&document.activeElement.classList.contains('cell'))){
     brush=KEYMAP[ev.key]; renderPalette();
@@ -1773,6 +1796,30 @@ function toggleLang(){
 }
 ['#themebtn','#themebtn2'].forEach(s=>{$(s).onclick=toggleTheme;});
 ['#langbtn','#langbtn2'].forEach(s=>{$(s).onclick=toggleLang;});
+
+/* ---------- annuler / rétablir ---------- */
+/* Pile de photos de la grille, bornée : au-delà de 60 pas en arrière,
+   personne ne remonte, et la mémoire n'a pas à suivre. */
+const HIST_MAX = 60;
+let undoStack = [], redoStack = [];
+
+function pushHistory(){
+  if(!scen) return;
+  undoStack.push(snapshot());
+  if(undoStack.length > HIST_MAX) undoStack.shift();
+  redoStack.length = 0;
+}
+function resetHistory(){ undoStack = []; redoStack = []; }
+
+function stepTo(pile, autre){
+  if(!pile.length || replayInfo || !scen) return;
+  autre.push(snapshot());
+  plan = applyLocks(scen, Object.assign(emptyPlan(scen), pile.pop()));
+  if(mode==='season'&&season) season.plan = plan;
+  save(); scheduleAutosave(); renderPlay();
+}
+const undo = () => stepTo(undoStack, redoStack);
+const redo = () => stepTo(redoStack, undoStack);
 
 /* ---------- brouillons ---------- */
 /* Trois emplacements manuels par épreuve, plus une reprise automatique
@@ -1859,6 +1906,7 @@ function openSlots(){
     ovl.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{
       const src = b.dataset.load==='auto' ? autosaveOf() : drafts()[+b.dataset.load];
       if(!src) return;
+      pushHistory();
       plan=applyLocks(scen, Object.assign(emptyPlan(scen), src.plan));
       if(mode==='season'&&season) season.plan=plan;
       save(); ovl.remove(); renderPlay(); toast(t('drLoaded'));
