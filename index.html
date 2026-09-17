@@ -1069,12 +1069,19 @@ function fmtDelta(d){
 // Titre et brief d'une semaine générée : construits ici, pas dans le moteur.
 function randomLabels(S){
   const d=t('diffs')[S.diff-1];
-  return {
-    titre:d,
-    brief: lang==='en'
-      ? `Generated week, difficulty "${d}". ${S.openDays} days open, ${S.equipe.length} staff. A 100/100 solution exists, the seed guarantees it.`
-      : `Semaine générée, difficulté « ${d} ». ${S.openDays} jours ouverts, ${S.equipe.length} salariés. Une solution à 100/100 existe, la graine le garantit.`
-  };
+  // Vérifié au solveur : jusqu'à « Tendue » une solution à 100 existe
+  // toujours. Au-delà, les contrats sont volontairement trop courts pour
+  // la charge, et certaines semaines plafonnent sous 100.
+  const garanti = S.diff<=3;
+  const base = lang==='en'
+    ? `Generated week, difficulty "${d}". ${S.openDays} days open, ${S.equipe.length} staff.`
+    : `Semaine générée, difficulté « ${d} ». ${S.openDays} jours ouverts, ${S.equipe.length} salariés.`;
+  const suite = lang==='en'
+    ? (garanti ? ' A 100/100 solution exists, the seed guarantees it.'
+               : ' At this level a perfect score is not guaranteed: the contracts are deliberately too short for the workload.')
+    : (garanti ? ' Une solution à 100/100 existe, la graine le garantit.'
+               : ' À ce niveau le 100 n\'est pas garanti : les contrats sont volontairement trop courts pour la charge.');
+  return { titre:d, brief: base+suite };
 }
 
 /* ======================= état ======================= */
