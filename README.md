@@ -1,10 +1,13 @@
-# Planning Coup de Feu
+# PlanningMaster
 
-Simulateur de planning d'équipe en restauration. Trois semaines à construire dans un
-restaurant de Bayeux, sous contraintes de repos, de couverture de service et de masse
-salariale. Bilingue français / anglais.
+Simulateur de planning d'équipe en restauration, dans un restaurant de Bayeux.
+Cinq niveaux scénarisés, une saison de dix semaines où l'état de l'équipe se reporte
+d'une semaine à l'autre, et un générateur de semaines à graine partageable — le tout
+sous contraintes de repos, de couverture de service et de masse salariale.
+Bilingue français / anglais.
 
-**En ligne : [jeu.arthurhugard.com](https://jeu.arthurhugard.com)**
+**En ligne : [planningmaster.arthurhugard.com](https://planningmaster.arthurhugard.com)**
+*(l'ancienne adresse jeu.arthurhugard.com continue de fonctionner)*
 
 ## Le principe
 

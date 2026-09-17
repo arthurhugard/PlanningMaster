@@ -92,6 +92,8 @@ body{margin:0;background:var(--bg);color:var(--ink);
 img{max-width:100%}
 [hidden]{display:none!important}
 .wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:24px 56px}
+/* L'écran de jeu a droit à plus de largeur : c'est un tableau, pas de la lecture. */
+.wrap.play{max-width:none}
 h1,h2,h3{text-wrap:balance}
 
 /* ---------- barre haute ---------- */
@@ -225,8 +227,14 @@ h1,h2,h3{text-wrap:balance}
 /* ---------- grille ---------- */
 .gridwrap{margin-top:14px;overflow-x:auto;background:var(--surface);
   border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.grid{display:grid;grid-template-columns:186px repeat(7,minmax(94px,1fr)) 104px;min-width:920px}
-.grid>*{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:7px 8px;min-height:44px}
+/* La grille se compresse au lieu de déborder : plus de défilement horizontal.
+   Les colonnes n'ont pas de largeur plancher, ce sont les contenus qui s'allègent
+   par paliers (nom du service, puis rôle, puis heures). */
+.grid{display:grid;grid-template-columns:minmax(96px,1.4fr) repeat(7,minmax(0,1fr)) minmax(78px,1fr)}
+.grid>*{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:7px 6px;
+  min-height:44px;min-width:0;overflow:hidden}
+.grid .nm,.grid .rl,.grid .code,.grid .hrs,.grid .sub,.grid .big,.grid .dn,.grid .ln b{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .grid>.r-end{border-right:none}
 .hd{background:var(--surface-2);font-family:"IBM Plex Mono",monospace;font-size:11px;
   letter-spacing:.06em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;z-index:5;
@@ -244,7 +252,7 @@ h1,h2,h3{text-wrap:balance}
 .namecell.salle{box-shadow:inset 3px 0 0 var(--soir)}
 .cell{cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:center;
   gap:1px;user-select:none;-webkit-user-select:none;transition:box-shadow .1s}
-.cell .code{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;letter-spacing:.04em}
+.cell .code{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:11.5px;letter-spacing:.02em}
 .cell .hrs{font-family:"IBM Plex Mono",monospace;font-size:10px;opacity:.72}
 .cell:hover{box-shadow:inset 0 0 0 2px var(--line-strong)}
 .cell:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
@@ -275,6 +283,7 @@ h1,h2,h3{text-wrap:balance}
   font-family:"IBM Plex Mono",monospace;font-size:11px;font-variant-numeric:tabular-nums}
 .covcell .ln{display:flex;justify-content:space-between;gap:6px}
 .covcell .ln b{font-weight:600}
+.covcell .pl{color:var(--muted);flex:none}
 .covcell .short b{color:var(--bad)}
 .covcell .okk b{color:var(--ok)}
 .covcell .plus b{color:var(--warn)}
@@ -283,7 +292,40 @@ h1,h2,h3{text-wrap:balance}
 /* ---------- panneaux ---------- */
 .cols{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
 .cols>*{min-width:0}
-@media(min-width:980px){.cols{grid-template-columns:minmax(0,1fr) 340px;align-items:start}}
+/* Le panneau ne passe à côté de la grille que lorsqu'il reste assez de largeur
+   pour les neuf colonnes ; en dessous il repasse dessous. */
+@media(min-width:1280px){.cols{grid-template-columns:minmax(0,1fr) 300px;align-items:start}}
+
+/* Paliers d'allègement */
+@media(max-width:1180px){
+  .grid>*{padding:6px 5px}
+  .cell .code{font-size:11px}
+}
+@media(max-width:820px){
+  .cell .lbl{display:none}
+  .namecell .rl{font-size:10px}
+  .grid{grid-template-columns:minmax(84px,1.3fr) repeat(7,minmax(0,1fr)) minmax(56px,.75fr)}
+}
+@media(max-width:640px){
+  .grid>*{padding:5px 3px;min-height:40px}
+  .namecell .rl .pole{display:none}
+  .namecell .nm{font-size:12px}
+  .namecell .rl{display:none}
+  .covcell .pll{display:none}
+  .totcell .sub{font-size:9px}
+  .grid{grid-template-columns:minmax(72px,1.15fr) repeat(7,minmax(0,1fr)) minmax(50px,.7fr)}
+}
+@media(max-width:560px){
+  .cell .hrs{display:none}
+  .totcell .sub{display:none}
+  .totcell .big{font-size:12px}
+  .hd .dn{font-size:11px}
+  .hd span:not(.dn){display:none}
+  .covcell{font-size:10px}
+  .grid{grid-template-columns:minmax(64px,1fr) repeat(7,minmax(0,1fr)) minmax(44px,.62fr)}
+}
+.covcell .pls{display:none}
+@media(max-width:640px){.covcell .pls{display:inline}}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   box-shadow:var(--shadow);overflow:hidden}
 .panel h3{margin:0;padding:11px 14px;font-family:"IBM Plex Mono",monospace;font-size:11px;
@@ -1151,7 +1193,8 @@ const RND_NAMES={
     others:[['Tom','commis'],['Hugo','cuisinier'],['Sami','plongeur'],['Lucas','cuisinier'],
             ['Rachid','commis'],['Iris','cuisinier'],['Bilal','plongeur'],['Jonas','commis']]},
   salle:{
-    leads:[['Claire','mh'],['Nora','rang'],['Yanis','rangM'],['Emma','rang'],['Victor','rangM']],
+    leads:[['Claire','mh'],['Nora','rang'],['Yanis','rangM'],['Emma','rang'],
+            ['Victor','rangM'],['Leonora','rang']],
     others:[['Léa','serveuse'],['Paul','serveur'],['Zoé','serveuse'],['Théo','serveur'],
             ['Mina','serveuse'],['Adam','serveur'],['Jade','serveuse']]}};
 
@@ -1255,6 +1298,7 @@ function show(name){
   screen=name;
   SCREENS.forEach(s=>{ $('#scr-'+s).hidden = (s!==name); });
   $('#topbar').hidden = (name==='home');
+  document.querySelector('.wrap').classList.toggle('play',name==='play');
   window.scrollTo(0,0);
   renderChrome();
   if(name==='home')   renderHome();
@@ -1492,7 +1536,9 @@ function renderGrid(S,p,ev){
       const label=lock?(motif?t('motifs')[motif]:t('motifs').ferme):t('shifts')[code];
       const sub=lock?'':(s.h?fmtH(s.h):'—');
       const c=add(cls.join(' '),
-        `<span class="code">${lock?'· '+label:code+' · '+label}</span><span class="hrs">${sub}</span>`);
+        lock
+          ? `<span class="code"><span class="lbl">${label}</span></span>`
+          : `<span class="code">${code}<span class="lbl"> · ${label}</span></span><span class="hrs">${sub}</span>`);
       c.title=lock?label:`${t('shifts')[code]} — ${s.label}`;
       if(!lock){
         c.tabIndex=0;
@@ -1507,7 +1553,7 @@ function renderGrid(S,p,ev){
     const h=ev.hours[em.id], diff=h-em.contrat;
     let tc='totcell';
     if(diff>4)tc+=' way'; else if(diff>0.01)tc+=' over'; else if(diff<-0.01)tc+=' under';
-    add(tc,`<span class="big">${fmtH(h)}</span><span class="sub">/ ${em.contrat} h · ${cur(ev.cost[em.id])}</span>`,true);
+    add(tc,`<span class="big">${fmtH(h)}</span><span class="sub">/${em.contrat}h · ${cur(ev.cost[em.id])}</span>`,true);
   });
   ['midi','soir'].forEach(sv=>{
     add('covrow covlabel',t('needFor')(t('services')[sv]));
@@ -1515,12 +1561,13 @@ function renderGrid(S,p,ev){
       const nc=j.besoin[sv].cuisine, ns=j.besoin[sv].salle;
       if(nc+ns===0){add('covrow covcell none','<span class="ln">—</span>');return;}
       const cnt=pole=>S.equipe.filter(em=>em.pole===pole&&SHIFTS[p[em.id][d]].couvre.includes(sv)).length;
-      const line=(lab,got,need)=>{
+      const line=(pole,got,need)=>{
         if(need===0)return '';
         const k=got<need?'short':(got>need?'plus':'okk');
-        return `<span class="ln ${k}">${lab}<b>${got}/${need}</b></span>`;
+        const lg=t('poleShort')[pole], sh=lg[0];
+        return `<span class="ln ${k}"><span class="pl"><span class="pll">${lg}</span><span class="pls">${sh}</span></span><b>${got}/${need}</b></span>`;
       };
-      add('covrow covcell',line(t('poleShort').cuisine+' ',cnt('cuisine'),nc)+line(t('poleShort').salle+' ',cnt('salle'),ns));
+      add('covrow covcell',line('cuisine',cnt('cuisine'),nc)+line('salle',cnt('salle'),ns));
     });
     add('covrow covcell none','',true);
   });
