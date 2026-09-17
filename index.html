@@ -36,11 +36,11 @@
   --bg:#E3E8E1; --surface:#FDFDFC; --surface-2:#EFF2EC;
   --ink:#101513; --ink-2:#39433E; --muted:#68726C;
   --line:#CDD4CB; --line-strong:#A9B3A9;
-  --midi:#B05B08; --midi-soft:#F8DEB8;
-  --prep:#7A5A1D; --prep-soft:#EFE2C2;
-  --soir:#294670; --soir-soft:#D0DCF0;
-  --coup:#5C3C70; --coup-soft:#E4D4EE;
-  --repos:#828C86; --repos-soft:#E0E5DE;
+  --midi:#A9500A; --midi-soft:#FBD59B;
+  --prep:#6F5017; --prep-soft:#EEDBA3;
+  --soir:#1F3E69; --soir-soft:#BCD1F2;
+  --coup:#553571; --coup-soft:#DFC6F0;
+  --repos:#7C867F; --repos-soft:#E9EDE7;
   --ok:#256B3E; --ok-soft:#D3E9DA;
   --warn:#8C5703; --warn-soft:#F8E6C2;
   --bad:#9E2B24; --bad-soft:#F7DAD6;
@@ -56,11 +56,11 @@
     --bg:#0D1110; --surface:#151A18; --surface-2:#1D2321;
     --ink:#EEF3EE; --ink-2:#BAC4BD; --muted:#8E988F;
     --line:#2A322E; --line-strong:#3E4741;
-    --midi:#F2A95B; --midi-soft:#432E13;
-    --prep:#D4B26E; --prep-soft:#3A3119;
-    --soir:#9BBBEA; --soir-soft:#1D2B44;
-    --coup:#CCA8E0; --coup-soft:#32263C;
-    --repos:#828C86; --repos-soft:#212724;
+    --midi:#F7B368; --midi-soft:#533814;
+    --prep:#DCBB78; --prep-soft:#453A1C;
+    --soir:#A6C4EF; --soir-soft:#223353;
+    --coup:#D6B2E8; --coup-soft:#3B2C48;
+    --repos:#8B958E; --repos-soft:#242B27;
     --ok:#86D3A2; --ok-soft:#142A1D;
     --warn:#EBBD69; --warn-soft:#332711;
     --bad:#F79488; --bad-soft:#3A1C18;
@@ -72,11 +72,11 @@
   --bg:#0D1110; --surface:#151A18; --surface-2:#1D2321;
   --ink:#EEF3EE; --ink-2:#BAC4BD; --muted:#8E988F;
   --line:#2A322E; --line-strong:#3E4741;
-  --midi:#F2A95B; --midi-soft:#432E13;
-  --prep:#D4B26E; --prep-soft:#3A3119;
-  --soir:#9BBBEA; --soir-soft:#1D2B44;
-  --coup:#CCA8E0; --coup-soft:#32263C;
-  --repos:#828C86; --repos-soft:#212724;
+  --midi:#F7B368; --midi-soft:#533814;
+  --prep:#DCBB78; --prep-soft:#453A1C;
+  --soir:#A6C4EF; --soir-soft:#223353;
+  --coup:#D6B2E8; --coup-soft:#3B2C48;
+  --repos:#8B958E; --repos-soft:#242B27;
   --ok:#86D3A2; --ok-soft:#142A1D;
   --warn:#EBBD69; --warn-soft:#332711;
   --bad:#F79488; --bad-soft:#3A1C18;
@@ -91,7 +91,13 @@ body{margin:0;background:var(--bg);color:var(--ink);
   font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
 img{max-width:100%}
 [hidden]{display:none!important}
-.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:24px 56px}
+/* Chaque écran occupe au moins la hauteur de la fenêtre, pied de page
+   collé en bas : sans cela, un écran court flottait dans le tiers haut
+   d'un grand moniteur. */
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:24px 28px;
+  min-height:100dvh;display:flex;flex-direction:column}
+.wrap>section:not([hidden]){flex:1 1 auto;min-width:0}
+footer.foot{margin-top:auto!important}
 /* L'écran de jeu a droit à plus de largeur : c'est un tableau, pas de la lecture. */
 .wrap.play{max-width:none}
 h1,h2,h3{text-wrap:balance}
@@ -115,6 +121,27 @@ h1,h2,h3{text-wrap:balance}
   font-size:clamp(36px,7vw,62px);line-height:.95;letter-spacing:-.025em;margin:0}
 .hero h1 em{font-style:italic;font-weight:600;color:var(--accent)}
 .hero p{margin:14px 0 0;color:var(--ink-2);max-width:56ch;font-size:16px}
+.herogrid{display:grid;gap:30px}
+.heroart{display:none}
+@media(min-width:980px){
+  .herogrid{grid-template-columns:minmax(0,1fr) minmax(300px,400px);align-items:center;gap:44px}
+  .heroart{display:block}
+}
+.artgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.artgrid span{height:24px;border-radius:3px;background:var(--repos-soft)}
+.artgrid span.P{background:var(--prep-soft);box-shadow:inset 3px 0 0 var(--prep)}
+.artgrid span.M{background:var(--midi-soft);box-shadow:inset 3px 0 0 var(--midi)}
+.artgrid span.S{background:var(--soir-soft);box-shadow:inset 3px 0 0 var(--soir)}
+.artgrid span.C{background:var(--coup-soft);box-shadow:inset 3px 0 0 var(--coup)}
+.artgrid span.d{height:auto;background:none;font-family:"IBM Plex Mono",monospace;
+  font-size:10px;letter-spacing:.1em;color:var(--muted);text-align:center;padding-bottom:3px}
+.artcap{margin:10px 0 0!important;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* étoiles : plus lisibles, avec le compte à côté */
+.starline{font-size:17px}
+.starcount{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);
+  margin-left:8px;font-variant-numeric:tabular-nums}
 .modes{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(232px,1fr))}
 .mode{text-align:left;font:inherit;cursor:pointer;background:var(--surface);
   border:1px solid var(--line);border-radius:var(--radius);padding:18px;
@@ -269,15 +296,19 @@ h1,h2,h3{text-wrap:balance}
 .pagehead .sub{color:var(--muted);font-size:13px}
 .lvlgrid{display:grid;gap:12px;grid-template-columns:1fr}
 @media(min-width:680px){.lvlgrid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1000px){.lvlgrid{grid-template-columns:repeat(3,1fr)}}
+/* Deux colonnes plutôt que trois sur grand écran : cinq niveaux tiennent
+   alors en trois rangées, les cartes respirent et la page ne finit plus
+   par un grand vide. */
+@media(min-width:1000px){.lvlgrid{grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;max-width:920px}}
 .lcard{text-align:left;font:inherit;cursor:pointer;background:var(--surface);
-  border:1px solid var(--line);border-radius:var(--radius);padding:14px;
+  border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;
   display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow)}
 .lcard:hover{border-color:var(--line-strong)}
 .lcard .lrow{display:flex;align-items:center;gap:8px}
 .lcard .ln{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--muted)}
-.lcard .lt{font-weight:600;font-size:15px}
+.lcard .lt{font-weight:600;font-size:17px;font-family:"Fraunces",Georgia,serif;letter-spacing:-.01em}
 .lcard .ld{font-size:12.5px;color:var(--muted)}
 .lcard .lb{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-2);
   border-top:1px solid var(--line);padding-top:7px;margin-top:2px;
@@ -287,6 +318,20 @@ h1,h2,h3{text-wrap:balance}
 .stars i.on{color:var(--midi)}
 .lcard.locked{opacity:.55;cursor:not-allowed}
 .lcard.locked:hover{border-color:var(--line)}
+/* Aperçu de la semaine : sept colonnes, hauteur proportionnelle à la charge,
+   fermetures hachurées. On voit la forme du niveau avant de l'ouvrir. */
+.lweek{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;
+  align-items:end;height:42px;margin-top:4px}
+.lweek i{display:block;border-radius:2px 2px 0 0;background:var(--soir-soft);
+  box-shadow:inset 0 -3px 0 var(--soir)}
+.lweek i.off{height:5px!important;background:
+  repeating-linear-gradient(135deg,transparent 0 4px,var(--line) 4px 8px);box-shadow:none}
+.lprog{height:5px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);
+  overflow:hidden;margin-top:2px}
+.lprog i{display:block;height:100%;background:var(--ok);border-radius:999px}
+.lcard .lrules{display:flex;flex-wrap:wrap;gap:4px}
+.lcard .lrules span{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.04em;
+  border:1px solid var(--line);border-radius:999px;padding:2px 7px;color:var(--muted)}
 
 /* ---------- saison ---------- */
 .seasongrid{display:grid;gap:16px;grid-template-columns:1fr}
@@ -329,14 +374,24 @@ h1,h2,h3{text-wrap:balance}
 .diffrow button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 
 /* ---------- brief ---------- */
+/* Deux lignes, pas cinq : le titre et la phrase d'accroche sur la première,
+   les compteurs et les règles sur la seconde. Le reste du brief est replié. */
 .brief{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
-  border-radius:var(--radius);padding:14px 16px;display:grid;gap:10px;box-shadow:var(--shadow)}
-.brief h2{font-family:"Fraunces",Georgia,serif;font-size:22px;margin:0;font-weight:600}
-.brief p{margin:0;color:var(--ink-2);max-width:68ch;font-size:15px}
-.briefstats{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:"IBM Plex Mono",monospace;
-  font-size:12px;font-variant-numeric:tabular-nums}
+  border-radius:var(--radius);padding:11px 14px;display:grid;gap:7px;box-shadow:var(--shadow)}
+.briefline{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 14px}
+.brief h2{font-family:"Fraunces",Georgia,serif;font-size:18px;margin:0;font-weight:600;flex:none}
+.brief p{margin:0;color:var(--ink-2);max-width:none;font-size:13.5px;flex:1 1 300px;min-width:0}
+.briefmeta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
+.briefstats{display:flex;flex-wrap:wrap;gap:6px 16px;font-family:"IBM Plex Mono",monospace;
+  font-size:11.5px;font-variant-numeric:tabular-nums}
 .briefstats b{font-weight:600;color:var(--ink)}
 .briefstats span{color:var(--muted)}
+.rulechips{display:flex;flex-wrap:wrap;gap:6px}
+.rulechip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.01em;
+  cursor:help;white-space:nowrap}
+.rulechip::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
 
 /* ---------- barre d'outils ---------- */
 .toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin-top:16px;padding:10px;
@@ -394,13 +449,17 @@ h1,h2,h3{text-wrap:balance}
   gap:1px;user-select:none;-webkit-user-select:none;transition:box-shadow .1s}
 .cell .code{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:13px;letter-spacing:.01em}
 .cell .hrs{font-family:"IBM Plex Mono",monospace;font-size:11px;opacity:.8}
-.cell:hover{box-shadow:inset 0 0 0 2px var(--line-strong)}
+.cell:hover{outline:2px solid var(--line-strong);outline-offset:-2px;z-index:1}
 .cell:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .cell.s-R{background:var(--repos-soft);color:var(--repos)}
-.cell.s-P{background:var(--prep-soft);color:var(--prep)}
-.cell.s-M{background:var(--midi-soft);color:var(--midi)}
-.cell.s-S{background:var(--soir-soft);color:var(--soir)}
-.cell.s-C{background:var(--coup-soft);color:var(--coup)}
+.cell.s-P{background:var(--prep-soft);color:var(--prep);box-shadow:inset 4px 0 0 var(--prep)}
+.cell.s-M{background:var(--midi-soft);color:var(--midi);box-shadow:inset 4px 0 0 var(--midi)}
+.cell.s-S{background:var(--soir-soft);color:var(--soir);box-shadow:inset 4px 0 0 var(--soir)}
+.cell.s-C{background:var(--coup-soft);color:var(--coup);box-shadow:inset 4px 0 0 var(--coup)}
+/* la coupure est la case la plus coûteuse du jeu : elle se repère de loin */
+.cell.s-C{background:
+  repeating-linear-gradient(135deg,transparent 0 8px,rgba(0,0,0,.03) 8px 16px),var(--coup-soft)}
+.cell.s-P,.cell.s-M,.cell.s-S,.cell.s-C{padding-left:11px}
 .cell.locked{cursor:not-allowed;color:var(--muted);
   background:repeating-linear-gradient(135deg,var(--surface-2),var(--surface-2) 5px,var(--line) 5px,var(--line) 6px)}
 .cell.locked:hover{box-shadow:none}
@@ -431,10 +490,19 @@ h1,h2,h3{text-wrap:balance}
 
 /* ---------- vue mobile : un jour à la fois ---------- */
 @media(max-width:700px){
-  .toolbar{gap:7px;padding:9px}
+  /* Les outils secondaires tiennent sur une seule ligne qui défile ;
+     seule l'action principale occupe toute la largeur. */
+  .toolbar{gap:6px;padding:8px;overflow-x:auto;flex-wrap:wrap}
   .toolbar .grow{display:none}
-  .toolbar .btn{flex:0 0 auto}
-  .toolbar .btn.primary{flex:1 1 100%;order:9;padding:11px;font-size:16px}
+  .toolbar .btn{flex:0 0 auto;font-size:13px;padding:8px 11px}
+  .toolbar .btn.ico{padding:8px 10px}
+  .toolbar .btn.primary{flex:1 1 100%;order:9;padding:12px;font-size:16px}
+  /* Brief : le titre, la phrase, puis les compteurs en petit. */
+  .brief{padding:10px 12px;gap:5px}
+  .brief h2{font-size:16px}
+  .brief p{font-size:13px;flex:1 1 100%}
+  .briefstats{font-size:11px;gap:4px 12px}
+  .briefmeta{gap:5px 12px}
 }
 .daynav{display:flex;align-items:center;gap:8px;margin-top:14px}
 .daynav button{font:inherit;cursor:pointer;background:var(--surface);color:var(--ink);
@@ -523,10 +591,12 @@ h1,h2,h3{text-wrap:balance}
   border-bottom:1px solid var(--line);background:var(--surface-2);font-weight:500}
 .scorebox{padding:14px;display:grid;gap:12px}
 .scoreline{display:flex;align-items:baseline;gap:10px}
-.scorenum{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:46px;line-height:.9;
-  font-variant-numeric:tabular-nums}
+.scorenum{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:54px;line-height:.85;
+  font-variant-numeric:tabular-nums;letter-spacing:-.03em;transition:color .25s}
+.scorenum.g{color:var(--ok)} .scorenum.w{color:var(--warn)} .scorenum.b{color:var(--bad)}
 .scoreof{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted)}
-.rank{margin-left:auto;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px}
+.rank{margin-left:auto;font-size:11px;font-weight:700;padding:4px 11px;border-radius:999px;
+  text-transform:uppercase;letter-spacing:.06em}
 .rank.g{background:var(--ok-soft);color:var(--ok)}
 .rank.w{background:var(--warn-soft);color:var(--warn)}
 .rank.b{background:var(--bad-soft);color:var(--bad)}
@@ -534,8 +604,9 @@ h1,h2,h3{text-wrap:balance}
 .meter .mtop{display:flex;justify-content:space-between;gap:8px;
   font-family:"IBM Plex Mono",monospace;font-size:11px;font-variant-numeric:tabular-nums}
 .meter .mtop span{color:var(--muted)}
-.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
-.bar i{display:block;height:100%;border-radius:3px;transition:width .3s ease}
+.bar{height:9px;border-radius:999px;background:var(--surface-2);overflow:hidden;
+  border:1px solid var(--line)}
+.bar i{display:block;height:100%;border-radius:999px;transition:width .35s ease}
 .issues{list-style:none;margin:0;padding:0}
 .issues li{display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line);align-items:flex-start}
 .issues li:last-child{border-bottom:none}
@@ -627,12 +698,22 @@ footer.foot a{color:var(--ink-2)}
       <button class="pill" id="langbtn2" type="button">EN</button>
       <button class="pill" id="themebtn2" type="button">Thème</button>
     </div>
-    <p class="brandline" id="h-brand"></p>
-    <h1>Planning<em>Master</em></h1>
-    <p id="h-tag"></p>
-    <div class="cta">
-      <button class="btn primary hero-go" id="h-go" type="button"></button>
-      <button class="btn ghost" id="h-alt" type="button"></button>
+    <div class="herogrid">
+      <div class="heromain">
+        <p class="brandline" id="h-brand"></p>
+        <h1>Planning<em>Master</em></h1>
+        <p id="h-tag"></p>
+        <div class="cta">
+          <button class="btn primary hero-go" id="h-go" type="button"></button>
+          <button class="btn ghost" id="h-alt" type="button"></button>
+        </div>
+      </div>
+      <!-- Décor : une semaine type, pour qu'on voie de quoi il s'agit avant
+           d'avoir lu une ligne. Aucune donnée, aucun état. -->
+      <div class="heroart" aria-hidden="true">
+        <div class="artgrid" id="h-art"></div>
+        <p class="artcap" id="h-artcap"></p>
+      </div>
     </div>
   </div>
 
@@ -648,7 +729,6 @@ footer.foot a{color:var(--ink-2)}
 
   <div class="modes anim-in" id="modes" style="animation-delay:.32s"></div>
   <button class="boardband anim-in" id="h-board" type="button" style="animation-delay:.4s"></button>
-  <footer class="foot"><span id="h-footL"></span><span id="h-footR"></span></footer>
 </section>
 
 <!-- ===== écran : niveaux ===== -->
@@ -709,7 +789,11 @@ footer.foot a{color:var(--ink-2)}
     </div>
     <div class="panel">
       <h3 id="rd-prevttl"></h3>
-      <div class="scorebox"><div class="briefstats" id="rd-preview"></div></div>
+      <div class="scorebox">
+        <div class="briefstats" id="rd-preview"></div>
+        <div class="lweek" id="rd-week" aria-hidden="true"></div>
+        <div class="rulechips" id="rd-rules"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -732,9 +816,14 @@ footer.foot a{color:var(--ink-2)}
 <section id="scr-play" hidden>
   <div class="tutobar" id="tutobar" hidden></div>
   <div class="brief">
-    <h2 id="briefTitle"></h2>
-    <p id="briefText"></p>
-    <div class="briefstats" id="briefStats"></div>
+    <div class="briefline">
+      <h2 id="briefTitle"></h2>
+      <p id="briefText"></p>
+    </div>
+    <div class="briefmeta">
+      <div class="briefstats" id="briefStats"></div>
+      <div class="rulechips" id="ruleChips"></div>
+    </div>
   </div>
 
   <div class="toolbar">
@@ -783,12 +872,13 @@ footer.foot a{color:var(--ink-2)}
   </div>
 </section>
 
+<footer class="foot"><span id="h-footL"></span><span id="h-footR"></span></footer>
 </div>
 
 <script type="module">
 "use strict";
 import {
-  SHIFTS, ORDER, KEYMAP, coutSalarie, evaluate, LEVELS,
+  SHIFTS, ORDER, KEYMAP, coutSalarie, evaluate, LEVELS, RULES_ORDER,
   SEASON_WEEKS, newSeason, seasonScenario, applySeasonWeek,
   randomSeed, generateWeek,
   TUTORIAL, DAILY_DIFF, dailySeed, dailyScenario,
@@ -810,6 +900,7 @@ let jourVu = 1;               // jour affiché en vue mobile
 const T = {
 fr:{
   html:"fr", other:"EN", theme:"Thème", menu:"← Menu",
+  artCap:"Une semaine · 5 salariés · 7 jours",
   brand:"Simulateur de planning · Restauration · Convention HCR",
   tag:"Vous êtes responsable d'exploitation d'un restaurant à Bayeux. Sept jours, une équipe, un budget. Placez les services sans casser le droit du travail, ni la marge.",
   days:["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"],
@@ -819,10 +910,17 @@ fr:{
   poleShort:{cuisine:"CUI",salle:"SAL"},
   roles:{chef:"Chef de cuisine",second:"Seconde de cuisine",commis:"Commis",
     cuisinier:"Cuisinier",plongeur:"Plongeur-commis",extra:"Extra",interim:"Extra intérim",
+    apprenti:"Apprenti",
     mh:"Maître d'hôtel",rang:"Cheffe de rang",rangM:"Chef de rang",
     serveur:"Serveur",serveuse:"Serveuse"},
   motifs:{cours:"Cours",conge:"Congé",arret:"Arrêt",ferme:"Fermé",epuise:"Épuisé"},
   notes:{ferme:"Fermé",soirFerme:"Soir fermé",ferie:"Férié",noel:"Noël"},
+  rulesOn:"Règles en vigueur",noRules:"Socle légal seul",
+  ruleShort:{coupure:"Coupure +8 €",dimanche:"Dimanche +20 %",ferie:"Férié ×2",apprenti:"Apprenti"},
+  ruleTxt:{coupure:"Indemnité de coupure : 8 € versés pour chaque journée travaillée en deux fois.",
+    dimanche:"Heures du dimanche majorées de 20 %.",
+    ferie:"Heures d'un jour férié payées double.",
+    apprenti:"Un apprenti ne travaille jamais après 22 h et plafonne à 35 h : ni soir, ni coupure, ni heures supplémentaires."},
   resp:"resp.", team:"Équipe", total:"Total", contract:"contrat",
   midiCount:a=>`${a} midi`, soirCount:a=>`${a} soir`,
   needFor:sv=>`Besoin ${sv}`,
@@ -861,6 +959,10 @@ fr:{
   iCoverWho:(g,n,pole)=>`${g} sur ${n} en ${pole==='cuisine'?'cuisine':'salle'}`,
   iResp:(d,sv,pole)=>`${d} ${sv} : aucun responsable en ${pole==='cuisine'?'cuisine':'salle'}`,
   iRespWho:pole=>`Il faut ${pole==='cuisine'?'le chef ou la seconde':"le maître d'hôtel ou la cheffe de rang"}`,
+  iApprSoir:n=>`Apprenti sur ${n} service${n>1?'s':''} du soir`,
+  iApprSoirWho:n=>`${n} : un apprenti ne travaille pas après 22 h`,
+  iApprH:h=>`Apprenti à ${h}`,
+  iApprHWho:n=>`${n} : 35 h maximum, heures supplémentaires interdites`,
   iWish:"Souhait non respecté",
   iBudget:o=>`Budget dépassé de ${o} €`,
   iBudgetWho:(t,b)=>`${t} € pour un objectif de ${b} €`,
@@ -983,6 +1085,7 @@ fr:{
 },
 en:{
   html:"en", other:"FR", theme:"Theme", menu:"← Menu",
+  artCap:"A week · 5 staff · 7 days",
   brand:"Shift-planning simulator · Restaurants · French labour rules",
   tag:"You run a restaurant in Bayeux. Seven days, one team, one budget. Build the roster without breaking the law, or the margin.",
   days:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
@@ -992,10 +1095,17 @@ en:{
   poleShort:{cuisine:"KIT",salle:"FOH"},
   roles:{chef:"Head chef",second:"Sous-chef",commis:"Commis chef",
     cuisinier:"Line cook",plongeur:"Kitchen porter",extra:"Casual staff",interim:"Agency cover",
+    apprenti:"Apprentice",
     mh:"Head waiter",rang:"Section head",rangM:"Section head",
     serveur:"Server",serveuse:"Server"},
   motifs:{cours:"Class",conge:"Leave",arret:"Sick leave",ferme:"Closed",epuise:"Burnt out"},
   notes:{ferme:"Closed",soirFerme:"No dinner",ferie:"Holiday",noel:"Christmas"},
+  rulesOn:"Rules in force",noRules:"Statutory rules only",
+  ruleShort:{coupure:"Split +€8",dimanche:"Sunday +20%",ferie:"Holiday ×2",apprenti:"Apprentice"},
+  ruleTxt:{coupure:"Split-shift allowance: €8 for every day worked in two parts.",
+    dimanche:"Sunday hours carry a 20% premium.",
+    ferie:"Bank-holiday hours are paid double.",
+    apprenti:"An apprentice never works past 10pm and is capped at 35 hours: no dinner, no split, no overtime."},
   resp:"lead", team:"Team", total:"Total", contract:"contract",
   midiCount:a=>`${a} lunch`, soirCount:a=>`${a} dinner`,
   needFor:sv=>`${sv} needs`,
@@ -1034,6 +1144,10 @@ en:{
   iCoverWho:(g,n,pole)=>`${g} of ${n} in ${pole==='cuisine'?'the kitchen':'the floor team'}`,
   iResp:(d,sv,pole)=>`${d} ${sv}: no lead ${pole==='cuisine'?'in the kitchen':'on the floor'}`,
   iRespWho:pole=>`You need ${pole==='cuisine'?'the head chef or sous-chef':'the head waiter or section head'}`,
+  iApprSoir:n=>`Apprentice on ${n} dinner service${n>1?'s':''}`,
+  iApprSoirWho:n=>`${n}: an apprentice cannot work past 10pm`,
+  iApprH:h=>`Apprentice rostered ${h}`,
+  iApprHWho:n=>`${n}: 35 hours maximum, no overtime allowed`,
   iWish:"Staff request ignored",
   iBudget:o=>`Budget exceeded by €${o}`,
   iBudgetWho:(t,b)=>`€${t} against a €${b} target`,
@@ -1173,6 +1287,8 @@ function fmtIssue(i){
     case 'COVER':  return [t('iCover')(D[a.jour],SV[a.sv],a.manque,a.pole),
                            t('iCoverWho')(a.present,a.need,a.pole)];
     case 'LEAD':   return [t('iResp')(D[a.jour],SV[a.sv],a.pole), t('iRespWho')(a.pole)];
+    case 'APPR_SOIR': return [t('iApprSoir')(a.n), t('iApprSoirWho')(a.nom)];
+    case 'APPR_H':    return [t('iApprH')(fmtH(a.h)), t('iApprHWho')(a.nom)];
     case 'WISH':   return [t('iWish'), X(a.txt)];
     case 'BUDGET': return [t('iBudget')(nf(a.over)), t('iBudgetWho')(nf(a.total),nf(a.budget))];
     default:       return [i.code, ''];
@@ -1276,7 +1392,19 @@ function heroAction(){
   return {key:'level', level:next, label:t('ctaResume')(X(next.n))};
 }
 
+/* Semaine décorative du héros. Fixe, lisible, sans aucun lien avec l'état
+   de la partie : c'est une vignette, pas un aperçu. */
+const ART = ['CCSRRCM','PMCSCRR','RSCCSMR','SCRPCSR','MRPCSCR'];
+function renderArt(){
+  const g=$('#h-art'); if(!g) return;
+  const jours=t('daysShort');
+  g.innerHTML = jours.map(j=>`<span class="d">${j.slice(0,3).toUpperCase()}</span>`).join('')
+    + ART.map(r=>[...r].map(c=>`<span class="${c==='R'?'':c}"></span>`).join('')).join('');
+  $('#h-artcap').textContent=t('artCap');
+}
+
 function renderHome(){
+  renderArt();
   $('#h-brand').textContent=t('brand');
   $('#h-tag').textContent=t('tag');
   $('#h-footL').textContent=t('footL');
@@ -1305,14 +1433,14 @@ function renderHome(){
       <span class="who">${me.pseudo||me.email}</span>
       <div class="pb"><span class="pk">${t('pbStars')}</span>
         <span class="starline">${Array.from({length:max},(_,k)=>
-          `<i class="${k<st?'on':''}">★</i>`).join('')}</span></div>
+          `<i class="${k<st?'on':''}">★</i>`).join('')}<span class="starcount">${st}/${max}</span></span></div>
       <div class="pb"><span class="pk">${t('pbBest')}</span><span class="pv">${best||'·'}</span></div>
       <div class="pb"><span class="pk">${t('pbRank')}</span><span class="pv">${done}<span style="font-size:13px;color:var(--muted)">/${LEVELS.length}</span></span></div>`;
   } else {
     pb.innerHTML=`
       <div class="pb"><span class="pk">${t('pbStars')}</span>
         <span class="starline">${Array.from({length:max},(_,k)=>
-          `<i class="${k<st?'on':''}">★</i>`).join('')}</span></div>
+          `<i class="${k<st?'on':''}">★</i>`).join('')}<span class="starcount">${st}/${max}</span></span></div>
       <span class="spacer"></span>
       <span style="color:var(--ink-2);font-size:13px">${t('pbGuest')}</span>
       <button class="btn" id="pb-in" type="button">${t('pbGuestGo')}</button>`;
@@ -1383,11 +1511,24 @@ function renderLevels(){
     const btn=document.createElement('button');
     btn.className='lcard'+(locked?' locked':''); btn.type='button';
     const st=stars(best);
+    // charge de chaque jour, ramenée au plus chargé de la semaine
+    const charges=L.jours.map(j=>j.ferme?-1:
+      j.besoin.midi.cuisine+j.besoin.midi.salle+j.besoin.soir.cuisine+j.besoin.soir.salle);
+    const cmax=Math.max(1,...charges);
+    const semaine=charges.map(c=>c<0
+      ? `<i class="off"></i>`
+      : `<i style="height:${Math.max(22,Math.round(c/cmax*100))}%"></i>`).join('');
+    const reg=RULES_ORDER.filter(k=>(L.regles||{})[k]);
     btn.innerHTML=`
       <div class="lrow"><span class="ln">${X(L.n)}</span>
         <span class="stars">${[0,1,2].map(k=>`<i class="${k<st?'on':''}">★</i>`).join('')}</span></div>
       <span class="lt">${X(L.titre)}</span>
       <span class="ld">${X(L.sous)}</span>
+      <span class="lweek" aria-hidden="true">${semaine}</span>
+      <span class="lrules">${reg.length
+        ? reg.map(k=>`<span>${t('ruleShort')[k]}</span>`).join('')
+        : `<span>${t('noRules')}</span>`}</span>
+      <span class="lprog" aria-hidden="true"><i style="width:${locked?0:best}%"></i></span>
       <span class="lb"><span>${locked?t('lvLocked'):(best?t('lvBest')+' '+best+'/100':t('lvNever'))}</span>
         <span>${cur(L.budget)}</span></span>`;
     if(!locked) btn.onclick=()=>{startScenario(L,'levels');};
@@ -1501,6 +1642,17 @@ function renderRandom(){
      <span>${t('rdStaff')} <b>${S.equipe.length}</b></span>
      <span>${t('rdSlots')} <b>${slots}</b></span>
      <span>${t('statBudget')} <b>${cur(S.budget)}</b></span>`;
+  // même vignette que sur les cartes de niveau : la forme de la semaine
+  // avant de s'engager dedans
+  const charges=S.jours.map(j=>j.ferme?-1:
+    j.besoin.midi.cuisine+j.besoin.midi.salle+j.besoin.soir.cuisine+j.besoin.soir.salle);
+  const cmax=Math.max(1,...charges);
+  $('#rd-week').innerHTML=charges.map(c=>c<0?'<i class="off"></i>'
+    :`<i style="height:${Math.max(22,Math.round(c/cmax*100))}%"></i>`).join('');
+  const reg=RULES_ORDER.filter(k=>(S.regles||{})[k]);
+  $('#rd-rules').innerHTML = reg.length
+    ? reg.map(k=>`<span class="rulechip" title="${t('ruleTxt')[k]}">${t('ruleShort')[k]}</span>`).join('')
+    : `<span class="rulechip" style="opacity:.6">${t('noRules')}</span>`;
 }
 
 /* ---------- écran de jeu ---------- */
@@ -1551,6 +1703,7 @@ function renderPlay(){
      <span>${t('statHours')} <b>${hTot} h</b></span>
      <span>${t('statCA')} <b>${cur(S.ca)}</b></span>
      <span>${t('statBudget')} <b>${cur(S.budget)}</b> (${Math.round(S.budget/S.ca*100)} %)</span>`;
+  renderRuleChips(S);
   const mobile = petitEcran.matches;
   $('#gridwrap').hidden = mobile;
   $('#dayview').hidden = !mobile;
@@ -1558,6 +1711,20 @@ function renderPlay(){
   if(mobile) renderDayView(S,plan,ev); else renderGrid(S,plan,ev);
   renderPanel(S,ev); renderTutobar(ev);
 }
+/* Les règles en vigueur sur l'épreuve en cours, en une ligne de puces.
+   Le détail est dans l'aide : ici on rappelle seulement ce qui change. */
+function activeRules(S){
+  const R=(S&&S.regles)||{};
+  return RULES_ORDER.filter(k=>R[k]);
+}
+function renderRuleChips(S){
+  const w=$('#ruleChips'); if(!w) return;
+  const on=activeRules(S);
+  w.innerHTML = on.length
+    ? on.map(k=>`<span class="rulechip" title="${t('ruleTxt')[k]}">${t('ruleShort')[k]}</span>`).join('')
+    : `<span class="rulechip" style="opacity:.6">${t('noRules')}</span>`;
+}
+
 function renderPalette(){
   const w=$('#palette'); w.innerHTML='';
   if(petitEcran.matches){ w.hidden=true; return; }
@@ -1641,9 +1808,10 @@ function renderGrid(S,p,ev){
 function renderPanel(S,ev){
   $('#score').textContent=ev.score;
   const r=$('#rank');
-  if(ev.score>=90){r.className='rank g';r.textContent=t('rankGood');}
-  else if(ev.score>=70){r.className='rank w';r.textContent=t('rankMid');}
-  else {r.className='rank b';r.textContent=t('rankBad');}
+  const niv = ev.score>=90?'g':ev.score>=70?'w':'b';
+  r.className='rank '+niv;
+  r.textContent = niv==='g'?t('rankGood'):niv==='w'?t('rankMid'):t('rankBad');
+  $('#score').className='scorenum '+niv;
   const pctCost=ev.total/S.budget*100;
   $('#costTxt').textContent=`${cur(ev.total)} / ${cur(S.budget)}`;
   const cb=$('#costBar');
@@ -1959,6 +2127,12 @@ function renderDayView(S, p, ev){
 function openRules(issues){
   const ovl=document.createElement('div');
   ovl.className='ovl';
+  const on=activeRules(scen);
+  const reglesBloc = on.length
+    ? `<div><b style="font-size:14px">${t('rulesOn')}</b>
+         <ul style="margin:6px 0 0;padding-left:18px;display:grid;gap:5px;color:var(--ink-2);font-size:14px">
+           ${on.map(k=>`<li><b>${t('ruleShort')[k]}</b> ${t('ruleTxt')[k]}</li>`).join('')}</ul></div>`
+    : '';
   const liste = issues && issues.length
     ? `<h4 style="font:inherit;font-weight:600;margin:4px 0 0">${t('allIssues')}</h4>
        <ul class="issues" style="border:1px solid var(--line);border-radius:6px">
@@ -1972,6 +2146,7 @@ function openRules(issues){
       <header><div class="ek">PlanningMaster</div><h2>${t('help')}</h2></header>
       <div class="body">
         ${liste}
+        ${reglesBloc}
         <div><b style="font-size:14px">${t('sumLegal')}</b>
           <ul style="margin:6px 0 0;padding-left:18px;display:grid;gap:5px;color:var(--ink-2);font-size:14px">
             ${t('ulLegal').map(x=>`<li>${x}</li>`).join('')}</ul></div>
@@ -2333,7 +2508,7 @@ function openAuth(){
       }
       me=cloud.currentUser();
       await pullProgress();
-      ovl.remove(); refreshAccount(); renderAll();
+      ovl.remove(); refreshAccount(); show(screen);
       toast(t('authDone')(me.pseudo||me.email));
     }catch(err){
       btn.disabled=false;
@@ -2359,7 +2534,7 @@ function openAccount(){
     </div>`;
   ovl.querySelector('#ac-close').onclick=()=>ovl.remove();
   ovl.querySelector('#ac-out').onclick=async()=>{
-    await cloud.signOut(); me=null; ovl.remove(); refreshAccount(); renderAll();
+    await cloud.signOut(); me=null; ovl.remove(); refreshAccount(); show(screen);
   };
   mountOvl(ovl);
 }
@@ -2523,7 +2698,7 @@ window.__pm={show,startScenario,setCell,LEVELS,generateWeek,newSeason,
   try{had=!!localStorage.getItem('cdf_v3');}catch(_){}
   load();
   if(!had&&/^en/i.test(navigator.language||''))lang='en';
-  cloud.init().then(u=>{ me=u; refreshAccount(); if(me) pullProgress().then(()=>renderAll()); })
+  cloud.init().then(u=>{ me=u; refreshAccount(); if(me) pullProgress().then(()=>show(screen)); })
              .catch(()=>{});
   const u=new URLSearchParams(location.search);
   const s=u.get('seed');
@@ -2534,6 +2709,30 @@ window.__pm={show,startScenario,setCell,LEVELS,generateWeek,newSeason,
     show('random');
   } else show('home');
   refreshAccount();
+})();
+</script>
+
+<script>
+/* Filet de sécurité. Une erreur de chargement de module ne produit
+   aucun message visible : la page reste structurée mais vide, ce qui
+   n'aide personne. On surveille le démarrage et on affiche la cause. */
+(function(){
+  var derniere = null;
+  window.addEventListener('error', function(e){
+    derniere = e.message || (e.error && e.error.message) || 'erreur inconnue';
+  }, true);
+  setTimeout(function(){
+    if (window.__pm) return;
+    var d = document.createElement('div');
+    d.setAttribute('style',
+      'position:fixed;left:0;right:0;top:0;z-index:999;padding:14px 16px;'+
+      'background:#9E2B24;color:#fff;font:14px/1.5 system-ui,sans-serif');
+    d.innerHTML = '<b>Le jeu n\'a pas pu démarrer.</b> ' +
+      (derniere ? 'Cause : ' + derniere + '. ' : '') +
+      'Essayez un rechargement forcé (Ctrl+Maj+R). Si le message persiste, ' +
+      'un fichier du jeu est manquant ou périmé sur le serveur.';
+    document.body.insertBefore(d, document.body.firstChild);
+  }, 2500);
 })();
 </script>
 </body>

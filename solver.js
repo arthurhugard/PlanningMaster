@@ -16,6 +16,12 @@
 import { SHIFTS, evaluate, emptyPlan, applyLocks, isLocked } from './game-core.js';
 
 const CODES = ['R', 'P', 'M', 'S', 'C'];
+const JOUR  = ['R', 'P', 'M'];   // palette d'un apprenti : jamais de fermeture
+
+/* Codes autorisés pour un salarié donné. */
+function codesDe(S, em) {
+  return ((S.regles || {}).apprenti && em.appr) ? JOUR : CODES;
+}
 
 /* Un score composite : le score du jeu d'abord, le coût ensuite.
    À score égal, un planning moins cher est meilleur. */
@@ -58,6 +64,7 @@ function greedy(S, rnd) {
       const cov = sv => pres().filter(em => SHIFTS[plan[em.id][d]].couvre.includes(sv)).length;
 
       // qui peut encore travailler ce jour-là, en gardant deux repos
+      const appr = em => (S.regles || {}).apprenti && em.appr;
       const dispo = () => pres().filter(em => {
         if (isLocked(S, em, d) || plan[em.id][d] !== 'R') return false;
         const repos = plan[em.id].filter(c => c === 'R').length;
@@ -73,13 +80,15 @@ function greedy(S, rnd) {
       let garde = 40;
       while ((cov('midi') < needM || cov('soir') < needS) && garde-- > 0) {
         const manqueM = cov('midi') < needM, manqueS = cov('soir') < needS;
-        const libres = dispo();
+        const sv = manqueM ? 'midi' : 'soir';
+        // un apprenti ne ferme pas : il n'est candidat qu'au midi
+        const libres = dispo().filter(em => sv === 'midi' || !appr(em));
         if (!libres.length) break;
         // un responsable d'abord si le service n'en a aucun
-        const sv = manqueM ? 'midi' : 'soir';
         const aResp = pres().some(em => em.resp && SHIFTS[plan[em.id][d]].couvre.includes(sv));
         const cible = (!aResp && libres.find(em => em.resp)) || libres[0];
-        const code = (manqueM && manqueS) ? 'C' : (manqueM ? 'M' : 'S');
+        const code = appr(cible) ? 'P'
+          : (manqueM && manqueS) ? 'C' : (manqueM ? 'M' : 'S');
         plan[cible.id][d] = code;
       }
     });
@@ -103,10 +112,12 @@ function greedy(S, rnd) {
    mouvements, dont deux échanges qui préservent la couverture.
    --------------------------------------------------------------------- */
 function* voisins(S, plan, cells, parPole) {
+  const parId = {};
+  S.equipe.forEach(em => { parId[em.id] = em; });
   // 1. changer une case
   for (const [id, d] of cells) {
     const avant = plan[id][d];
-    for (const code of CODES) {
+    for (const code of codesDe(S, parId[id])) {
       if (code === avant) continue;
       yield { do: () => { plan[id][d] = code; }, undo: () => { plan[id][d] = avant; } };
     }
@@ -120,6 +131,7 @@ function* voisins(S, plan, cells, parPole) {
       for (let i = 0; i < g.length; i++) for (let j = i + 1; j < g.length; j++) {
         const a = g[i], b = g[j];
         if (isLocked(S, a, d) || isLocked(S, b, d)) continue;
+        if (!!a.appr !== !!b.appr) continue;
         if (plan[a.id][d] === plan[b.id][d]) continue;
         yield {
           do: () => { const t = plan[a.id][d]; plan[a.id][d] = plan[b.id][d]; plan[b.id][d] = t; },
@@ -139,6 +151,7 @@ function* voisins(S, plan, cells, parPole) {
       // n'est pas transposable telle quelle
       if (a.indispo && Object.keys(a.indispo).length) continue;
       if (b.indispo && Object.keys(b.indispo).length) continue;
+      if (!!a.appr !== !!b.appr) continue;   // palettes différentes
       const swap = () => { const t = plan[a.id]; plan[a.id] = plan[b.id]; plan[b.id] = t; };
       yield { do: swap, undo: swap };
     }
@@ -187,15 +200,17 @@ function secouer(S, plan, cells, rnd, force) {
   // ce qui déplace la solution bien plus loin qu'un bruit ponctuel
   if (rnd() < 0.34) {
     const em = S.equipe[Math.floor(rnd() * S.equipe.length)];
+    const pal = codesDe(S, em);
     for (let d = 0; d < 7; d++) {
       if (isLocked(S, em, d)) continue;
-      plan[em.id][d] = CODES[Math.floor(rnd() * CODES.length)];
+      plan[em.id][d] = pal[Math.floor(rnd() * pal.length)];
     }
     return;
   }
   for (let i = 0; i < force; i++) {
     const [id, d] = cells[Math.floor(rnd() * cells.length)];
-    plan[id][d] = CODES[Math.floor(rnd() * CODES.length)];
+    const pal = codesDe(S, S.equipe.find(x => x.id === id));
+    plan[id][d] = pal[Math.floor(rnd() * pal.length)];
   }
 }
 
