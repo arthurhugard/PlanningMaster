@@ -500,6 +500,51 @@ function generateWeek(seedStr,diff){
 
 
 /* --------------------------------------------------------------------
+   Défi du jour : la graine dérive de la date, donc tout le monde joue
+   exactement la même semaine et le classement se remet à zéro chaque
+   jour. Le format reste celui que l'Edge Function sait revalider.
+   -------------------------------------------------------------------- */
+const DAILY_DIFF = 3;
+function dailySeed(date){
+  const d = date || new Date();
+  const y = String(d.getUTCFullYear()).slice(2);
+  const m = String(d.getUTCMonth()+1).padStart(2,'0');
+  const j = String(d.getUTCDate()).padStart(2,'0');
+  return `D${y}${m}${j}`;
+}
+function dailyScenario(date){
+  const scen = generateWeek(dailySeed(date), DAILY_DIFF);
+  scen.daily = true;
+  return scen;
+}
+
+/* --------------------------------------------------------------------
+   Tutoriel : deux salariés, quatre jours ouverts, un besoin d'une
+   personne par service. La solution tient en quatre coupures chacun,
+   soit exactement leur contrat — ce qui permet de faire découvrir la
+   palette, la ligne de besoin, le compteur d'heures et le repos de 11 h
+   sans jamais noyer le joueur.
+   -------------------------------------------------------------------- */
+const TUTORIAL = {
+  id:'tuto',
+  n:{fr:'Tutoriel',en:'Tutorial'},
+  titre:{fr:'Prendre le service',en:'Taking over the pass'},
+  sous:{fr:'2 salariés · 4 jours',en:'2 staff · 4 days'},
+  brief:{fr:"Un petit restaurant ouvert du mardi au vendredi. Un cuisinier, une responsable de salle, un service midi et un service soir par jour. Suivez les étapes.",
+    en:"A small restaurant open Tuesday to Friday. One cook, one floor lead, one lunch and one dinner service a day. Follow the steps."},
+  ca:6000, budget:1800, reposConsecutifs:false,
+  jours:[
+    {ferme:true,besoin:b(0,0,0,0),note:'ferme'},
+    {besoin:b(1,1,1,1)},{besoin:b(1,1,1,1)},{besoin:b(1,1,1,1)},{besoin:b(1,1,1,1)},
+    {ferme:true,besoin:b(0,0,0,0),note:'ferme'},
+    {ferme:true,besoin:b(0,0,0,0),note:'ferme'}],
+  equipe:[
+    e('c1','Marc Lefèvre','cuisine','chef',39,24,true),
+    e('s1','Claire Aubert','salle','mh',39,21,true)],
+  prefs:[],
+};
+
+/* --------------------------------------------------------------------
    Verrous et assainissement des grilles.
    Le serveur ne fait pas confiance à ce qu'il reçoit : toute case
    verrouillée (fermeture, congé, arrêt) ou tout code inconnu est ramené
@@ -546,4 +591,5 @@ export {
   deriveNeeds, seasonScenario, applySeasonWeek, newSeason,
   mulberry32, seedToInt, randomSeed, generateWeek,
   isLocked, emptyPlan, applyLocks, sanitizePlan,
+  TUTORIAL, DAILY_DIFF, dailySeed, dailyScenario,
 };

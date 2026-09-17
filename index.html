@@ -115,8 +115,7 @@ h1,h2,h3{text-wrap:balance}
   font-size:clamp(36px,7vw,62px);line-height:.95;letter-spacing:-.025em;margin:0}
 .hero h1 em{font-style:italic;font-weight:600;color:var(--accent)}
 .hero p{margin:14px 0 0;color:var(--ink-2);max-width:56ch;font-size:16px}
-.modes{display:grid;gap:14px;grid-template-columns:1fr}
-@media(min-width:760px){.modes{grid-template-columns:repeat(3,1fr)}}
+.modes{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(232px,1fr))}
 .mode{text-align:left;font:inherit;cursor:pointer;background:var(--surface);
   border:1px solid var(--line);border-radius:var(--radius);padding:18px;
   display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);
@@ -128,6 +127,82 @@ h1,h2,h3{text-wrap:balance}
 .mode .md{color:var(--ink-2);font-size:13px;flex:1}
 .mode .mf{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);
   border-top:1px solid var(--line);padding-top:8px}
+
+/* ---------- accueil : mise en scène ---------- */
+.hero .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;align-items:center}
+.btn.hero-go{font-family:"Fraunces",Georgia,serif;font-size:19px;font-weight:600;
+  padding:14px 28px;border-radius:7px;letter-spacing:-.01em}
+.btn.ghost{background:none;border-color:var(--line-strong);color:var(--ink-2)}
+.btn.ghost:hover{background:var(--surface);color:var(--ink)}
+
+.playerbar{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 16px;margin-bottom:22px;box-shadow:var(--shadow)}
+.playerbar .pb{display:grid;gap:1px}
+.playerbar .pk{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.playerbar .pv{font-family:"Fraunces",Georgia,serif;font-size:20px;font-weight:600;
+  line-height:1.05;font-variant-numeric:tabular-nums}
+.playerbar .who{font-weight:600;font-size:15px}
+.playerbar .spacer{flex:1 1 auto;min-width:4px}
+.starline{display:flex;gap:2px;font-size:15px;letter-spacing:1px}
+.starline i{font-style:normal;color:var(--line-strong)}
+.starline i.on{color:var(--midi)}
+
+.homecols{display:grid;gap:14px;grid-template-columns:1fr;margin-bottom:22px}
+@media(min-width:820px){.homecols{grid-template-columns:1.25fr 1fr}}
+.homecols>*{min-width:0}
+.daily{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--midi);
+  border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:9px}
+.daily .dk{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--midi)}
+.daily h3{font-family:"Fraunces",Georgia,serif;font-size:22px;font-weight:600;margin:0;
+  padding:0;border:0;background:none;text-transform:none;letter-spacing:-.01em;color:var(--ink)}
+.daily p{margin:0;color:var(--ink-2);font-size:13px}
+.daily .dmeta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);
+  display:flex;flex-wrap:wrap;gap:4px 16px}
+.daily .dgo{margin-top:4px;align-self:flex-start}
+
+.mini-board{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden}
+.mini-board h3{margin:0;padding:11px 14px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  border-bottom:1px solid var(--line);background:var(--surface-2);font-weight:500}
+.mini-board ol{list-style:none;margin:0;padding:0}
+.mini-board li{display:flex;gap:10px;align-items:baseline;padding:9px 14px;
+  border-bottom:1px solid var(--line);font-size:13px}
+.mini-board li:last-child{border-bottom:none}
+.mini-board .rk{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);width:14px}
+.mini-board .nm2{font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini-board .sc{font-family:"IBM Plex Mono",monospace;font-weight:600;font-variant-numeric:tabular-nums}
+.mini-board .empty{color:var(--muted);font-size:12.5px}
+
+/* entrée : une seule fois, au chargement */
+/* L'état au repos est VISIBLE : l'animation ne fait que retarder l'entrée.
+   Avec `backwards`, si elle ne se déclenche pas, le contenu s'affiche
+   normalement au lieu de rester bloqué à opacity:0. */
+.anim-in{animation:riseIn .5s ease backwards}
+@keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .anim-in{opacity:1;transform:none;animation:none}
+}
+
+/* ---------- tutoriel ---------- */
+.tutobar{position:sticky;top:env(safe-area-inset-top,0px);z-index:31;margin-top:16px;
+  background:var(--ink);color:var(--surface);border-radius:var(--radius);
+  padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;
+  box-shadow:var(--shadow)}
+.tutobar .tk{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;opacity:.65;flex:none}
+.tutobar .tt{flex:1 1 260px;font-size:14px;line-height:1.45}
+.tutobar .tt b{font-weight:600}
+.tutobar .tbtn{font:inherit;font-size:13px;cursor:pointer;border-radius:5px;padding:6px 14px;
+  border:1px solid rgba(255,255,255,.35);background:none;color:var(--surface)}
+.tutobar .tbtn:hover{background:rgba(255,255,255,.12)}
+.tutobar .tbtn.go{background:var(--surface);color:var(--ink);border-color:var(--surface);font-weight:600}
+.tutobar .tbtn[disabled]{opacity:.4;cursor:default}
+.tutobar .tdone{color:#7BC496;font-weight:600;font-size:13px}
 
 /* ---------- sélection de niveaux ---------- */
 .pagehead{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:18px}
@@ -425,17 +500,32 @@ footer.foot a{color:var(--ink-2)}
 
 <!-- ===== écran : accueil ===== -->
 <section id="scr-home">
-  <div class="hero">
-    <p class="brandline" id="h-brand"></p>
-    <h1>Planning<em>Master</em></h1>
-    <p id="h-tag"></p>
-    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+  <div class="hero anim-in" style="animation-delay:0s">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;justify-content:flex-end">
       <button class="pill" id="accountbtn2" type="button">Compte</button>
       <button class="pill" id="langbtn2" type="button">EN</button>
       <button class="pill" id="themebtn2" type="button">Thème</button>
     </div>
+    <p class="brandline" id="h-brand"></p>
+    <h1>Planning<em>Master</em></h1>
+    <p id="h-tag"></p>
+    <div class="cta">
+      <button class="btn primary hero-go" id="h-go" type="button"></button>
+      <button class="btn ghost" id="h-alt" type="button"></button>
+    </div>
   </div>
-  <div class="modes" id="modes"></div>
+
+  <div class="playerbar anim-in" id="h-player" style="animation-delay:.08s"></div>
+
+  <div class="homecols">
+    <div class="daily anim-in" id="h-daily" style="animation-delay:.16s"></div>
+    <div class="mini-board anim-in" style="animation-delay:.24s">
+      <h3 id="h-topttl"></h3>
+      <ol id="h-top"></ol>
+    </div>
+  </div>
+
+  <div class="modes anim-in" id="modes" style="animation-delay:.32s"></div>
   <footer class="foot"><span id="h-footL"></span><span id="h-footR"></span></footer>
 </section>
 
@@ -514,6 +604,7 @@ footer.foot a{color:var(--ink-2)}
 
 <!-- ===== écran : jeu ===== -->
 <section id="scr-play" hidden>
+  <div class="tutobar" id="tutobar" hidden></div>
   <div class="brief">
     <h2 id="briefTitle"></h2>
     <p id="briefText"></p>
@@ -577,6 +668,7 @@ import {
   SHIFTS, ORDER, KEYMAP, coutSalarie, evaluate, LEVELS,
   SEASON_WEEKS, newSeason, seasonScenario, applySeasonWeek,
   randomSeed, generateWeek,
+  TUTORIAL, DAILY_DIFF, dailySeed, dailyScenario,
 } from './game-core.js';
 import * as cloud from './cloud.js';
 
@@ -708,6 +800,20 @@ fr:{
   sentFail:"Enregistrement impossible. Réessayez.",
   sentLegal:"Corrigez les infractions avant d'enregistrer.",
   snSubmit:"Enregistrer ma saison",
+  /* accueil */
+  ctaTuto:"Commencer le tutoriel", ctaResume:n=>`Continuer : ${n}`,
+  ctaSeason:w=>`Reprendre la saison — semaine ${w}`, ctaModes:"Tous les modes",
+  pbStars:"Étoiles", pbBest:"Meilleur score", pbRank:"Niveaux terminés",
+  pbGuest:"Vous jouez sans compte : la progression reste sur ce navigateur.",
+  pbGuestGo:"Se connecter",
+  dTtl:"Défi du jour", dSub:"La même semaine pour tout le monde, jusqu'à minuit.",
+  dGo:"Jouer le défi", dAgain:"Rejouer", dDoneS:s=>`Déjà joué aujourd'hui : ${s}/100`,
+  dSeed:g=>`Graine ${g}`, dDiff:"Difficulté tendue",
+  topTtl:"Top du jour", topEmpty:"Personne n'a encore joué aujourd'hui.",
+  /* tutoriel */
+  tuStep:(n,tot)=>`Étape ${n} / ${tot}`, tuNext:"Suivant", tuSkip:"Passer",
+  tuDone:"Tutoriel terminé", tuGoLevel:"Passer au niveau 1",
+  tuFin:"C'est tout : vous savez lire une grille, couvrir un service et repérer une infraction.",
   snNotDone:"Terminez les dix semaines d'abord.",
 },
 en:{
@@ -827,6 +933,18 @@ en:{
   sentFail:"Could not save. Try again.",
   sentLegal:"Fix the labour-law breaches before saving.",
   snSubmit:"Submit my season",
+  ctaTuto:"Start the tutorial", ctaResume:n=>`Continue: ${n}`,
+  ctaSeason:w=>`Resume the season — week ${w}`, ctaModes:"All modes",
+  pbStars:"Stars", pbBest:"Best score", pbRank:"Levels cleared",
+  pbGuest:"You are playing without an account: progress stays in this browser.",
+  pbGuestGo:"Sign in",
+  dTtl:"Daily challenge", dSub:"The same week for everyone, until midnight.",
+  dGo:"Play the challenge", dAgain:"Play again", dDoneS:s=>`Played today: ${s}/100`,
+  dSeed:g=>`Seed ${g}`, dDiff:"Tight difficulty",
+  topTtl:"Today's top", topEmpty:"Nobody has played today yet.",
+  tuStep:(n,tot)=>`Step ${n} / ${tot}`, tuNext:"Next", tuSkip:"Skip",
+  tuDone:"Tutorial complete", tuGoLevel:"On to level 1",
+  tuFin:"That's it: you can read a roster, cover a service and spot a breach.",
   snNotDone:"Finish all ten weeks first.",
 }};
 let lang = "fr";
@@ -942,11 +1060,95 @@ function renderChrome(){
   refreshAccount();
 }
 
+function totalStars(){
+  return LEVELS.reduce((a,L)=>a+stars(progress[L.id]||0),0);
+}
+function heroAction(){
+  const joue = LEVELS.some(L=>progress[L.id]);
+  if(!progress.tuto && !joue) return {key:'tuto', label:t('ctaTuto')};
+  if(season && season.week>0 && season.week<SEASON_WEEKS.length)
+    return {key:'season', label:t('ctaSeason')(season.week+1)};
+  const next = LEVELS.find(L=>(progress[L.id]||0)<100) || LEVELS[0];
+  return {key:'level', level:next, label:t('ctaResume')(X(next.n))};
+}
+
 function renderHome(){
   $('#h-brand').textContent=t('brand');
   $('#h-tag').textContent=t('tag');
   $('#h-footL').textContent=t('footL');
   $('#h-footR').innerHTML=`<a href="${REPO_URL}" rel="noopener">${t('footR')}</a>`;
+
+  // action dominante, dépendante de l'état
+  const act=heroAction();
+  const go=$('#h-go');
+  go.textContent=act.label;
+  go.onclick=()=>{
+    if(act.key==='tuto'){ startTutorial(); }
+    else if(act.key==='season'){ mode='season'; show('season'); }
+    else { startScenario(act.level,'levels'); }
+  };
+  const alt=$('#h-alt');
+  alt.textContent=t('ctaModes');
+  alt.onclick=()=>{ mode='levels'; show('levels'); };
+
+  // bandeau joueur
+  const st=totalStars(), max=LEVELS.length*3;
+  const best=Math.max(0,...LEVELS.map(L=>progress[L.id]||0));
+  const done=LEVELS.filter(L=>(progress[L.id]||0)>=60).length;
+  const pb=$('#h-player');
+  if(me){
+    pb.innerHTML=`
+      <span class="who">${me.pseudo||me.email}</span>
+      <div class="pb"><span class="pk">${t('pbStars')}</span>
+        <span class="starline">${Array.from({length:max},(_,k)=>
+          `<i class="${k<st?'on':''}">★</i>`).join('')}</span></div>
+      <div class="pb"><span class="pk">${t('pbBest')}</span><span class="pv">${best||'—'}</span></div>
+      <div class="pb"><span class="pk">${t('pbRank')}</span><span class="pv">${done}<span style="font-size:13px;color:var(--muted)">/${LEVELS.length}</span></span></div>`;
+  } else {
+    pb.innerHTML=`
+      <div class="pb"><span class="pk">${t('pbStars')}</span>
+        <span class="starline">${Array.from({length:max},(_,k)=>
+          `<i class="${k<st?'on':''}">★</i>`).join('')}</span></div>
+      <span class="spacer"></span>
+      <span style="color:var(--ink-2);font-size:13px">${t('pbGuest')}</span>
+      <button class="btn" id="pb-in" type="button">${t('pbGuestGo')}</button>`;
+    const b=$('#pb-in'); if(b) b.onclick=openAuth;
+  }
+
+  // défi du jour
+  const seed=dailySeed();
+  const fait = progress.daily && progress.daily.seed===seed ? progress.daily.score : null;
+  const dt=new Date();
+  const jour=dt.toLocaleDateString(lang==='en'?'en-GB':'fr-FR',
+    {weekday:'long',day:'numeric',month:'long'});
+  $('#h-daily').innerHTML=`
+    <span class="dk">${t('dTtl')}</span>
+    <h3>${jour.charAt(0).toUpperCase()+jour.slice(1)}</h3>
+    <p>${t('dSub')}</p>
+    <div class="dmeta"><span>${t('dSeed')(seed)}</span><span>${t('dDiff')}</span>
+      ${fait!==null?`<span style="color:var(--ok)">${t('dDoneS')(fait)}</span>`:''}</div>
+    <button class="btn primary dgo" id="h-dgo" type="button">${fait!==null?t('dAgain'):t('dGo')}</button>`;
+  $('#h-dgo').onclick=()=>{ startScenario(dailyScenario(),'daily'); };
+
+  // top du jour
+  $('#h-topttl').textContent=t('topTtl');
+  const ol=$('#h-top');
+  ol.innerHTML=`<li class="empty" style="padding:9px 14px">…</li>`;
+  cloud.leaderboard('seed',`${seed}:${DAILY_DIFF}`,3).then(rows=>{
+    ol.innerHTML='';
+    if(!rows.length){
+      ol.innerHTML=`<li><span class="empty">${t('topEmpty')}</span></li>`;
+      return;
+    }
+    rows.forEach((r,i)=>{
+      const li=document.createElement('li');
+      li.innerHTML=`<span class="rk">${i+1}</span>
+        <span class="nm2">${r.pseudo}</span><span class="sc">${r.score}</span>`;
+      ol.appendChild(li);
+    });
+  }).catch(()=>{ ol.innerHTML=`<li><span class="empty">${t('topEmpty')}</span></li>`; });
+
+  // cartes de mode
   const w=$('#modes'); w.innerHTML='';
   const keys=['levels','season','random','board'];
   t('modes').forEach((m,i)=>{
@@ -1124,7 +1326,7 @@ function renderPlay(){
      <span>${t('statHours')} <b>${hTot} h</b></span>
      <span>${t('statCA')} <b>${cur(S.ca)}</b></span>
      <span>${t('statBudget')} <b>${cur(S.budget)}</b> (${Math.round(S.budget/S.ca*100)} %)</span>`;
-  renderPalette(); renderGrid(S,plan,ev); renderPanel(S,ev);
+  renderPalette(); renderGrid(S,plan,ev); renderPanel(S,ev); renderTutobar(ev);
 }
 function renderPalette(){
   const w=$('#palette'); w.innerHTML='';
@@ -1300,6 +1502,13 @@ $('#btnCheck').onclick=()=>{
     const prev=progress[scen.id]||0;
     if(ev.score>prev){progress[scen.id]=ev.score;save();}
   }
+  if(mode==='daily'){
+    const d=progress.daily;
+    if(!d||d.seed!==scen.seed||ev.score>d.score){
+      progress.daily={seed:scen.seed,score:ev.score}; save();
+    }
+  }
+  if(mode==='tuto'){ return; }
   if(mode==='season'&&season){
     if(legal){toast(t('tLegal')(ev.score,legal));return;}
     const weekNo=season.week+1;
@@ -1372,6 +1581,68 @@ function toggleLang(){
 }
 ['#themebtn','#themebtn2'].forEach(s=>{$(s).onclick=toggleTheme;});
 ['#langbtn','#langbtn2'].forEach(s=>{$(s).onclick=toggleLang;});
+
+/* ---------- tutoriel guidé ---------- */
+const TU_STEPS=[
+ {txt:{fr:"Dans la palette, choisissez <b>Coupure</b> — elle couvre le midi et le soir d'un coup. Puis cliquez sur la case de <b>Marc</b>, au <b>mardi</b>.",
+       en:"In the palette, pick <b>Split</b> — it covers lunch and dinner in one go. Then click <b>Marc</b>'s cell on <b>Tuesday</b>."},
+  check:(p)=>p.c1[1]==='C'},
+ {txt:{fr:"Regardez la ligne <b>Besoin midi</b> sous la grille : mardi affiche <b>CUI 1/1</b> mais <b>SAL 0/1</b>. La cuisine est couverte, pas la salle. Placez la coupure de <b>Claire</b> au mardi.",
+       en:"Look at the <b>lunch needs</b> row under the grid: Tuesday shows <b>KIT 1/1</b> but <b>FOH 0/1</b>. The kitchen is covered, the floor isn't. Place <b>Claire</b>'s split on Tuesday."},
+  check:(p)=>p.s1[1]==='C'},
+ {txt:{fr:"Mardi est complet. Faites de même pour <b>mercredi, jeudi et vendredi</b> — vous pouvez rester appuyé et glisser sur plusieurs cases.",
+       en:"Tuesday is covered. Do the same for <b>Wednesday, Thursday and Friday</b> — you can hold and drag across cells."},
+  check:(p)=>[2,3,4].every(d=>p.c1[d]==='C'&&p.s1[d]==='C')},
+ {txt:{fr:"Colonne <b>Total</b> à droite : <b>39 h sur 39 h</b>, exactement le contrat. Ni heure supplémentaire, ni heure payée dans le vide. Le score est à 100.",
+       en:"<b>Total</b> column on the right: <b>39h of 39h</b>, exactly the contract. No overtime, no paid idle hours. The score is 100."},
+  info:true},
+ {txt:{fr:"Maintenant provoquons une infraction. Mettez <b>Soir</b> sur le mercredi de Marc, puis <b>Prépa</b> sur son jeudi.",
+       en:"Now let's trigger a breach. Put <b>Dinner</b> on Marc's Wednesday, then <b>Prep</b> on his Thursday."},
+  check:(p,ev)=>ev.issues.some(i=>i.code==='REST')},
+ {txt:{fr:"Les deux cases passent en rouge : le soir finit à 23:45, la prépa reprend à 08:00, soit <b>8 h 15 de repos</b> au lieu des 11 h légales. Remettez deux <b>coupures</b> pour revenir à 100.",
+       en:"Both cells turn red: dinner ends at 23:45, prep starts at 08:00 — <b>8h15 of rest</b> instead of the legal 11. Put two <b>splits</b> back to return to 100."},
+  check:(p,ev)=>ev.score===100},
+];
+let tuStep=0;
+
+function startTutorial(){
+  tuStep=0;
+  startScenario(TUTORIAL,'tuto');
+}
+function renderTutobar(ev){
+  const bar=$('#tutobar');
+  if(mode!=='tuto'){ bar.hidden=true; return; }
+  bar.hidden=false;
+  const fini = tuStep>=TU_STEPS.length;
+  if(fini){
+    bar.innerHTML=`<span class="tk">${t('tuDone')}</span>
+      <span class="tt">${t('tuFin')}</span>
+      <button class="tbtn go" id="tu-go" type="button">${t('tuGoLevel')}</button>`;
+    $('#tu-go').onclick=()=>{ startScenario(LEVELS[0],'levels'); };
+    return;
+  }
+  const st=TU_STEPS[tuStep];
+  const ok = st.info ? true : st.check(plan,ev);
+  bar.innerHTML=`<span class="tk">${t('tuStep')(tuStep+1,TU_STEPS.length)}</span>
+    <span class="tt">${X(st.txt)}</span>
+    ${ok&&st.info?`<button class="tbtn go" id="tu-next" type="button">${t('tuNext')}</button>`:''}
+    ${ok&&!st.info?`<span class="tdone">✓</span>`:''}
+    <button class="tbtn" id="tu-skip" type="button">${t('tuSkip')}</button>`;
+  const nx=$('#tu-next'); if(nx) nx.onclick=()=>{ tuStep++; renderPlay(); };
+  $('#tu-skip').onclick=()=>{ progress.tuto=100; save(); pushProgress(); show('home'); };
+  // les étapes à condition s'enchaînent d'elles-mêmes
+  if(ok && !st.info){
+    setTimeout(()=>{
+      if(mode!=='tuto') return;
+      const e2=evaluate(scen,plan);
+      if(TU_STEPS[tuStep] && !TU_STEPS[tuStep].info && TU_STEPS[tuStep].check(plan,e2)){
+        tuStep++;
+        if(tuStep>=TU_STEPS.length){ progress.tuto=100; save(); pushProgress(); }
+        renderPlay();
+      }
+    },700);
+  }
+}
 
 /* ---------- compte, classements, enregistrement ---------- */
 let me = null;            // { id, email, pseudo } ou null
@@ -1493,7 +1764,7 @@ async function submitCurrent(ev){
   if(ev.issues.some(i=>i.cat==='legal')){ toast(t('sentLegal')); return; }
   let payload=null;
   if(mode==='levels') payload={mode:'level', ref:scen.id, grid:plan};
-  else if(mode==='random') payload={mode:'seed', ref:`${scen.seed}:${scen.diff}`, grid:plan};
+  else if(mode==='random'||mode==='daily') payload={mode:'seed', ref:`${scen.seed}:${scen.diff}`, grid:plan};
   else return;
   try{
     const r=await cloud.submitScore(payload);
@@ -1559,7 +1830,7 @@ async function renderBoard(){
 ['#accountbtn','#accountbtn2'].forEach(sel=>{ const el=$(sel); if(el) el.onclick=openAuth; });
 
 /* ---------- démarrage ---------- */
-window.__pm={show,startScenario,LEVELS,generateWeek,newSeason,
+window.__pm={show,startScenario,setCell,LEVELS,generateWeek,newSeason,
   get season(){return season;}, set season(v){season=v;}};
 
 (function start(){
