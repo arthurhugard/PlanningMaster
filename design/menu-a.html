@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PlanningMaster — Direction A : Le passe</title>
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800;9..144,900&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* =====================================================================
+   PlanningMaster — comp de design, écrans de menu, Direction A.
+   « Le passe » : le menu traité comme un passe de cuisine, tickets
+   accrochés à une tringle. Reprend les variables et la typographie du
+   projet (game-core.js / index.html ne sont pas touchés). Fichier
+   autonome, sans dépendance externe hors Google Fonts déjà en usage.
+   ===================================================================== */
+:root{
+  --bg:#E3E8E1; --surface:#FDFDFC; --surface-2:#EFF2EC; --paper:#F7F4EC;
+  --ink:#101513; --ink-2:#39433E; --muted:#68726C;
+  --line:#CDD4CB; --line-strong:#A9B3A9;
+  --midi:#A9500A; --midi-soft:#FBD59B;
+  --prep:#6F5017; --prep-soft:#EEDBA3;
+  --soir:#1F3E69; --soir-soft:#BCD1F2;
+  --coup:#553571; --coup-soft:#DFC6F0;
+  --repos:#7C867F; --repos-soft:#E9EDE7;
+  --ok:#256B3E; --ok-soft:#D3E9DA;
+  --warn:#8C5703; --warn-soft:#F8E6C2;
+  --bad:#9E2B24; --bad-soft:#F7DAD6;
+  --accent:#9E2B24;
+  --shadow:0 1px 2px rgba(23,28,26,.06), 0 6px 18px -10px rgba(23,28,26,.22);
+  --shadow-lift:0 14px 30px -14px rgba(23,28,26,.32);
+  --radius:6px;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1110; --surface:#151A18; --surface-2:#1D2321; --paper:#191F1B;
+    --ink:#EEF3EE; --ink-2:#BAC4BD; --muted:#8E988F;
+    --line:#2A322E; --line-strong:#3E4741;
+    --midi:#F7B368; --midi-soft:#533814;
+    --prep:#DCBB78; --prep-soft:#453A1C;
+    --soir:#A6C4EF; --soir-soft:#223353;
+    --coup:#D6B2E8; --coup-soft:#3B2C48;
+    --repos:#8B958E; --repos-soft:#242B27;
+    --ok:#86D3A2; --ok-soft:#142A1D;
+    --warn:#EBBD69; --warn-soft:#332711;
+    --bad:#F79488; --bad-soft:#3A1C18;
+    --accent:#F79488;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    --shadow-lift:0 18px 36px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1110; --surface:#151A18; --surface-2:#1D2321; --paper:#191F1B;
+  --ink:#EEF3EE; --ink-2:#BAC4BD; --muted:#8E988F;
+  --line:#2A322E; --line-strong:#3E4741;
+  --midi:#F7B368; --midi-soft:#533814;
+  --prep:#DCBB78; --prep-soft:#453A1C;
+  --soir:#A6C4EF; --soir-soft:#223353;
+  --coup:#D6B2E8; --coup-soft:#3B2C48;
+  --repos:#8B958E; --repos-soft:#242B27;
+  --ok:#86D3A2; --ok-soft:#142A1D;
+  --warn:#EBBD69; --warn-soft:#332711;
+  --bad:#F79488; --bad-soft:#3A1C18;
+  --accent:#F79488;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  --shadow-lift:0 18px 36px -16px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.i{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.19em;flex:none}
+[hidden]{display:none!important}
+/* Un <button> sans couleur déclarée prend le texte système (souvent noir
+   littéral) au lieu d'hériter de var(--ink) : ça passe inaperçu tant que
+   le thème réel de l'appareil et le bouton clair/sombre de la page sont
+   d'accord, et casse dès qu'on force le thème dans l'autre sens. */
+button{font:inherit;color:inherit}
+
+/* ---------- scaffolding : jamais livré, sert seulement à comparer ---------- */
+.compbar{position:sticky;top:0;z-index:90;display:flex;align-items:center;gap:12px;
+  padding:8px 14px;background:#1a1a1a;color:#eee;font-family:"IBM Plex Mono",monospace;
+  font-size:12px;flex-wrap:wrap}
+.compbar b{color:#fff}
+.compbar .grow{flex:1 1 auto}
+.compbar button{font:inherit;cursor:pointer;background:#2c2c2c;color:#eee;border:1px solid #444;
+  border-radius:5px;padding:7px 12px;min-height:32px}
+.compbar button:hover{background:#3a3a3a}
+.compbar .wpx{color:#9a9;opacity:.85}
+
+/* ---------- barre pleine largeur (remplace la topbar contenue) ---------- */
+.a-topstrip{background:var(--ink);color:var(--bg);display:flex;align-items:center;gap:14px;
+  padding:0 clamp(16px,4vw,40px);min-height:56px}
+.a-mark{width:30px;height:30px;border-radius:4px;border:1.5px solid var(--line-strong);
+  display:flex;align-items:center;justify-content:center;position:relative;flex:none}
+.a-mark::after{content:"";position:absolute;top:-4.5px;left:50%;transform:translateX(-50%);
+  width:7px;height:7px;border-radius:50%;background:var(--bg);opacity:.5}
+.a-mark span{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:11px;letter-spacing:.02em}
+.a-brand{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:16px;letter-spacing:-.01em}
+.a-brand em{font-style:italic;font-weight:500;color:var(--accent)}
+.a-topstrip .grow{flex:1 1 auto}
+/* Une puce claire/sombre plutôt qu'un blanc transparent : le fond de la
+   bande s'inverse avec le thème, un blanc à opacité fixe y perdrait tout
+   contraste une fois sur deux. */
+.a-stars-badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:999px;
+  padding:6px 12px;display:flex;align-items:center;gap:6px;color:var(--ink)}
+.a-stars-badge i{color:var(--midi)}
+.a-pill{font:inherit;font-size:12.5px;background:none;color:var(--bg);opacity:.75;
+  border:1px solid var(--line-strong);border-radius:999px;padding:0 13px;min-height:38px;
+  cursor:pointer;display:inline-flex;align-items:center}
+.a-pill:hover{opacity:1;border-color:var(--bg)}
+@media(max-width:700px){ .a-topstrip{flex-wrap:wrap;padding-block:8px} .a-brand{font-size:14px} }
+
+.a-stage{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+
+/* ---------- tringle décorative : les sept jours accrochés ---------- */
+.a-rail-week{position:relative;margin:34px 0 20px;padding-top:22px}
+.a-rail-week::before{content:"";position:absolute;top:8px;left:0;right:0;height:2px;background:var(--line-strong)}
+.a-rail-week ol{list-style:none;margin:0;padding:0;display:flex;gap:clamp(6px,2vw,18px);
+  overflow-x:auto;padding-bottom:4px}
+.a-rail-week li{flex:1 1 0;min-width:40px;text-align:center;position:relative}
+.a-rail-week .clip{position:absolute;top:-8px;left:50%;transform:translateX(-50%) rotate(var(--rot,0deg));
+  width:10px;height:10px;border-radius:2px;background:var(--line-strong)}
+.a-rail-week .chit{margin-top:10px;border-radius:3px 3px 7px 7px;padding:10px 4px 6px;
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.06em;color:var(--ink-2);
+  transform:rotate(var(--rot,0deg));box-shadow:var(--shadow);border:1px solid var(--line)}
+.a-rail-week .chit b{display:block;font-size:13px;margin-top:3px;letter-spacing:0}
+.a-rail-week li.R .chit{background:var(--repos-soft);color:var(--repos)}
+.a-rail-week li.P .chit{background:var(--prep-soft);color:var(--prep)}
+.a-rail-week li.M .chit{background:var(--midi-soft);color:var(--midi)}
+.a-rail-week li.S .chit{background:var(--soir-soft);color:var(--soir)}
+.a-rail-week li.C .chit{background:var(--coup-soft);color:var(--coup)}
+
+/* ---------- le ticket-héros ---------- */
+.a-ticket{background:var(--paper);border:1px solid var(--line);border-radius:3px;
+  padding:30px clamp(20px,4vw,44px) 26px;box-shadow:var(--shadow-lift);position:relative;
+  transform:rotate(-.35deg)}
+.a-ticket::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:0;
+  border-bottom:2px dashed var(--line-strong)}
+.a-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px;margin:0 0 12px}
+.a-eyebrow::before{content:"";width:16px;height:1.5px;background:var(--accent)}
+.a-ticket h1{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:clamp(34px,6vw,56px);
+  line-height:.96;letter-spacing:-.025em;margin:0}
+.a-ticket h1 em{font-style:italic;font-weight:600;color:var(--accent)}
+.a-ticket p.lead{margin:14px 0 0;color:var(--ink-2);max-width:52ch;font-size:16px}
+.a-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;align-items:center}
+.a-stamp{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:18px;letter-spacing:-.01em;
+  background:var(--ink);color:var(--bg);border:2px solid var(--ink);border-radius:8px;
+  padding:15px 26px;cursor:pointer;transform:rotate(-1.4deg);box-shadow:0 6px 0 -2px rgba(0,0,0,.15);
+  transition:transform .12s}
+.a-stamp:hover{transform:rotate(-1.4deg) translateY(-2px)}
+.a-ghost{font:inherit;font-size:15px;background:none;border:1px solid var(--line-strong);
+  color:var(--ink-2);border-radius:7px;padding:0 20px;min-height:48px;cursor:pointer}
+.a-ghost:hover{background:var(--surface);color:var(--ink)}
+
+/* ---------- deux tickets jumeaux : défi + classement ---------- */
+.a-twin{display:grid;gap:16px;grid-template-columns:1fr;margin-top:22px}
+@media(min-width:800px){.a-twin{grid-template-columns:1.2fr 1fr}}
+.a-note{background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  padding:16px 18px 18px;box-shadow:var(--shadow);position:relative}
+.a-note::before{content:"";position:absolute;top:-6px;left:20px;width:26px;height:12px;
+  background:var(--line-strong);border-radius:2px;transform:rotate(-4deg);opacity:.8}
+.a-note .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.a-note .k i{color:var(--midi)}
+.a-note h3{font-family:"Fraunces",Georgia,serif;font-size:21px;font-weight:600;margin:0}
+.a-note .meta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);margin-top:6px}
+.a-note .go{margin-top:12px}
+.a-lb{list-style:none;margin:10px 0 0;padding:0}
+.a-lb li{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+.a-lb li:first-child{border-top:none}
+.a-lb .rk{font-family:"IBM Plex Mono",monospace;color:var(--muted);width:16px}
+.a-lb .nm{font-weight:600;flex:1}
+.a-lb .sc{font-family:"IBM Plex Mono",monospace;font-weight:700}
+
+/* ---------- panneau de commande : les quatre modes ---------- */
+.a-panel{display:grid;gap:10px;grid-template-columns:repeat(6,1fr);margin-top:26px}
+.a-key{grid-column:span 2;background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  padding:16px 16px 14px;text-align:left;font:inherit;cursor:pointer;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:8px;min-height:150px;transition:transform .12s,border-color .12s}
+.a-key:hover{transform:translateY(-3px);border-color:var(--line-strong)}
+.a-key.main{grid-column:span 6;background:var(--ink);color:var(--bg);min-height:118px;
+  flex-direction:row;align-items:center;gap:20px}
+.a-key .badge{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  flex:none}
+.a-key.main .badge{background:var(--bad-soft);color:var(--accent)}
+.a-key .badge .i{width:22px;height:22px}
+.a-key.n-saison .badge{background:var(--soir-soft);color:var(--soir)}
+.a-key.n-alea .badge{background:var(--coup-soft);color:var(--coup)}
+.a-key.n-exam .badge{background:var(--midi-soft);color:var(--midi)}
+.a-key .tt{font-family:"Fraunces",Georgia,serif;font-size:21px;font-weight:600;line-height:1.1}
+.a-key.main .tt{font-size:25px}
+.a-key .dd{font-size:12.5px;color:var(--ink-2)}
+.a-key.main .dd{color:var(--bg);opacity:.78}
+.a-key .mf{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);margin-top:auto}
+.a-key.main .mf{color:var(--bg);opacity:.65;margin-top:0}
+.a-key.main .txtcol{flex:1;display:flex;flex-direction:column;gap:4px}
+@media(max-width:760px){
+  .a-panel{grid-template-columns:repeat(2,1fr)}
+  .a-key{grid-column:span 1}
+  .a-key.main{grid-column:span 2;flex-direction:column;align-items:flex-start}
+}
+
+/* ---------- bandeau classement, façon ardoise ---------- */
+.a-slate{width:100%;margin-top:22px;background:var(--ink);color:var(--bg);border-radius:6px;
+  padding:20px clamp(18px,4vw,30px);display:flex;flex-wrap:wrap;gap:14px 26px;align-items:center;
+  text-align:left;cursor:pointer;box-shadow:var(--shadow);border:2px dashed var(--line-strong)}
+.a-slate:hover{border-color:var(--bg)}
+.a-slate .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.18em;
+  text-transform:uppercase;opacity:.6;display:block;margin-bottom:4px}
+.a-slate .t{font-family:"Fraunces",Georgia,serif;font-size:25px;font-weight:600}
+.a-slate .arrow{margin-left:auto;font-size:22px;opacity:.7}
+
+/* ---------- écran niveaux : la tringle verticale ---------- */
+.a-lvlhead{margin:44px 0 26px;display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px}
+.a-lvlhead h2{font-family:"Fraunces",Georgia,serif;font-size:30px;font-weight:700;margin:0}
+.a-lvlhead .sub{color:var(--muted);font-size:13.5px}
+.a-track{position:relative;padding-left:34px}
+.a-track::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:var(--line-strong)}
+.a-row{position:relative;margin-bottom:18px}
+.a-node{position:absolute;left:-34px;top:22px;width:20px;height:20px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--line-strong);display:flex;align-items:center;
+  justify-content:center;font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:700;
+  color:var(--muted);z-index:1}
+.a-row.done .a-node{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.a-row.current .a-node{border-color:var(--accent);color:var(--accent)}
+.a-ticket-lvl{width:100%;font:inherit;text-align:left;cursor:pointer;
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  padding:16px 18px 16px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.a-ticket-lvl:hover{border-color:var(--line-strong)}
+.a-ticket-lvl[disabled]{cursor:not-allowed}
+.a-ticket-lvl::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
+.a-row.done .a-ticket-lvl::before{background:var(--ok)}
+.a-row.current .a-ticket-lvl::before{background:var(--accent)}
+.a-row.locked .a-ticket-lvl::before{background:var(--line-strong)}
+.a-lrow1{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.a-lnum{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.a-lstars{display:flex;gap:2px;font-size:13px;letter-spacing:1px;margin-left:auto}
+.a-lstars i{font-style:normal;color:var(--line-strong)}
+.a-lstars i.on{color:var(--midi)}
+.a-status{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;padding:3px 10px;
+  border-radius:999px}
+.a-status.ok2{background:var(--ok-soft);color:var(--ok)}
+.a-status.new{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+.a-status.locked{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.a-lvl-title{font-family:"Fraunces",Georgia,serif;font-size:20px;font-weight:600;margin:6px 0 2px;
+  letter-spacing:-.01em}
+.a-lvl-meta{font-size:12.5px;color:var(--muted)}
+.a-lvl-body{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;align-items:flex-end}
+.a-lweek{display:flex;gap:3px;height:34px;align-items:flex-end;flex:1 1 220px;min-width:180px}
+.a-lweek i{flex:1;display:block;border-radius:2px 2px 0 0;background:var(--soir-soft);
+  box-shadow:inset 0 -3px 0 var(--soir)}
+.a-lweek i.off{height:5px!important;background:repeating-linear-gradient(135deg,transparent 0 4px,var(--line) 4px 8px);
+  box-shadow:none}
+.a-ltags{display:flex;flex-wrap:wrap;gap:5px}
+.a-ltags span{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.04em;
+  border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted)}
+.a-lfoot{display:flex;justify-content:space-between;gap:10px;margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-2)}
+.a-lfoot b{color:var(--ink)}
+.a-ticket-lvl[disabled]{background:var(--surface-2)}
+.a-row.locked .a-lvl-title,.a-row.locked .a-lvl-meta{color:var(--muted)}
+.a-row.locked .a-lweek{filter:grayscale(1);opacity:.7}
+.a-lock{display:flex;align-items:center;gap:6px}
+.a-lock .i{width:14px;height:14px}
+.a-stamp-mini{display:inline-block;font-family:"IBM Plex Mono",monospace;
+  font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--ok);border:2px solid var(--ok);
+  border-radius:4px;padding:2px 7px;transform:rotate(-6deg);opacity:.85}
+
+footer.a-foot{margin:40px 0 30px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="compbar">
+  <b>Direction A — Le passe</b>
+  <span>Comp statique, hors production</span>
+  <span class="grow"></span>
+  <span class="wpx" id="wpx"></span>
+  <button type="button" id="themeToggle">Basculer clair / sombre</button>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-repos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.2 8.2 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z"/></symbol>
+<symbol id="i-prep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18M7.5 18a4.5 4.5 0 0 1 9 0M12 4.5v3M5.6 7.6l2.1 2.1M18.4 7.6l-2.1 2.1"/></symbol>
+<symbol id="i-midi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></symbol>
+<symbol id="i-soir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.2 8.2 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z"/><path d="M17 3.5v3M15.5 5h3"/></symbol>
+<symbol id="i-coup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.6" y="4.4" width="4.6" height="15.2" rx="1.5"/><rect x="14.8" y="4.4" width="4.6" height="15.2" rx="1.5"/></symbol>
+<symbol id="i-niveaux" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5h5v-7h-5zM9.5 20.5h5V8h-5zM15.5 20.5h5V3.5h-5z"/></symbol>
+<symbol id="i-saison" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.3" y="5" width="17.4" height="15.7" rx="2"/><path d="M3.3 9.6h17.4M8 3.3v3.4M16 3.3v3.4"/></symbol>
+<symbol id="i-alea" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="3.4" width="17.2" height="17.2" rx="3"/><circle cx="8.4" cy="8.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.6" cy="15.6" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-chrono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.4" r="7.6"/><path d="M12 9.6v3.8l2.6 1.6M9.4 2.8h5.2M18.6 6.4l1.5-1.5"/></symbol>
+<symbol id="i-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-trophee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.2h10v4.3a5 5 0 0 1-10 0z"/><path d="M7 5.8H4.4v1.4A3.2 3.2 0 0 0 7.6 10.4M17 5.8h2.6v1.4a3.2 3.2 0 0 1-3.2 3.2"/><path d="M12 13.5v3.4M8.6 20.3h6.8l-.7-3.4H9.3z"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="9.5" rx="1.6"/><path d="M8 10.5V7.2a4 4 0 0 1 8 0v3.3"/></symbol>
+</defs></svg>
+
+<!-- ===================== ÉCRAN : ACCUEIL ===================== -->
+<div class="a-topstrip">
+  <div class="a-mark"><span>PM</span></div>
+  <p class="a-brand">Planning<em>Master</em></p>
+  <span class="grow"></span>
+  <span class="a-stars-badge"><i>★</i> 5 / 15</span>
+  <button class="a-pill" type="button">EN</button>
+  <button class="a-pill" type="button">Thème</button>
+  <button class="a-pill" type="button">Compte</button>
+</div>
+
+<div class="a-stage">
+
+  <div class="a-rail-week" aria-hidden="true">
+    <ol>
+      <li class="P" style="--rot:-2deg"><span class="clip"></span><div class="chit">LUN<b>P</b></div></li>
+      <li class="M" style="--rot:1.5deg"><span class="clip"></span><div class="chit">MAR<b>M</b></div></li>
+      <li class="S" style="--rot:-1deg"><span class="clip"></span><div class="chit">MER<b>S</b></div></li>
+      <li class="C" style="--rot:2deg"><span class="clip"></span><div class="chit">JEU<b>C</b></div></li>
+      <li class="M" style="--rot:-1.5deg"><span class="clip"></span><div class="chit">VEN<b>M</b></div></li>
+      <li class="C" style="--rot:1deg"><span class="clip"></span><div class="chit">SAM<b>C</b></div></li>
+      <li class="R" style="--rot:-2deg"><span class="clip"></span><div class="chit">DIM<b>R</b></div></li>
+    </ol>
+  </div>
+
+  <div class="a-ticket">
+    <p class="a-eyebrow">Commande du chef</p>
+    <h1>Planning<em>Master</em></h1>
+    <p class="lead">Un restaurant à Lyon. Sept jours, une équipe, un budget.</p>
+    <div class="a-cta">
+      <button class="a-stamp" type="button">Reprendre : niveau 3</button>
+      <button class="a-ghost" type="button">Tous les modes</button>
+    </div>
+  </div>
+
+  <div class="a-twin">
+    <div class="a-note">
+      <p class="k"><svg class="i" aria-hidden="true"><use href="#i-defi"/></svg> Défi du jour</p>
+      <h3>Vendredi 18 septembre</h3>
+      <p class="meta">Graine D260918 · Difficulté tendue</p>
+      <button class="a-stamp go" type="button" style="font-size:14px;padding:11px 20px">Jouer le défi</button>
+    </div>
+    <div class="a-note">
+      <p class="k"><svg class="i" aria-hidden="true"><use href="#i-trophee"/></svg> Meilleurs scores · Niveau 3</p>
+      <ul class="a-lb">
+        <li><span class="rk">1</span><span class="nm">Claire Aubert</span><span class="sc">96</span></li>
+        <li><span class="rk">2</span><span class="nm">Marc Lefèvre</span><span class="sc">91</span></li>
+        <li><span class="rk">3</span><span class="nm">Inès Diallo</span><span class="sc">88</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="a-panel">
+    <button class="a-key main" type="button">
+      <span class="badge"><svg class="i" aria-hidden="true"><use href="#i-niveaux"/></svg></span>
+      <span class="txtcol">
+        <span class="tt">Les niveaux</span>
+        <span class="dd">Apprentissage guidé, cinq semaines, une histoire chacune.</span>
+      </span>
+      <span class="mf">5 niveaux · étoiles</span>
+    </button>
+    <button class="a-key n-saison" type="button">
+      <span class="badge"><svg class="i" aria-hidden="true"><use href="#i-saison"/></svg></span>
+      <span class="tt">La saison</span>
+      <span class="dd">Campagne</span>
+      <span class="mf">10 semaines · état reporté</span>
+    </button>
+    <button class="a-key n-alea" type="button">
+      <span class="badge"><svg class="i" aria-hidden="true"><use href="#i-alea"/></svg></span>
+      <span class="tt">Aléatoire</span>
+      <span class="dd">Sans fin</span>
+      <span class="mf">illimité · graine partageable</span>
+    </button>
+    <button class="a-key n-exam" type="button">
+      <span class="badge"><svg class="i" aria-hidden="true"><use href="#i-chrono"/></svg></span>
+      <span class="tt">L'examen</span>
+      <span class="dd">Épreuve</span>
+      <span class="mf">chrono · export PDF</span>
+    </button>
+  </div>
+
+  <button class="a-slate" type="button">
+    <span><span class="k"><svg class="i" aria-hidden="true"><use href="#i-trophee"/></svg> Se mesurer aux autres</span>
+    <span class="t">Classements</span></span>
+    <span class="arrow">→</span>
+  </button>
+
+  <!-- ===================== ÉCRAN : NIVEAUX ===================== -->
+  <div class="a-lvlhead">
+    <h2>Les niveaux</h2>
+    <span class="sub">Terminez un niveau à 60 minimum pour débloquer le suivant.</span>
+  </div>
+
+  <div class="a-track">
+
+    <div class="a-row done">
+      <div class="a-node">1</div>
+      <button class="a-ticket-lvl" type="button">
+        <div class="a-lrow1">
+          <span class="a-lnum">Niveau 1</span>
+          <span class="a-status ok2">100 / 100</span>
+          <span class="a-stamp-mini">Parfait</span>
+          <span class="a-lstars"><i class="on">★</i><i class="on">★</i><i class="on">★</i></span>
+        </div>
+        <h3 class="a-lvl-title">Novembre, semaine calme</h3>
+        <p class="a-lvl-meta">6 salariés · fermé le lundi</p>
+        <div class="a-lvl-body">
+          <div class="a-lweek" aria-hidden="true">
+            <i class="off"></i><i style="height:60%"></i><i style="height:75%"></i><i style="height:50%"></i><i style="height:80%"></i><i style="height:90%"></i><i style="height:40%"></i>
+          </div>
+          <div class="a-ltags"><span>Socle légal seul</span></div>
+        </div>
+        <div class="a-lfoot"><span>Meilleur score <b>100 / 100</b></span><span>Budget <b>4 100 €</b></span></div>
+      </button>
+    </div>
+
+    <div class="a-row current">
+      <div class="a-node">2</div>
+      <button class="a-ticket-lvl" type="button">
+        <div class="a-lrow1">
+          <span class="a-lnum">Niveau 2</span>
+          <span class="a-status ok2">82 / 100</span>
+          <span class="a-lstars"><i class="on">★</i><i class="on">★</i><i>★</i></span>
+        </div>
+        <h3 class="a-lvl-title">Le pont du 8 mai</h3>
+        <p class="a-lvl-meta">8 salariés · ouvert 7 jours</p>
+        <div class="a-lvl-body">
+          <div class="a-lweek" aria-hidden="true">
+            <i style="height:55%"></i><i style="height:65%"></i><i style="height:70%"></i><i style="height:60%"></i><i style="height:85%"></i><i style="height:95%"></i><i style="height:80%"></i>
+          </div>
+          <div class="a-ltags"><span>Coupure +8 €</span><span>Férié ×2</span></div>
+        </div>
+        <div class="a-lfoot"><span>Meilleur score <b>82 / 100</b></span><span>Budget <b>6 000 €</b></span></div>
+      </button>
+    </div>
+
+    <div class="a-row">
+      <div class="a-node">3</div>
+      <button class="a-ticket-lvl" type="button">
+        <div class="a-lrow1">
+          <span class="a-lnum">Niveau 3</span>
+          <span class="a-status new">Jamais jouée</span>
+          <span class="a-lstars"><i>★</i><i>★</i><i>★</i></span>
+        </div>
+        <h3 class="a-lvl-title">Juin, les Nuits de Fourvière</h3>
+        <p class="a-lvl-meta">10 salariés · budget sous tension</p>
+        <div class="a-lvl-body">
+          <div class="a-lweek" aria-hidden="true">
+            <i style="height:70%"></i><i style="height:75%"></i><i style="height:80%"></i><i style="height:85%"></i><i style="height:90%"></i><i style="height:100%"></i><i style="height:95%"></i>
+          </div>
+          <div class="a-ltags"><span>Coupure +8 €</span><span>Dimanche +20 %</span></div>
+        </div>
+        <div class="a-lfoot"><span>Jamais jouée</span><span>Budget <b>6 800 €</b></span></div>
+      </button>
+    </div>
+
+    <div class="a-row locked">
+      <div class="a-node"><svg class="i" style="width:11px;height:11px" aria-hidden="true"><use href="#i-lock"/></svg></div>
+      <button class="a-ticket-lvl" type="button" disabled>
+        <div class="a-lrow1">
+          <span class="a-lnum">Niveau 4</span>
+          <span class="a-status locked"><span class="a-lock"><svg class="i" aria-hidden="true"><use href="#i-lock"/></svg> Verrouillé</span></span>
+          <span class="a-lstars"><i>★</i><i>★</i><i>★</i></span>
+        </div>
+        <h3 class="a-lvl-title">Réouverture après travaux</h3>
+        <p class="a-lvl-meta">8 salariés · 5 jours, tout en soirée</p>
+        <div class="a-lvl-body">
+          <div class="a-lweek" aria-hidden="true">
+            <i class="off"></i><i class="off"></i><i style="height:70%"></i><i style="height:85%"></i><i style="height:90%"></i><i style="height:95%"></i><i style="height:80%"></i>
+          </div>
+          <div class="a-ltags"><span>Coupure +8 €</span><span>Dimanche +20 %</span></div>
+        </div>
+        <div class="a-lfoot"><span>Verrouillé</span><span>Budget <b>5 730 €</b></span></div>
+      </button>
+    </div>
+
+    <div class="a-row locked">
+      <div class="a-node"><svg class="i" style="width:11px;height:11px" aria-hidden="true"><use href="#i-lock"/></svg></div>
+      <button class="a-ticket-lvl" type="button" disabled>
+        <div class="a-lrow1">
+          <span class="a-lnum">Niveau 5</span>
+          <span class="a-status locked"><span class="a-lock"><svg class="i" aria-hidden="true"><use href="#i-lock"/></svg> Verrouillé</span></span>
+          <span class="a-lstars"><i>★</i><i>★</i><i>★</i></span>
+        </div>
+        <h3 class="a-lvl-title">La semaine de Noël</h3>
+        <p class="a-lvl-meta">10 salariés · tout le monde veut partir</p>
+        <div class="a-lvl-body">
+          <div class="a-lweek" aria-hidden="true">
+            <i style="height:60%"></i><i style="height:70%"></i><i style="height:75%"></i><i style="height:80%"></i><i style="height:90%"></i><i style="height:100%"></i><i class="off"></i>
+          </div>
+          <div class="a-ltags"><span>Coupure +8 €</span><span>Dimanche +20 %</span><span>Férié ×2</span><span>Apprenti</span></div>
+        </div>
+        <div class="a-lfoot"><span>Verrouillé</span><span>Budget <b>7 150 €</b></span></div>
+      </button>
+    </div>
+
+  </div>
+
+  <footer class="a-foot">
+    <span>Simulateur pédagogique · données et équipe fictives</span>
+    <span>Direction A — Le passe</span>
+  </footer>
+</div>
+
+<script>
+function toggleTheme(){
+  const c=document.documentElement.getAttribute('data-theme');
+  const dark=c?c==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+}
+document.getElementById('themeToggle').onclick=toggleTheme;
+const wpx=document.getElementById('wpx');
+function reportWidth(){ wpx.textContent = window.innerWidth+' px'; }
+reportWidth();
+window.addEventListener('resize',reportWidth);
+</script>
+</body>
+</html>

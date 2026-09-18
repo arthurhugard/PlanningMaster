@@ -1,13 +1,13 @@
 # PlanningMaster
 
-Simulateur de planning d'équipe en restauration, dans un restaurant de Bayeux.
+Simulateur de planning d'équipe en restauration, dans un restaurant lyonnais.
 Cinq niveaux scénarisés, une saison de dix semaines où l'état de l'équipe se reporte
 d'une semaine à l'autre, et un générateur de semaines à graine partageable — le tout
 sous contraintes de repos, de couverture de service et de masse salariale.
 Bilingue français / anglais.
 
 **En ligne : [planningmaster.arthurhugard.com](https://planningmaster.arthurhugard.com)**
-*(l'ancienne adresse jeu.arthurhugard.com continue de fonctionner)*
+*(l'ancienne adresse jeu.arthurhugard.com redirige)*
 
 ## Le principe
 

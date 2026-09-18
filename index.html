@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="PlanningMaster">
 <meta property="og:title" content="PlanningMaster">
 <meta property="og:description" content="Trois modes, une équipe, un budget. 11 h de repos, effectifs par service, masse salariale : saurez-vous tenir une saison entière ?">
-<meta property="og:url" content="https://jeu.arthurhugard.com/">
-<meta property="og:image" content="https://jeu.arthurhugard.com/og.png">
+<meta property="og:url" content="https://planningmaster.arthurhugard.com/">
+<meta property="og:image" content="https://planningmaster.arthurhugard.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="fr_FR">
@@ -21,9 +21,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="PlanningMaster">
 <meta name="twitter:description" content="Trois modes, une équipe, un budget. Saurez-vous tenir une saison entière ?">
-<meta name="twitter:image" content="https://jeu.arthurhugard.com/og.png">
+<meta name="twitter:image" content="https://planningmaster.arthurhugard.com/og.png">
 
-<link rel="canonical" href="https://jeu.arthurhugard.com/">
+<link rel="canonical" href="https://planningmaster.arthurhugard.com/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -280,6 +280,47 @@ h1,h2,h3{text-wrap:balance}
 .tutobar .tbtn.go{background:var(--surface);color:var(--ink);border-color:var(--surface);font-weight:600}
 .tutobar .tbtn[disabled]{opacity:.4;cursor:default}
 .tutobar .tdone{color:#7BC496;font-weight:600;font-size:13px}
+
+/* ---------- mode examen ---------- */
+/* Le chrono est la seule information ajoutée à l'écran : pendant une
+   épreuve, le tableau de bord et les compteurs d'infractions disparaissent,
+   sinon ce n'est plus un examen mais une dictée corrigée en direct. */
+.exambar{position:sticky;top:env(safe-area-inset-top,0px);z-index:31;margin-top:16px;
+  background:var(--ink);color:var(--surface);border-radius:var(--radius);
+  padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;
+  box-shadow:var(--shadow)}
+.exambar .ek2{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;opacity:.6;flex:none}
+.exambar .who3{font-size:14px;font-weight:600;flex:1 1 180px;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.exambar .chrono{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:28px;
+  line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.exambar .chrono.rouge{color:#F79488}
+.exambar .tbtn{font:inherit;font-size:13px;cursor:pointer;border-radius:6px;padding:9px 15px;
+  border:1px solid rgba(255,255,255,.35);background:none;color:var(--surface)}
+.exambar .tbtn:hover{background:rgba(255,255,255,.12)}
+.exrules{list-style:none;margin:0;padding:0;display:grid;gap:9px;
+  color:var(--ink-2);font-size:14px}
+.exrules li{display:flex;gap:9px;align-items:flex-start}
+.exrules .i{width:17px;height:17px;color:var(--muted);margin-top:2px;flex:none}
+
+/* Le rendu papier : seules la copie et la grille sortent, en noir sur blanc,
+   sur une page en paysage. Le reste de l'interface n'a rien à y faire. */
+@media print{
+  @page{size:landscape;margin:12mm}
+  body{background:#fff!important;color:#000!important}
+  .topbar,.toolbar,.exambar,.tutobar,.brief,.cols>aside,.ovl,.majbar,
+  footer.foot,#dayview,.daynav{display:none!important}
+  .wrap{padding:0!important;min-height:0!important;display:block!important}
+  .cols{display:block!important;margin:0!important}
+  .gridwrap{border:1px solid #999!important;box-shadow:none!important;overflow:visible!important}
+  .grid>*{border-color:#bbb!important}
+  .cell{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .copie{display:block!important}
+}
+.copie{display:none;margin-bottom:10mm}
+.copie h2{font-family:"Fraunces",Georgia,serif;font-size:20pt;margin:0 0 4mm}
+.copie .cl2{font-size:10pt;color:#333;display:flex;flex-wrap:wrap;gap:2mm 8mm}
 
 /* ---------- rejeu d'une grille du classement ---------- */
 .tutobar.replay{background:var(--soir);color:#fff}
@@ -609,6 +650,7 @@ h1,h2,h3{text-wrap:balance}
 /* ---------- panneaux ---------- */
 .cols{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
 .cols>*{min-width:0}
+.cols.solo{grid-template-columns:1fr!important}
 /* Le panneau ne passe à côté de la grille que lorsqu'il reste assez de largeur
    pour les neuf colonnes ; en dessous il repasse dessous. */
 @media(min-width:1280px){.cols{grid-template-columns:minmax(0,1fr) 300px;align-items:start}}
@@ -784,6 +826,7 @@ footer.foot a{color:var(--ink-2)}
 <symbol id="i-alea" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="3.4" width="17.2" height="17.2" rx="3"/><circle cx="8.4" cy="8.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.6" cy="15.6" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none"/></symbol>
 <symbol id="i-trophee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.2h10v4.3a5 5 0 0 1-10 0z"/><path d="M7 5.8H4.4v1.4A3.2 3.2 0 0 0 7.6 10.4M17 5.8h2.6v1.4a3.2 3.2 0 0 1-3.2 3.2"/><path d="M12 13.5v3.4M8.6 20.3h6.8l-.7-3.4H9.3z"/></symbol>
 <symbol id="i-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-chrono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.4" r="7.6"/><path d="M12 9.6v3.8l2.6 1.6M9.4 2.8h5.2M18.6 6.4l1.5-1.5"/></symbol>
 <symbol id="i-install" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.4v11.4"/><path d="m7.8 10.6 4.2 4.2 4.2-4.2"/><path d="M4.4 15.6v2.6a2.4 2.4 0 0 0 2.4 2.4h10.4a2.4 2.4 0 0 0 2.4-2.4v-2.6"/></symbol>
 <symbol id="i-compte" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2a7.2 7.2 0 0 1 14.4 0"/></symbol>
 <symbol id="i-aide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.8-.9 1.4v.5"/><circle cx="12" cy="16.8" r="1" fill="currentColor" stroke="none"/></symbol>
@@ -914,6 +957,40 @@ footer.foot a{color:var(--ink-2)}
   </div>
 </section>
 
+<!-- ===== écran : examen ===== -->
+<section id="scr-exam" hidden>
+  <div class="pagehead"><h2 id="ex-title"></h2><span class="sub" id="ex-sub"></span></div>
+  <div class="randbox">
+    <div class="field">
+      <label for="ex-name" id="ex-namelbl"></label>
+      <input type="text" id="ex-name" maxlength="40" autocomplete="name" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="ex-code" id="ex-codelbl"></label>
+      <input type="text" id="ex-code" maxlength="12" autocomplete="off" spellcheck="false">
+      <span class="sub" style="color:var(--muted);font-size:12px" id="ex-codehelp"></span>
+    </div>
+    <div class="field">
+      <label id="ex-timelbl"></label>
+      <div class="diffrow" id="ex-time"></div>
+    </div>
+    <div class="field">
+      <label id="ex-difflbl"></label>
+      <div class="diffrow" id="ex-diff"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn primary big" id="ex-go" type="button"></button>
+      <button class="btn" id="ex-roll" type="button"></button>
+    </div>
+    <div class="panel">
+      <h3 id="ex-rulesttl"></h3>
+      <div class="scorebox">
+        <ul class="exrules" id="ex-rules"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ===== écran : classements ===== -->
 <section id="scr-board" hidden>
   <div class="pagehead"><h2 id="bd-title"></h2><span class="sub" id="bd-sub"></span></div>
@@ -931,6 +1008,7 @@ footer.foot a{color:var(--ink-2)}
 <!-- ===== écran : jeu ===== -->
 <section id="scr-play" hidden>
   <div class="tutobar" id="tutobar" hidden></div>
+  <div class="exambar" id="exambar" hidden></div>
   <div class="brief">
     <div class="briefline">
       <h2 id="briefTitle"></h2>
@@ -957,6 +1035,7 @@ footer.foot a{color:var(--ink-2)}
 
   <div class="cols">
     <div>
+      <div class="copie" id="copie"></div>
       <div class="gridwrap" id="gridwrap"><div class="grid" id="grid"></div></div>
       <div id="dayview" hidden></div>
     </div>
@@ -1003,11 +1082,11 @@ import {
 } from './game-core.js';
 import * as cloud from './cloud.js';
 
-// Bascule sur planningmaster.arthurhugard.com une fois le CNAME actif.
-const SITE = "jeu.arthurhugard.com";
+const SITE = "planningmaster.arthurhugard.com";
 const REPO_URL = "https://github.com/arthurhugard/planningmaster";
 
 /* Constantes partagées, déclarées avant tout usage. */
+const examCfg = { nom:'', code:'', diff:3, minutes:30 };
 const HIST_MAX = 60;          // pas d'annulation conservés
 const SLOTS = 3;              // emplacements de brouillon par épreuve
 const petitEcran = window.matchMedia('(max-width:700px)');
@@ -1019,6 +1098,23 @@ const T = {
 fr:{
   html:"fr", other:"EN", theme:"Thème", menu:"← Menu",
   artCap:"Une semaine · 5 salariés · 7 jours",
+  /* examen */
+  exTitle:"L'examen", exSub:"Une semaine imposée, un chrono, aucune correction en direct.",
+  exName:"Nom sur la copie", exNamePh:"Prénom et nom",
+  exCode:"Code de l'épreuve", exCodeHelp:"Même code, même semaine pour tout le monde. Distribuez-le à un groupe pour comparer les copies.",
+  exTime:"Durée", exMin:m=>`${m} min`, exDiff:"Difficulté",
+  exGo:"Commencer l'épreuve",
+  exRulesTtl:"Conditions",
+  exRules:["Le score, la masse salariale et la liste des infractions sont masqués pendant l'épreuve.",
+    "Le brouillon du chef et les sauvegardes sont désactivés.",
+    "Le chrono ne se met pas en pause. À zéro, la copie est ramassée telle quelle.",
+    "La copie s'exporte en PDF à la fin, avec le nom, le code et le score."],
+  exBar:c=>`Épreuve ${c}`, exNoName:"Copie anonyme",
+  exFinish:"Rendre la copie", exQuit:"Abandonner", exOver:"0:00",
+  exDone:"Copie rendue", exTimeUp:"Temps écoulé, copie ramassée",
+  exDetail:"Voir le détail", exPdf:"Exporter en PDF",
+  exPdfHelp:"L'export ouvre la fenêtre d'impression. Choisissez « Enregistrer au format PDF » comme destination. Sur iPhone, la feuille de partage propose « Enregistrer dans Fichiers ».",
+  exPaper:"PlanningMaster, copie d'examen", exScore:"Score",
   /* installation */
   instBtn:"Installer",
   instOk:"Installé. Le jeu s'ouvre maintenant comme une application.",
@@ -1119,6 +1215,7 @@ fr:{
     {k:"Apprentissage",t:"Les niveaux",d:"",f:"5 niveaux · étoiles"},
     {k:"Campagne",t:"La saison",d:"",f:"10 semaines · état reporté"},
     {k:"Sans fin",t:"Aléatoire",d:"",f:"illimité · graine partageable"},
+    {k:"Épreuve",t:"L'examen",d:"",f:"chrono · export PDF"},
 ]
 ,
   /* niveaux */
@@ -1225,6 +1322,23 @@ fr:{
 en:{
   html:"en", other:"FR", theme:"Theme", menu:"← Menu",
   artCap:"A week · 5 staff · 7 days",
+  /* exam */
+  exTitle:"The exam", exSub:"A set week, a timer, and no live marking.",
+  exName:"Name on the paper", exNamePh:"First and last name",
+  exCode:"Exam code", exCodeHelp:"Same code, same week for everyone. Hand it to a group to compare papers.",
+  exTime:"Duration", exMin:m=>`${m} min`, exDiff:"Difficulty",
+  exGo:"Start the exam",
+  exRulesTtl:"Conditions",
+  exRules:["Score, payroll and the list of breaches are hidden during the exam.",
+    "The chef's draft and the save slots are disabled.",
+    "The timer never pauses. At zero, the paper is collected as it stands.",
+    "The paper exports to PDF at the end, with name, code and score."],
+  exBar:c=>`Exam ${c}`, exNoName:"Unnamed paper",
+  exFinish:"Hand in", exQuit:"Give up", exOver:"0:00",
+  exDone:"Paper handed in", exTimeUp:"Time up, paper collected",
+  exDetail:"See the detail", exPdf:"Export to PDF",
+  exPdfHelp:"Exporting opens the print dialog. Choose \"Save as PDF\" as the destination. On iPhone, the share sheet offers \"Save to Files\".",
+  exPaper:"PlanningMaster, exam paper", exScore:"Score",
   /* install */
   instBtn:"Install",
   instOk:"Installed. The game now opens like an app.",
@@ -1324,6 +1438,7 @@ en:{
     {k:"Learning",t:"Levels",d:"",f:"5 levels · stars"},
     {k:"Campaign",t:"The season",d:"",f:"10 weeks · state carries over"},
     {k:"Endless",t:"Random",d:"",f:"unlimited · shareable seed"},
+    {k:"Assessment",t:"The exam",d:"",f:"timer · PDF export"},
 ]
 ,
   lvTitle:"Levels", lvSub:"Score at least 60 on a level to unlock the next.",
@@ -1516,7 +1631,7 @@ const stars = s => s>=100?3 : s>=80?2 : s>=60?1 : 0;
 
 /* ======================= rendu ======================= */
 const $=s=>document.querySelector(s);
-const SCREENS=['home','levels','season','random','board','play'];
+const SCREENS=['home','levels','season','random','exam','board','play'];
 function show(name){
   screen=name;
   SCREENS.forEach(s=>{ $('#scr-'+s).hidden = (s!==name); });
@@ -1528,6 +1643,7 @@ function show(name){
   if(name==='levels') renderLevels();
   if(name==='season') renderSeason();
   if(name==='random') renderRandom();
+  if(name==='exam')   renderExam();
   if(name==='board')  renderBoard();
   if(name==='play')   renderPlay();
 }
@@ -1639,8 +1755,8 @@ function renderHome(){
 
   // cartes de mode
   const w=$('#modes'); w.innerHTML='';
-  const keys=['levels','season','random'];
-  const MODE_ICON=['niveaux','saison','alea'];
+  const keys=['levels','season','random','exam'];
+  const MODE_ICON=['niveaux','saison','alea','chrono'];
   t('modes').forEach((m,i)=>{
     const btn=document.createElement('button');
     btn.className='mode'; btn.type='button';
@@ -1812,6 +1928,200 @@ function renderRandom(){
     : `<span class="rulechip" style="opacity:.6">${t('noRules')}</span>`;
 }
 
+/* =====================================================================
+   Mode examen
+
+   Une semaine imposée, un chrono, et surtout aucun retour en direct : le
+   tableau de bord et les compteurs d'infractions disparaissent pendant
+   l'épreuve. Sans cela, le jeu corrigerait la copie au fur et à mesure,
+   ce qui n'évalue plus rien.
+
+   Le code d'épreuve est la graine du générateur : deux personnes qui
+   entrent le même code planifient exactement la même semaine, ce qui
+   permet de faire passer l'épreuve à un groupe et de comparer.
+
+   L'export se fait par l'impression du navigateur, pas par une
+   bibliothèque PDF : rien à télécharger, ça marche hors ligne, et sur
+   iPhone la feuille de partage propose « Enregistrer dans Fichiers ».
+   ===================================================================== */
+const EX_MINUTES = [15, 30, 45];
+const EX_STORE = 'pm_exam';
+let exam = null;        // { nom, code, diff, minutes, fin, fini }
+let examTimer = null;
+
+function sauverExam(){
+  try{ exam ? localStorage.setItem(EX_STORE, JSON.stringify(exam))
+            : localStorage.removeItem(EX_STORE); }catch(_){}
+}
+function lireExam(){
+  try{ const r=localStorage.getItem(EX_STORE); return r?JSON.parse(r):null; }catch(_){ return null; }
+}
+
+function renderExam(){
+  if(!examCfg.code) examCfg.code=randomSeed();
+  $('#ex-title').textContent=t('exTitle');
+  $('#ex-sub').textContent=t('exSub');
+  $('#ex-namelbl').textContent=t('exName');
+  $('#ex-codelbl').textContent=t('exCode');
+  $('#ex-codehelp').textContent=t('exCodeHelp');
+  $('#ex-timelbl').textContent=t('exTime');
+  $('#ex-difflbl').textContent=t('exDiff');
+  $('#ex-rulesttl').textContent=t('exRulesTtl');
+  $('#ex-go').innerHTML=ico('valider')+t('exGo');
+  $('#ex-roll').textContent=t('rdRoll');
+
+  const cfg = examCfg;
+  const nom=$('#ex-name'), code=$('#ex-code');
+  nom.value=cfg.nom; nom.placeholder=t('exNamePh');
+  code.value=cfg.code;
+  nom.oninput=()=>{ cfg.nom=nom.value; };
+  code.oninput=()=>{ cfg.code=code.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12); code.value=cfg.code; };
+
+  const tps=$('#ex-time'); tps.innerHTML='';
+  EX_MINUTES.forEach(m=>{
+    const b=document.createElement('button'); b.type='button';
+    b.textContent=t('exMin')(m);
+    b.setAttribute('aria-pressed',String(m===cfg.minutes));
+    b.onclick=()=>{ cfg.minutes=m; renderExam(); };
+    tps.appendChild(b);
+  });
+  const df=$('#ex-diff'); df.innerHTML='';
+  t('diffs').forEach((d,i)=>{
+    const b=document.createElement('button'); b.type='button';
+    b.textContent=d;
+    b.setAttribute('aria-pressed',String(i+1===cfg.diff));
+    b.onclick=()=>{ cfg.diff=i+1; renderExam(); };
+    df.appendChild(b);
+  });
+  $('#ex-rules').innerHTML=t('exRules')
+    .map(x=>`<li>${ico('valider')}<span>${x}</span></li>`).join('');
+
+  $('#ex-roll').onclick=()=>{ cfg.code=randomSeed(); renderExam(); };
+  $('#ex-go').onclick=()=>{
+    if(!cfg.code) cfg.code=randomSeed();
+    demarrerExam();
+  };
+}
+
+function demarrerExam(){
+  exam={ nom:(examCfg.nom||'').trim(), code:examCfg.code, diff:examCfg.diff,
+         minutes:examCfg.minutes, fin:Date.now()+examCfg.minutes*60000, fini:false };
+  sauverExam();
+  startScenario(generateWeek(exam.code, exam.diff), 'exam');
+}
+
+function resteExam(){
+  if(!exam) return 0;
+  return Math.max(0, exam.fin - Date.now());
+}
+function fmtChrono(ms){
+  const s=Math.ceil(ms/1000);
+  return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+}
+
+function renderExambar(){
+  const bar=$('#exambar');
+  if(mode!=='exam' || !exam){ bar.hidden=true; stopChrono(); return; }
+  bar.hidden=false;
+  const reste=resteExam();
+  bar.innerHTML=`
+    <span class="ek2">${t('exBar')(exam.code)}</span>
+    <span class="who3">${exam.nom || t('exNoName')}</span>
+    <span class="chrono${!exam.fini && reste<120000?' rouge':''}" id="ex-chrono">${
+      exam.fini ? t('exOver') : fmtChrono(reste)}</span>
+    <button class="tbtn" id="ex-stop" type="button">${
+      exam.fini ? t('exPdf') : t('exFinish')}</button>
+    <button class="tbtn" id="ex-quit" type="button">${t('exQuit')}</button>`;
+  $('#ex-stop').onclick=()=>{ exam.fini ? exporterPDF() : finirExam(false); };
+  $('#ex-quit').onclick=()=>{ quitterExam(); };
+  if(!exam.fini) lancerChrono();
+}
+
+function lancerChrono(){
+  if(examTimer) return;
+  examTimer=setInterval(()=>{
+    if(!exam || exam.fini){ stopChrono(); return; }
+    const c=$('#ex-chrono'); if(!c){ stopChrono(); return; }
+    const reste=resteExam();
+    c.textContent=fmtChrono(reste);
+    c.classList.toggle('rouge', reste<120000);
+    if(reste<=0) finirExam(true);
+  },1000);
+}
+function stopChrono(){ if(examTimer){ clearInterval(examTimer); examTimer=null; } }
+
+function quitterExam(){
+  stopChrono(); exam=null; sauverExam();
+  mode='exam'; show('exam');
+}
+
+function finirExam(auto){
+  if(!exam || exam.fini) return;
+  exam.fini=true; stopChrono(); sauverExam();
+  const ev=evaluate(scen,plan);
+  renderPlay();
+  ouvrirBilanExam(ev, auto);
+}
+
+/* En-tête de la copie imprimée : il n'existe que sur le papier. */
+function remplirCopie(ev){
+  const c=$('#copie'); if(!c) return;
+  const d=new Date().toLocaleDateString(lang==='en'?'en-GB':'fr-FR',
+    {day:'2-digit',month:'long',year:'numeric'});
+  c.innerHTML=`<h2>${t('exPaper')}</h2>
+    <div class="cl2">
+      <span>${t('exName')} <b>${exam&&exam.nom?exam.nom:'—'}</b></span>
+      <span>${t('exCode')} <b>${exam?exam.code:'—'}</b></span>
+      <span>${t('exDiff')} <b>${t('diffs')[(exam?exam.diff:3)-1]}</b></span>
+      <span>${d}</span>
+      <span>${t('exScore')} <b>${ev.score}/100</b></span>
+      <span>${t('lblCost')} <b>${cur(ev.total)} / ${cur(scen.budget)}</b></span>
+    </div>`;
+}
+
+function exporterPDF(){
+  remplirCopie(evaluate(scen,plan));
+  // la vue mobile n'imprime rien d'utile : on repasse sur la grille complète
+  const etaitMobile = petitEcran.matches;
+  if(etaitMobile){ $('#gridwrap').hidden=false; $('#dayview').hidden=true; renderGrid(scen,plan,evaluate(scen,plan)); }
+  setTimeout(()=>{
+    window.print();
+    if(etaitMobile) setTimeout(()=>renderPlay(),300);
+  },60);
+}
+
+function ouvrirBilanExam(ev, auto){
+  const ovl=document.createElement('div');
+  ovl.className='ovl';
+  const rk={legal:0,couv:1,eco:2,conf:3};
+  const parCat=CATS.map(c=>{
+    const pts=ev.issues.filter(i=>i.cat===c.k).reduce((a,i)=>a+i.pts,0);
+    return `<li>${ico(c.ic)}<span>${t('catName')[c.k]}</span>
+      <b style="margin-left:auto;font-variant-numeric:tabular-nums">${pts?'−'+pts:'0'}</b></li>`;
+  }).join('');
+  const sorted=ev.issues.slice().sort((a,c)=>(rk[a.cat]-rk[c.cat])||(c.pts-a.pts));
+  ovl.innerHTML=`
+    <div class="sheet" role="dialog" aria-modal="true">
+      <header><div class="ek">${t('exBar')(exam?exam.code:'')}</div>
+        <h2>${auto?t('exTimeUp'):t('exDone')}</h2></header>
+      <div class="body">
+        <div class="scoreline" style="margin-bottom:4px">
+          <span class="scorenum ${ev.score>=90?'g':ev.score>=70?'w':'b'}">${ev.score}</span>
+          <span class="scoreof">/ 100</span>
+        </div>
+        <ul class="exrules" style="gap:7px">${parCat}</ul>
+        <p class="disclaim">${t('exPdfHelp')}</p>
+      </div>
+      <footer>
+        <button class="btn" id="ex-detail" type="button">${t('exDetail')}</button>
+        <button class="btn primary" id="ex-print" type="button">${ico('install')}${t('exPdf')}</button>
+      </footer>
+    </div>`;
+  ovl.querySelector('#ex-print').onclick=()=>{ ovl.remove(); exporterPDF(); };
+  ovl.querySelector('#ex-detail').onclick=()=>{ ovl.remove(); openRules(sorted); };
+  mountOvl(ovl);
+}
+
 /* ---------- écran de jeu ---------- */
 function startScenario(S,from){
   replayInfo=null;
@@ -1825,12 +2135,14 @@ function renderPlay(){
   const S=scen, ev=evaluate(S,plan);
   $('#btnClear').innerHTML=ico('vider')+t('btnClear');
   $('#btnDraft').innerHTML=ico('chef')+t('btnDraft');
-  $('#btnDraft').hidden=!S.draft||!!replayInfo;
+  const enExam = mode==='exam' && exam && !exam.fini;
+  $('#btnDraft').hidden=!S.draft||!!replayInfo||mode==='exam';
   document.querySelector('.toolbar').style.display=replayInfo?'none':'';
-  $('#btnCheck').innerHTML=ico('valider')+t('btnCheck');
+  $('#btnCheck').innerHTML=ico('valider')+(mode==='exam'?t('exFinish'):t('btnCheck'));
+  $('#btnCheck').hidden = mode==='exam' && exam && exam.fini;
   $('#btnShare').textContent=t('btnShare');
   $('#btnSlots').innerHTML=ico('brouillon')+t('btnSlots');
-  $('#btnSlots').hidden=!!replayInfo||mode==='tuto';
+  $('#btnSlots').hidden=!!replayInfo||mode==='tuto'||mode==='exam';
   const bu=$('#btnUndo'), br=$('#btnRedo');
   bu.hidden=br.hidden=!!replayInfo;
   bu.disabled=!undoStack.length; br.disabled=!redoStack.length;
@@ -1868,7 +2180,13 @@ function renderPlay(){
   $('#dayview').hidden = !mobile;
   renderPalette();
   if(mobile) renderDayView(S,plan,ev); else renderGrid(S,plan,ev);
-  renderPanel(S,ev); renderTutobar(ev);
+  // Pendant l'épreuve, le panneau de droite disparaît : pas de score, pas
+  // de liste d'infractions, pas de coût. La grille et les besoins suffisent.
+  const aside=document.querySelector('.cols > aside');
+  if(aside) aside.hidden = enExam;
+  document.querySelector('.cols').classList.toggle('solo', enExam);
+  if(!enExam) renderPanel(S,ev);
+  renderTutobar(ev); renderExambar();
 }
 /* Les règles en vigueur sur l'épreuve en cours, en une ligne de puces.
    Le détail est dans l'aide : ici on rappelle seulement ce qui change. */
@@ -2114,6 +2432,7 @@ $('#btnHelp').onclick=()=>openRules(null);
 $('#btnUndo').onclick=undo;
 $('#btnRedo').onclick=redo;
 $('#btnCheck').onclick=()=>{
+  if(mode==='exam'){ finirExam(false); return; }
   const ev=evaluate(scen,plan);
   const legal=ev.issues.filter(i=>i.cat==='legal').length;
   const couv=ev.issues.filter(i=>i.cat==='couv').length;
@@ -2981,6 +3300,18 @@ window.__pm={show,startScenario,setCell,LEVELS,generateWeek,newSeason,
   if(!had&&/^en/i.test(navigator.language||''))lang='en';
   cloud.init().then(u=>{ me=u; refreshAccount(); if(me) pullProgress().then(()=>show(screen)); })
              .catch(()=>{});
+  // Une épreuve en cours survit à un rechargement : le temps a continué
+  // de s'écouler, on ne rend pas une minute au passage.
+  const ex=lireExam();
+  if(ex && !ex.fini && ex.fin > Date.now()){
+    exam=ex;
+    Object.assign(examCfg,{nom:ex.nom,code:ex.code,diff:ex.diff,minutes:ex.minutes});
+    startScenario(generateWeek(ex.code, ex.diff), 'exam');
+    refreshAccount();
+    return;
+  }
+  if(ex) { try{ localStorage.removeItem(EX_STORE); }catch(_){} }
+
   const u=new URLSearchParams(location.search);
   // Raccourcis de l'icône installée (appui long sur l'icône) : ils ouvrent
   // directement le mode voulu au lieu de la page d'accueil.

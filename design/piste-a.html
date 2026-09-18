@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlanningMaster — Piste A, Le Ticket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAE3D0; --surface:#F8F4E7; --surface-2:#EEE6D0;
+  --ink:#1C1A14; --ink-2:#4B4734; --muted:#8B8367;
+  --line:#D2C7A6; --line-strong:#A89B72;
+  --accent:#C4351B;
+  --repos:#635C46; --repos-soft:#E4DEC9;
+  --prep:#7A5B12;  --prep-soft:#EEDFA8;
+  --midi:#A5480F;  --midi-soft:#F3D3B4;
+  --soir:#1E5A82;  --soir-soft:#C9DFEC;
+  --coup:#6B3E74;  --coup-soft:#E1CFE6;
+  --ok:#2E6B3B;    --ok-soft:#D2E6CE;
+  --warn:#8A5A0C;  --warn-soft:#F0DFB4;
+  --bad:#B23327;   --bad-soft:#F3D4CE;
+  --shadow-color:rgba(28,26,20,.35);
+  --shadow:3px 3px 0 var(--shadow-color);
+  --radius:2px;
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px; --sp-7:48px;
+  --fs-1:11px; --fs-2:13px; --fs-3:15px; --fs-4:16px; --fs-5:20px; --fs-6:26px; --fs-7:36px; --fs-8:52px;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15130E; --surface:#1F1C14; --surface-2:#282319;
+    --ink:#F2ECDA; --ink-2:#C7BFA3; --muted:#8F866B;
+    --line:#3A3423; --line-strong:#544C33;
+    --accent:#FF6A3D;
+    --repos:#A79E80; --repos-soft:#2C2818;
+    --prep:#D9B65A;  --prep-soft:#3B2F12;
+    --midi:#E89257;  --midi-soft:#452912;
+    --soir:#7FB8E0;  --soir-soft:#1B3245;
+    --coup:#CB9FD1;  --coup-soft:#392A40;
+    --ok:#8FD39A;    --ok-soft:#1D3320;
+    --warn:#E8BE6E;  --warn-soft:#3A2C10;
+    --bad:#F08979;   --bad-soft:#3F1E17;
+    --shadow-color:rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15130E; --surface:#1F1C14; --surface-2:#282319;
+  --ink:#F2ECDA; --ink-2:#C7BFA3; --muted:#8F866B;
+  --line:#3A3423; --line-strong:#544C33;
+  --accent:#FF6A3D;
+  --repos:#A79E80; --repos-soft:#2C2818;
+  --prep:#D9B65A;  --prep-soft:#3B2F12;
+  --midi:#E89257;  --midi-soft:#452912;
+  --soir:#7FB8E0;  --soir-soft:#1B3245;
+  --coup:#CB9FD1;  --coup-soft:#392A40;
+  --ok:#8FD39A;    --ok-soft:#1D3320;
+  --warn:#E8BE6E;  --warn-soft:#3A2C10;
+  --bad:#F08979;   --bad-soft:#3F1E17;
+  --shadow-color:rgba(0,0,0,.55);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:var(--fs-4);line-height:1.55;-webkit-font-smoothing:antialiased}
+.i{width:1.1em;height:1.1em;display:inline-block;vertical-align:-.17em;flex:none}
+.wrap{max-width:1160px;margin:0 auto;padding:var(--sp-5) var(--sp-4) var(--sp-7)}
+h1,h2,h3{margin:0;font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:800;
+  text-transform:uppercase;letter-spacing:.01em}
+
+/* ---- outil de comparaison (hors système) ---- */
+.meta{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:var(--sp-3);
+  background:var(--ink);color:var(--surface);padding:var(--sp-2) var(--sp-4);
+  font-size:var(--fs-1);letter-spacing:.08em;text-transform:uppercase}
+.meta button{font:inherit;cursor:pointer;background:var(--surface);color:var(--ink);
+  border:0;padding:6px 14px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.cap{font-size:var(--fs-1);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  margin:var(--sp-6) 0 var(--sp-2)}
+.cap:first-of-type{margin-top:var(--sp-5)}
+
+/* ---- topbar + logo ---- */
+.topbar{display:flex;align-items:center;gap:var(--sp-3);padding-bottom:var(--sp-3);
+  border-bottom:3px solid var(--ink)}
+.mark{width:26px;height:26px;background:var(--accent);flex:none;
+  clip-path:polygon(0 0,100% 0,100% 100%,30% 100%,0 70%)}
+.brandline{font-size:var(--fs-1);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0}
+.topttl{font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:var(--fs-5);
+  letter-spacing:.02em;text-transform:uppercase;margin:0}
+.grow{flex:1}
+.pill{font:inherit;font-size:var(--fs-2);background:var(--surface);color:var(--ink-2);
+  border:1px solid var(--line-strong);border-radius:var(--radius);padding:0 14px;min-height:36px;
+  display:inline-flex;align-items:center;gap:6px}
+
+/* ---- hero ---- */
+.hero{padding-block:var(--sp-6) var(--sp-5);border-bottom:2px dashed var(--line-strong);margin-bottom:var(--sp-5)}
+.hero h1{font-size:clamp(40px,7vw,var(--fs-8));line-height:.92}
+.hero h1 span{color:var(--accent)}
+.hero p{margin:var(--sp-3) 0 0;color:var(--ink-2);max-width:58ch;font-size:var(--fs-3)}
+.cta{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-4)}
+
+/* ---- boutons ---- */
+.btn{font:inherit;font-size:var(--fs-2);font-weight:700;cursor:pointer;border-radius:var(--radius);
+  padding:0 18px;min-height:44px;border:1px solid var(--ink);background:var(--surface-2);color:var(--ink);
+  display:inline-flex;align-items:center;gap:8px;letter-spacing:.04em;text-transform:uppercase}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.ghost{background:none;border-color:var(--line-strong);color:var(--ink-2)}
+.btn:active{transform:translate(1px,1px)}
+
+/* ---- carte de niveau ---- */
+.lcard{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--radius);
+  padding:var(--sp-4);box-shadow:var(--shadow);max-width:420px;display:grid;gap:var(--sp-2)}
+.lcard .lrow{display:flex;align-items:center;gap:var(--sp-2)}
+.lcard .ln{font-size:var(--fs-1);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lcard .lt{font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:var(--fs-6);
+  text-transform:uppercase;letter-spacing:.01em}
+.lcard .ld{font-size:var(--fs-2);color:var(--muted)}
+.stars{margin-left:auto;display:flex;gap:2px;font-size:14px;color:var(--line-strong)}
+.stars i.on{color:var(--accent)}
+.lweek{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;align-items:end;height:36px;margin-top:2px}
+.lweek i{display:block;background:var(--soir-soft);box-shadow:inset 0 -3px 0 var(--soir)}
+.lweek i.off{height:4px!important;background:repeating-linear-gradient(135deg,transparent 0 4px,var(--line-strong) 4px 8px);box-shadow:none}
+.lrules{display:flex;flex-wrap:wrap;gap:4px}
+.lrules span{font-size:10px;letter-spacing:.04em;border:1px solid var(--line-strong);padding:2px 7px;color:var(--muted)}
+.lb{font-size:var(--fs-1);color:var(--ink-2);border-top:2px dashed var(--line);padding-top:var(--sp-2);
+  display:flex;justify-content:space-between}
+
+/* ---- palette de services ---- */
+.palette{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+.chip{display:flex;align-items:center;gap:var(--sp-2);border:1px solid var(--line-strong);
+  border-radius:var(--radius);padding:var(--sp-2) var(--sp-3);background:var(--surface-2);min-height:48px}
+.chip .sw{width:26px;height:26px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff}
+.chip .lb2{display:grid;gap:0;text-align:left}
+.chip .nm{font-weight:700;font-size:var(--fs-2);text-transform:uppercase;letter-spacing:.03em}
+.chip .hh{font-size:10px;color:var(--muted)}
+
+/* ---- grille ---- */
+.gridwrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--surface)}
+.grid{display:grid;grid-template-columns:minmax(120px,1.3fr) repeat(7,minmax(58px,1fr)) minmax(74px,1fr);min-width:760px}
+.grid>*{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:7px 8px;
+  min-height:44px;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.hd{background:var(--surface-2);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hd .dn{color:var(--ink);font-size:11px;font-weight:600}
+.nmcell{background:var(--surface)}
+.nmcell .nm{font-weight:700;font-size:var(--fs-2)}
+.nmcell .rl{font-size:10px;color:var(--muted)}
+.cell .code{font-weight:700;font-size:13px;letter-spacing:.02em}
+.cell .hrs{font-size:10px;opacity:.75}
+.cell.s-R{background:var(--repos-soft);color:var(--repos)}
+.cell.s-P{background:var(--prep-soft);color:var(--prep);box-shadow:inset 4px 0 0 var(--prep)}
+.cell.s-M{background:var(--midi-soft);color:var(--midi);box-shadow:inset 4px 0 0 var(--midi)}
+.cell.s-S{background:var(--soir-soft);color:var(--soir);box-shadow:inset 4px 0 0 var(--soir)}
+.cell.s-C{background:var(--coup-soft);color:var(--coup);box-shadow:inset 4px 0 0 var(--coup)}
+.cell.s-P,.cell.s-M,.cell.s-S,.cell.s-C{padding-left:12px}
+.cell.flagged{position:relative}
+.cell.flagged::after{content:"";position:absolute;top:4px;right:4px;width:9px;height:9px;
+  background:repeating-linear-gradient(135deg,var(--bad) 0 2px,transparent 2px 4px)}
+.totcell{background:var(--surface-2);font-variant-numeric:tabular-nums}
+.totcell .big{font-size:14px;font-weight:700}
+.totcell .sub{font-size:10px;color:var(--muted)}
+.totcell.way .big{color:var(--bad)}
+.gridnote{padding:var(--sp-2) var(--sp-3);font-size:var(--fs-1);color:var(--muted);
+  border-top:2px dashed var(--line-strong);display:flex;align-items:center;gap:6px}
+.gridnote .sq{width:9px;height:9px;background:repeating-linear-gradient(135deg,var(--bad) 0 2px,transparent 2px 4px)}
+
+/* ---- tableau de bord ---- */
+.board{display:grid;gap:var(--sp-4);grid-template-columns:1fr;max-width:640px}
+@media(min-width:640px){.board{grid-template-columns:220px 1fr}}
+.scorebox{background:var(--surface);border:1px solid var(--line-strong);padding:var(--sp-4);
+  box-shadow:var(--shadow);display:grid;gap:var(--sp-3);align-content:start}
+.scoreline{display:flex;align-items:baseline;gap:var(--sp-2)}
+.scorenum{font-family:"Big Shoulders Display",sans-serif;font-weight:900;font-size:60px;
+  line-height:.8;color:var(--ok)}
+.scoreof{font-size:var(--fs-1);color:var(--muted)}
+.rank{margin-left:auto;font-size:10px;font-weight:700;padding:3px 10px;letter-spacing:.06em;
+  text-transform:uppercase;background:var(--ok-soft);color:var(--ok)}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-strong);
+  border:1px solid var(--line-strong)}
+.cat{background:var(--surface);padding:var(--sp-3);display:grid;gap:5px}
+.cat .ct{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--ink-2);
+  text-transform:uppercase;letter-spacing:.03em}
+.cat .ct .i{width:14px;height:14px;color:var(--muted)}
+.cat .cv{font-family:"Big Shoulders Display",sans-serif;font-size:24px;font-weight:800}
+.cat.legal .cv{color:var(--bad)} .cat.couv .cv{color:var(--warn)}
+.cat.eco .cv{color:var(--soir)} .cat.conf .cv{color:var(--coup)}
+.issues{list-style:none;margin:0;padding:0;border:1px solid var(--line-strong);background:var(--surface)}
+.issues li{display:flex;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:var(--fs-2)}
+.issues li:last-child{border-bottom:none}
+.issues .dot{width:7px;height:7px;flex:none;margin-top:6px}
+.issues li.legal .dot{background:var(--bad)}
+.issues li.couv .dot{background:var(--warn)}
+.issues .pts{margin-left:auto;font-size:11px;flex:none}
+.issues li.legal .pts{color:var(--bad)}
+.issues li.couv .pts{color:var(--warn)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+<symbol id="i-repos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.2 8.2 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z"/></symbol>
+<symbol id="i-prep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18M7.5 18a4.5 4.5 0 0 1 9 0M12 4.5v3M5.6 7.6l2.1 2.1M18.4 7.6l-2.1 2.1"/></symbol>
+<symbol id="i-midi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></symbol>
+<symbol id="i-soir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.2 8.2 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z"/><path d="M17 3.5v3M15.5 5h3"/></symbol>
+<symbol id="i-coup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.6" y="4.4" width="4.6" height="15.2" rx="1.5"/><rect x="14.8" y="4.4" width="4.6" height="15.2" rx="1.5"/></symbol>
+<symbol id="i-legal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2v17.6M6 6.5h12M4.2 20.8h15.6"/><path d="M6 6.5 3 13h6ZM18 6.5 15 13h6Z"/></symbol>
+<symbol id="i-couv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.2 19.4a5.8 5.8 0 0 1 11.6 0"/><path d="M16.4 5.4a3.1 3.1 0 0 1 0 5.6M18.2 19.4a5.8 5.8 0 0 0-2-4.4"/></symbol>
+<symbol id="i-budget" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 7.5H10a2.5 2.5 0 0 0 0 5h4a2.5 2.5 0 0 1 0 5H8"/><path d="M12 4.5v15"/></symbol>
+<symbol id="i-conf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.3S3.8 15.4 3.8 9.6a4.4 4.4 0 0 1 8.2-2.3 4.4 4.4 0 0 1 8.2 2.3c0 5.8-8.2 10.7-8.2 10.7Z"/></symbol>
+</svg>
+
+<div class="meta">
+  <span>Piste A · Le Ticket</span>
+  <span class="grow"></span>
+  <button type="button" onclick="toggleTheme()">Basculer clair / sombre</button>
+</div>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <span class="mark" aria-hidden="true"></span>
+    <div>
+      <p class="brandline">Simulateur de planning · Restauration</p>
+      <p class="topttl">PlanningMaster</p>
+    </div>
+    <span class="grow"></span>
+    <span class="pill">Semaine 24</span>
+  </div>
+
+  <p class="cap">Bloc titre</p>
+  <div class="hero">
+    <h1>Tenez le<br><span>coup de feu</span></h1>
+    <p>Sept jours, une équipe, un budget. Onze heures de repos entre deux
+      services, deux jours de repos par semaine, la carte qui ne s'arrête
+      jamais un samedi soir.</p>
+    <div class="cta">
+      <button class="btn primary">Commencer</button>
+      <button class="btn ghost">Voir les niveaux</button>
+    </div>
+  </div>
+
+  <p class="cap">Carte de niveau</p>
+  <div class="lcard">
+    <div class="lrow">
+      <span class="ln">Niveau 03</span>
+      <span class="stars"><i class="on">★</i><i class="on">★</i><i>★</i></span>
+    </div>
+    <p class="lt">Service du Samedi</p>
+    <p class="ld">Deux services complets, un apprenti à ménager, un jour férié à couvrir.</p>
+    <div class="lweek">
+      <i style="height:60%"></i><i style="height:40%"></i><i style="height:80%"></i>
+      <i class="off"></i><i style="height:70%"></i><i style="height:95%"></i><i style="height:90%"></i>
+    </div>
+    <div class="lrules"><span>Indemnité coupure</span><span>Dimanche majoré</span><span>Apprenti 35h</span></div>
+    <div class="lb"><span>Meilleur score : 91</span><span>3 tentatives</span></div>
+  </div>
+
+  <p class="cap">Palette de services</p>
+  <div class="palette">
+    <div class="chip"><span class="sw" style="background:var(--repos)"><svg class="i"><use href="#i-repos"/></svg></span>
+      <span class="lb2"><span class="nm">Repos</span><span class="hh">R · touche 1</span></span></div>
+    <div class="chip"><span class="sw" style="background:var(--prep)"><svg class="i"><use href="#i-prep"/></svg></span>
+      <span class="lb2"><span class="nm">Préparation</span><span class="hh">P · 7h · touche 2</span></span></div>
+    <div class="chip"><span class="sw" style="background:var(--midi)"><svg class="i"><use href="#i-midi"/></svg></span>
+      <span class="lb2"><span class="nm">Midi</span><span class="hh">M · 4h · touche 3</span></span></div>
+    <div class="chip"><span class="sw" style="background:var(--soir)"><svg class="i"><use href="#i-soir"/></svg></span>
+      <span class="lb2"><span class="nm">Soir</span><span class="hh">S · 5h45 · touche 4</span></span></div>
+    <div class="chip"><span class="sw" style="background:var(--coup)"><svg class="i"><use href="#i-coup"/></svg></span>
+      <span class="lb2"><span class="nm">Coupure</span><span class="hh">C · 9h45 · touche 5</span></span></div>
+  </div>
+
+  <p class="cap">Grille remplie</p>
+  <div class="gridwrap">
+    <div class="grid">
+      <div class="hd nmcell">Équipe</div>
+      <div class="hd"><span class="dn">Lun</span></div><div class="hd"><span class="dn">Mar</span></div>
+      <div class="hd"><span class="dn">Mer</span></div><div class="hd"><span class="dn">Jeu</span></div>
+      <div class="hd"><span class="dn">Ven</span></div><div class="hd"><span class="dn">Sam</span></div>
+      <div class="hd"><span class="dn">Dim</span></div><div class="hd">Total</div>
+
+      <div class="nmcell"><span class="nm">Léa Bernard</span><span class="rl">Cuisine · CDI</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-M"><span class="code">M</span><span class="hrs">4h</span></div>
+      <div class="cell s-C flagged"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="totcell"><span class="big">43h</span><span class="sub">+20%</span></div>
+
+      <div class="nmcell"><span class="nm">Karim Saidi</span><span class="rl">Salle · CDI</span></div>
+      <div class="cell s-S"><span class="code">S</span><span class="hrs">5h45</span></div>
+      <div class="cell s-S"><span class="code">S</span><span class="hrs">5h45</span></div>
+      <div class="cell s-S"><span class="code">S</span><span class="hrs">5h45</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="totcell"><span class="big">36h</span><span class="sub">+10%</span></div>
+
+      <div class="nmcell"><span class="nm">Inès Roche</span><span class="rl">Salle · apprentie</span></div>
+      <div class="cell s-P"><span class="code">P</span><span class="hrs">7h</span></div>
+      <div class="cell s-M"><span class="code">M</span><span class="hrs">4h</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-P"><span class="code">P</span><span class="hrs">7h</span></div>
+      <div class="cell s-M"><span class="code">M</span><span class="hrs">4h</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-P"><span class="code">P</span><span class="hrs">7h</span></div>
+      <div class="totcell"><span class="big">29h</span><span class="sub">sous 35h</span></div>
+
+      <div class="nmcell"><span class="nm">Marc Ferreira</span><span class="rl">Cuisine · CDI</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="cell s-C"><span class="code">C</span><span class="hrs">9h45</span></div>
+      <div class="totcell way"><span class="big">49h</span><span class="sub">+50%</span></div>
+
+      <div class="nmcell"><span class="nm">Sofia Nguyen</span><span class="rl">Salle · CDI</span></div>
+      <div class="cell s-S"><span class="code">S</span><span class="hrs">5h45</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-S"><span class="code">S</span><span class="hrs">5h45</span></div>
+      <div class="cell s-S"><span class="code">S</span><span class="hrs">5h45</span></div>
+      <div class="cell s-S"><span class="code">S</span><span class="hrs">5h45</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-S"><span class="code">S</span><span class="hrs">5h45</span></div>
+      <div class="totcell"><span class="big">28h45</span><span class="sub">temps partiel</span></div>
+
+      <div class="nmcell"><span class="nm">Hugo Petit</span><span class="rl">Cuisine · CDI</span></div>
+      <div class="cell s-P"><span class="code">P</span><span class="hrs">7h</span></div>
+      <div class="cell s-P"><span class="code">P</span><span class="hrs">7h</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-P"><span class="code">P</span><span class="hrs">7h</span></div>
+      <div class="cell s-P"><span class="code">P</span><span class="hrs">7h</span></div>
+      <div class="cell s-R"><span class="code">R</span></div>
+      <div class="cell s-P"><span class="code">P</span><span class="hrs">7h</span></div>
+      <div class="totcell"><span class="big">35h</span><span class="sub">base</span></div>
+    </div>
+    <div class="gridnote"><span class="sq"></span> Case en infraction : moins de 11h de repos avant le service suivant.</div>
+  </div>
+
+  <p class="cap">Tableau de bord</p>
+  <div class="board">
+    <div class="scorebox">
+      <div class="scoreline"><span class="scorenum">78</span><span class="scoreof">/100</span>
+        <span class="rank">Correct</span></div>
+    </div>
+    <div class="cats">
+      <div class="cat legal"><span class="ct"><svg class="i"><use href="#i-legal"/></svg>Légal</span><span class="cv">−14</span></div>
+      <div class="cat couv"><span class="ct"><svg class="i"><use href="#i-couv"/></svg>Couverture</span><span class="cv">−6</span></div>
+      <div class="cat eco"><span class="ct"><svg class="i"><use href="#i-budget"/></svg>Budget</span><span class="cv">−2</span></div>
+      <div class="cat conf"><span class="ct"><svg class="i"><use href="#i-conf"/></svg>Confort</span><span class="cv">0</span></div>
+    </div>
+  </div>
+  <ul class="issues">
+    <li class="legal"><span class="dot"></span><span>Léa Bernard : repos de 9h20 seulement entre le vendredi soir et le samedi coupure.</span><span class="pts">−14</span></li>
+    <li class="couv"><span class="dot"></span><span>Service du samedi midi : un poste cuisine manquant sur deux demandés.</span><span class="pts">−6</span></li>
+  </ul>
+
+  <p class="cap">Boutons</p>
+  <div class="cta">
+    <button class="btn primary">Valider la semaine</button>
+    <button class="btn ghost">Annuler</button>
+  </div>
+
+</div>
+
+<script>
+function toggleTheme(){
+  const r=document.documentElement;
+  const cur=r.getAttribute('data-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  r.setAttribute('data-theme', cur==='dark'?'light':'dark');
+}
+</script>
+</body>
+</html>

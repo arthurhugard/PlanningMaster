@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jeu.arthurhugard.com/sitemap.xml
+Sitemap: https://planningmaster.arthurhugard.com/sitemap.xml
